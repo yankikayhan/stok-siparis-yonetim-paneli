@@ -1,0 +1,89 @@
+const path = require('node:path')
+const { randomUUID } = require('node:crypto')
+const jsonServer = require('json-server')
+
+const server = jsonServer.create()
+const router = jsonServer.router(path.join(__dirname, 'db.json'))
+const delayArgument = process.argv.find((argument) => argument.startsWith('--delay='))
+const delay = delayArgument ? Number(delayArgument.split('=')[1]) : 0
+
+server.use(jsonServer.defaults())
+server.use(jsonServer.bodyParser)
+
+if (Number.isFinite(delay) && delay > 0) {
+  server.use((_request, _response, next) => setTimeout(next, delay))
+}
+
+server.post('/orders', (request, response) => {
+  const { customerId, items } = request.body ?? {}
+
+  if (typeof customerId !== 'string' || !Array.isArray(items) || items.length === 0) {
+    return response.status(400).json({ message: 'Musteri ve en az bir siparis kalemi gereklidir.' })
+  }
+
+  const customer = router.db.get('customers').find({ id: customerId }).value()
+
+  if (!customer) {
+    return response.status(404).json({ message: 'Musteri bulunamadi.' })
+  }
+
+  const requestedQuantities = new Map()
+
+  for (const item of items) {
+    if (typeof item?.productId !== 'string' || !Number.isInteger(item.quantity) || item.quantity <= 0) {
+      return response.status(400).json({ message: 'Gecersiz siparis kalemi.' })
+    }
+
+    requestedQuantities.set(item.productId, (requestedQuantities.get(item.productId) ?? 0) + item.quantity)
+  }
+
+  const products = []
+
+  for (const [productId, quantity] of requestedQuantities) {
+    const product = router.db.get('products').find({ id: productId }).value()
+
+    if (!product || !product.active) {
+      return response.status(404).json({ message: 'Siparisteki urunlerden biri bulunamadi.' })
+    }
+
+    if (product.stock < quantity) {
+      return response.status(409).json({ message: `${product.name} icin yeterli stok yok.` })
+    }
+
+    products.push({ product, quantity })
+  }
+
+  const createdAt = new Date().toISOString()
+  const orderItems = products.map(({ product, quantity }) => ({
+    productId: product.id,
+    productName: product.name,
+    quantity,
+    unitPrice: product.price,
+    lineTotal: product.price * quantity,
+  }))
+  const order = {
+    id: `ord-${randomUUID()}`,
+    customerId,
+    status: 'pending',
+    total: orderItems.reduce((total, item) => total + item.lineTotal, 0),
+    createdAt,
+    items: orderItems,
+  }
+
+  for (const { product, quantity } of products) {
+    router.db
+      .get('products')
+      .find({ id: product.id })
+      .assign({ stock: product.stock - quantity, updatedAt: createdAt })
+      .write()
+  }
+
+  router.db.get('orders').push(order).write()
+  return response.status(201).json(order)
+})
+
+server.use(router)
+
+server.listen(3001, () => {
+  console.log('Mock API listening on http://localhost:3001')
+})

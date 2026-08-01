@@ -1,0 +1,132 @@
+{
+  "categories": [
+    {
+      "id": "cat-electronics",
+      "name": "Elektronik"
+    },
+    {
+      "id": "cat-office",
+      "name": "Ofis"
+    },
+    {
+      "id": "cat-packaging",
+      "name": "Paketleme"
+    }
+  ],
+  "products": [
+    {
+      "id": "prd-001",
+      "name": "Kablosuz Klavye",
+      "sku": "ELK-KLV-001",
+      "categoryId": "cat-electronics",
+      "price": 1499.9,
+      "stock": 6,
+      "reorderLevel": 8,
+      "active": true,
+      "createdAt": "2026-06-02T09:30:00.000Z",
+      "updatedAt": "2026-07-23T21:02:35.003Z"
+    },
+    {
+      "id": "prd-002",
+      "name": "27 Inc Monitor",
+      "sku": "ELK-MNT-027",
+      "categoryId": "cat-electronics",
+      "price": 8299.5,
+      "stock": 4,
+      "reorderLevel": 6,
+      "active": true,
+      "createdAt": "2026-05-18T11:10:00.000Z",
+      "updatedAt": "2026-07-08T14:20:00.000Z"
+    },
+    {
+      "id": "prd-003",
+      "name": "A4 Fotokopi Kagidi",
+      "sku": "OFS-KGT-080",
+      "categoryId": "cat-office",
+      "price": 189.75,
+      "stock": 47,
+      "reorderLevel": 15,
+      "active": true,
+      "createdAt": "2026-04-12T08:00:00.000Z",
+      "updatedAt": "2026-07-02T09:15:00.000Z"
+    },
+    {
+      "id": "prd-004",
+      "name": "Kargo Kutusu Orta Boy",
+      "sku": "PKT-KTU-040",
+      "categoryId": "cat-packaging",
+      "price": 24.9,
+      "stock": 9,
+      "reorderLevel": 12,
+      "active": true,
+      "createdAt": "2026-06-23T13:45:00.000Z",
+      "updatedAt": "2026-07-11T07:30:00.000Z"
+    }
+  ],
+  "customers": [
+    {
+      "id": "cus-001",
+      "name": "Deniz Arslan",
+      "email": "deniz.arslan@example.com",
+      "phone": "+90 532 555 01 01",
+      "company": "Arslan Tasarim",
+      "createdAt": "2026-03-10T09:00:00.000Z"
+    },
+    {
+      "id": "cus-002",
+      "name": "Ece Demir",
+      "email": "ece.demir@example.com",
+      "phone": "+90 533 555 02 02",
+      "company": "Demir Ofis",
+      "createdAt": "2026-04-21T12:15:00.000Z"
+    }
+  ],
+  "orders": [
+    {
+      "id": "ord-001",
+      "customerId": "cus-001",
+      "status": "pending",
+      "total": 1689.65,
+      "createdAt": "2026-07-12T10:30:00.000Z",
+      "items": [
+        {
+          "productId": "prd-001",
+          "productName": "Kablosuz Klavye",
+          "quantity": 1,
+          "unitPrice": 1499.9,
+          "lineTotal": 1499.9
+        },
+        {
+          "productId": "prd-003",
+          "productName": "A4 Fotokopi Kagidi",
+          "quantity": 1,
+          "unitPrice": 189.75,
+          "lineTotal": 189.75
+        }
+      ]
+    },
+    {
+      "id": "ord-1566fa38-2877-4121-bbee-f71620ca281a",
+      "customerId": "cus-001",
+      "status": "pending",
+      "total": 17998.800000000003,
+      "createdAt": "2026-07-23T21:02:35.003Z",
+      "items": [
+        {
+          "productId": "prd-001",
+          "productName": "Kablosuz Klavye",
+          "quantity": 12,
+          "unitPrice": 1499.9,
+          "lineTotal": 17998.800000000003
+        }
+      ]
+    }
+  ],
+  "profile": {
+    "id": "profile-001",
+    "name": "Merve Kaya",
+    "email": "merve.kaya@example.com",
+    "companyName": "Noktasi Isletme",
+    "currency": "TRY"
+  }
+}

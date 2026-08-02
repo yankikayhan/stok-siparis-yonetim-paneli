@@ -1,42 +1,14 @@
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
-
-const productSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-  sku: z.string(),
-  categoryId: z.string(),
-  price: z.number().nonnegative(),
-  stock: z.number().int().nonnegative(),
-  reorderLevel: z.number().int().nonnegative(),
-  active: z.boolean(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
-})
-
-const orderSchema = z.object({
-  id: z.string(),
-  customerId: z.string(),
-  status: z.enum(['pending', 'paid', 'shipped', 'cancelled']),
-  total: z.number().nonnegative(),
-  createdAt: z.iso.datetime(),
-  items: z.array(
-    z.object({
-      productId: z.string(),
-      productName: z.string(),
-      quantity: z.number().int().positive(),
-      unitPrice: z.number().nonnegative(),
-      lineTotal: z.number().nonnegative(),
-    }),
-  ),
-})
+import { orderSchema } from '../../orders/api/orders-api'
+import { productSchema, type Product } from '../../products/api/products-api'
 
 const productsSchema = z.array(productSchema)
 const ordersSchema = z.array(orderSchema)
 
 export type DashboardSummary = {
   totalProducts: number
-  lowStockProducts: Array<z.output<typeof productSchema>>
+  lowStockProducts: Product[]
   openOrders: number
   totalRevenue: number
 }

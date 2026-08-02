@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
+import { orderSchema, type Order } from '../../orders/api/orders-api'
 
 const customerSchema = z.object({
   id: z.string(),
@@ -10,28 +11,11 @@ const customerSchema = z.object({
   createdAt: z.iso.datetime(),
 })
 
-const orderSchema = z.object({
-  id: z.string(),
-  customerId: z.string(),
-  status: z.enum(['pending', 'paid', 'shipped', 'cancelled']),
-  total: z.number().nonnegative(),
-  createdAt: z.iso.datetime(),
-  items: z.array(
-    z.object({
-      productId: z.string(),
-      productName: z.string(),
-      quantity: z.number().int().positive(),
-      unitPrice: z.number().nonnegative(),
-      lineTotal: z.number().nonnegative(),
-    }),
-  ),
-})
-
 const customersSchema = z.array(customerSchema)
 const ordersSchema = z.array(orderSchema)
 
 export type Customer = z.output<typeof customerSchema>
-export type CustomerOrder = z.output<typeof orderSchema>
+export type CustomerOrder = Order
 
 export const customerQueryKeys = {
   all: ['customers'] as const,

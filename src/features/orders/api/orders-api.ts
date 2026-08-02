@@ -5,7 +5,7 @@ import type { Product } from '../../products/api/products-api'
 // API response schemas
 const orderStatusSchema = z.enum(['pending', 'paid', 'shipped', 'cancelled'])
 
-const orderSchema = z.object({
+export const orderSchema = z.object({
   id: z.string(),
   customerId: z.string(),
   status: orderStatusSchema,

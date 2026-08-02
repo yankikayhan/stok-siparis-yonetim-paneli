@@ -1,6 +1,8 @@
-import { type z } from 'zod'
+import { z } from 'zod'
 import { environment } from '../../app/config/env'
 import { ApiError } from './api-error'
+
+const errorBodySchema = z.object({ message: z.string() })
 
 type RequestOptions<TSchema extends z.ZodType> = Omit<RequestInit, 'body'> & {
   body?: unknown
@@ -52,7 +54,17 @@ export async function request<TSchema extends z.ZodType>(
   }
 
   if (!response.ok) {
-    throw new ApiError(`Istek basarisiz oldu (${response.status}).`, response.status)
+    let message = `Istek basarisiz oldu (${response.status}).`
+
+    try {
+      const errorPayload: unknown = JSON.parse(await response.text())
+      const result = errorBodySchema.safeParse(errorPayload)
+      if (result.success) message = result.data.message
+    } catch {
+      // Govde JSON degilse genel mesaj kullanilir.
+    }
+
+    throw new ApiError(message, response.status)
   }
 
   const responseBody = await response.text()

@@ -80,6 +80,7 @@ export function updateProduct(id: string, values: ProductFormValues) {
 export function deleteProduct(id: string) {
   return request(`/products/${id}`, {
     method: 'DELETE',
-    schema: z.undefined(),
+    // json-server silme cevabinda `{}` dondurur; govde bizim icin anlamsizdir.
+    schema: z.unknown(),
   })
 }

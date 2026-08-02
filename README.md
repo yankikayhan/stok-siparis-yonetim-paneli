@@ -301,6 +301,7 @@ Loading durumlarini gozlemlemek icin normal API yerine `npm run api:delay` calis
 
 - Bu bir mock backend'dir; production veritabani, kimlik dogrulama, yetkilendirme ve kullanici oturumu yoktur.
 - Uygulama tek profil kaydi varsayar; `/profile` isteginde kullaniciya gore erisim kontrolu yapilmaz.
+- Parasal tutarlar JavaScript'in `number` tipiyle (kayan nokta) hesaplanir. Carpma ve toplama islemlerinde `17998.800000000003` gibi hassasiyet sapmalari olusabilir; kurus duzeyinde kesinlik gereken gercek bir sistemde tutarlar en kucuk birim (kurus) uzerinden tamsayi olarak tutulmalidir.
 - Siparis olusturulunca stok azalir. Bir siparisi `cancelled` yapmak stoklari otomatik geri eklemez; durum guncelleme endpoint'i yalnizca `status` alanini degistirir.
 - Tema ve tablo yogunlugu profil kaydina degil, kullanilan tarayicinin `localStorage` alanina yazilir. Baska bir tarayiciya veya cihaza tasinmaz.
 - API calismiyorsa frontend veri yukleyemez; ekranlarda hata ve tekrar deneme durumlari gorulur.

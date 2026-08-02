@@ -128,15 +128,122 @@ Mevcut durum: Utility'ler dogrudan; class tekrari cok; dark mode store'da var am
 
 ---
 
-## Onerilen Calisma Sirasi
+## Uygulama Adimlari: Branch ve Commit Plani
 
-Teknolojileri izole calismak yerine, birbirini besleyen su sirayla gitmek daha verimli:
+### Adim 1 — Zod ve veri katmani temeli
 
-1. **Altyapi turu (kisa):** Zod sema tekilligi + server hata govdesi parse + env dogrulama → tum sonraki islerin temeli.
-2. **Zustand toast + global hata:** Toast store → `QueryCache.onError` baglantisi → tum mutation'larin geri bildirimi tek yerden.
-3. **TanStack Query derinligi:** Parametreli key'ler + server-side filtre/sayfalama → `queryOptions` → prefetch → optimistic update yayginlastirma → Suspense'e gecis.
-4. **RHF derinligi:** Server hata eslestirme → reset pattern'leri → canli toplam → `FormProvider` ayristirmasi.
-5. **React yapisal iyilestirme:** Custom hook'lar → ortak bilesenler → Error Boundary + lazy routes → portal dialog.
-6. **Tailwind:** Dark mode + token'lar + `Button` bileseni → geri kalan gorsel maddeler.
-7. **TypeScript maddeleri** ayri bir faz degil; her fazda ilgili maddeyi yeri geldiginde uygula (or. `DataTable<T>` React ayristirma fazinda).
+- **Branch:** `refactor/zod-veri-katmani`
+- **Amac:** Tum sonraki adimlarin uzerine kurulacagi sema ve hata altyapisini saglamlastirmak.
+- **Maddeler:**
+  - Sema tekilligi ve paylasim (Zod)
+  - Sema kompozisyonu (Zod)
+  - Server hata govdesini parse et (Zod)
+  - Ortak hata haritasi (Zod)
+  - `safeParse` sonucunu isleme (Zod)
+  - Env dogrulamayi derinlestir (Zod)
+  - `z.input` vs `z.output` ayrimini netlestir (Zod)
+  - `transform` ve `pipe` (Zod)
+  - `discriminatedUnion` (Zod)
+  - Tip daraltma fonksiyonlari — `isApiError` (TypeScript)
+  - `unknown` disiplini (TypeScript)
+  - Utility type pratigi (TypeScript)
+
+### Adim 2 — Zustand temeli: toast ve global hata
+
+- **Branch:** `feature/toast-global-hata`
+- **Amac:** Tum mutation ve query hatalarinin tek merkezden kullaniciya bildirilmesi.
+- **Maddeler:**
+  - Toast kuyrugu store'u (Zustand)
+  - Store'a component disindan erisim (Zustand)
+  - Store testi (Zustand)
+  - Devtools middleware (Zustand)
+  - Selector disiplini (Zustand)
+  - `useShallow` (Zustand)
+  - Global hata yonetimi — `QueryCache.onError` / `MutationCache.onError` (TanStack Query)
+
+### Adim 3 — TanStack Query I: parametreli key'ler, filtre ve sayfalama
+
+- **Branch:** `feature/query-filtre-sayfalama`
+- **Amac:** Client-side filtrelemeyi server-side'a tasiyip cache anahtarlarini parametrelestirmek.
+- **Maddeler:**
+  - Server-side filtreleme + parametreli query key (TanStack Query)
+  - `queryOptions` helper (TanStack Query)
+  - Sayfalama + `placeholderData: keepPreviousData` (TanStack Query)
+  - `select` ile veri donusumu (TanStack Query)
+  - `staleTime`/`gcTime` deneyleri (TanStack Query)
+  - `as const` + tip turetme (TypeScript)
+
+### Adim 4 — TanStack Query II: cache stratejileri ve gelismis sorgular
+
+- **Branch:** `feature/query-cache-stratejileri`
+- **Amac:** Cache'i bilincli yonetmek; okuma/yazma stratejilerini ve gelismis sorgu araclarini ogrenmek.
+- **Maddeler:**
+  - `setQueryData` vs `invalidateQueries` deneyi (TanStack Query)
+  - Optimistic update'i yayginlastir (TanStack Query)
+  - Prefetching (TanStack Query)
+  - Dependent query'yi derinlestir (TanStack Query)
+  - Para birimi tercihini islevsel yap (TanStack Query)
+  - `useQueries` ile paralel sorgular (TanStack Query)
+  - Mutation state paylasimi (TanStack Query)
+  - Infinite query (TanStack Query)
+
+### Adim 5 — React Hook Form derinligi
+
+- **Branch:** `feature/rhf-derinligi`
+- **Amac:** Form davranislarini profesyonellestirmek; form state sinirlarini pratikte kavramak.
+- **Maddeler:**
+  - Validasyon modlari (RHF)
+  - Server hatasini alana esle (RHF — Adim 1'deki hata govdesi parse'ina dayanir)
+  - `formState` derinligi (RHF)
+  - Reset pattern'leri (RHF)
+  - `price` varsayilan degeri celiskisini coz (RHF)
+  - `useWatch` vs `watch` vs `getValues` (RHF)
+  - `Controller` ihtiyacini gor (RHF)
+  - `useFieldArray` ileri kullanim (RHF)
+  - Odak yonetimi (RHF)
+  - Form bilesenini ayristir (RHF)
+  - Cok adimli form (RHF)
+  - Refine performans bilinci (Zod — siparis formu baglaminda)
+  - `useId` ve erisilebilirlik (React — form label iliskileri baglaminda)
+  - Siparis taslagi (draft) store'u (Zustand — form state ↔ client state siniri)
+
+### Adim 6 — React yapisal iyilestirme
+
+- **Branch:** `refactor/react-yapisal`
+- **Amac:** Sisman sayfalari ayristirmak; Suspense, Error Boundary ve code splitting'e gecmek.
+- **Maddeler:**
+  - Custom hook'lara ayristirma (React)
+  - Bilesen ayristirma (React)
+  - Error Boundary (React)
+  - Suspense + `lazy` (React)
+  - `useSuspenseQuery` + Suspense (TanStack Query — bilerek bu adimda: Error Boundary on kosuludur)
+  - Portal ile dialog (React)
+  - `useEffect` disiplinini gor (React)
+  - Memoizasyon bilinci (React)
+  - Concurrent ozellikler (React)
+  - Liste render optimizasyonu (React)
+  - `satisfies` operatoru (TypeScript)
+  - Discriminated union ile UI state (TypeScript)
+  - Generic bilesen — `DataTable<T>` (TypeScript)
+  - Template literal types (TypeScript)
+  - Strict ayarlar — `noUncheckedIndexedAccess` (TypeScript)
+
+### Adim 7 — Tailwind: tema ve gorunum
+
+- **Branch:** `feature/tema-gorunum`
+- **Amac:** Dark mode'u uctan uca kurmak, tasarim token'lari ve gorsel etkilesimleri tamamlamak.
+- **Maddeler:**
+  - `subscribeWithSelector` (Zustand — dark mode'un on kosulu)
+  - Dark mode'u gercekten uygula (Tailwind)
+  - `@theme` ile design token (Tailwind)
+  - Class tekrarini bilesenle coz (Tailwind)
+  - `clsx`/`tailwind-merge` (Tailwind — `Button` bileseniyle birlikte)
+  - `data-*` variant'lari (Tailwind)
+  - `group` ve `peer` (Tailwind)
+  - Container queries (Tailwind)
+  - `form-input` ozel class'ini incele (Tailwind)
+  - Animasyon ve gecisler (Tailwind — Adim 2'deki toast'lara uygulanir)
+  - Responsive denetim (Tailwind)
+  - Slice pattern (Zustand — store artik tema + sidebar + tablo + toast + taslak icerir)
+  - Persist derinligi (Zustand)
 

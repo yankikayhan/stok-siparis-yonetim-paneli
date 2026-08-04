@@ -9,3 +9,7 @@ export class ApiError extends Error {
     this.cause = cause
   }
 }
+
+export function isApiError(error: unknown): error is ApiError {
+  return error instanceof ApiError
+}

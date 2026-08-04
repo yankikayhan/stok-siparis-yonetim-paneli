@@ -1,6 +1,7 @@
 import { type UseQueryResult, useQuery } from '@tanstack/react-query'
 import { Building2, Mail, Phone, ReceiptText, UsersRound } from 'lucide-react'
 import { useState } from 'react'
+import { isApiError } from '../../../shared/api/api-error'
 import {
   customerQueryKeys,
   getCustomerOrders,
@@ -130,7 +131,7 @@ function CustomerDetail({
           <div className="mt-4 h-24 animate-pulse bg-slate-100" />
         ) : ordersQuery.isError ? (
           <div className="mt-4 border border-rose-200 bg-rose-50 p-4">
-            <p className="text-sm text-rose-800">{ordersQuery.error instanceof Error ? ordersQuery.error.message : 'Siparisler yuklenemedi.'}</p>
+            <p className="text-sm text-rose-800">{isApiError(ordersQuery.error) ? ordersQuery.error.message : 'Siparisler yuklenemedi.'}</p>
             <button type="button" onClick={() => void ordersQuery.refetch()} className="mt-3 text-sm font-medium text-rose-800 underline">Tekrar dene</button>
           </div>
         ) : ordersQuery.data?.length === 0 ? (

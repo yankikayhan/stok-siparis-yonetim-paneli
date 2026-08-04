@@ -1,7 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowUpDown, ClipboardList } from 'lucide-react'
 import { useState } from 'react'
-import { ApiError } from '../../../shared/api/api-error'
+import { isApiError } from '../../../shared/api/api-error'
 import { customerQueryKeys, getCustomers } from '../../customers/api/customers-api'
 import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
 import { getProducts, productQueryKeys } from '../../products/api/products-api'
@@ -121,7 +121,7 @@ export function OrdersPage() {
 
       {updateStatusMutation.isError && (
         <p className="border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-          {updateStatusMutation.error instanceof ApiError ? updateStatusMutation.error.message : 'Siparis durumu guncellenemedi. Degisiklik geri alindi.'}
+          {isApiError(updateStatusMutation.error) ? updateStatusMutation.error.message : 'Siparis durumu guncellenemedi. Degisiklik geri alindi.'}
         </p>
       )}
 

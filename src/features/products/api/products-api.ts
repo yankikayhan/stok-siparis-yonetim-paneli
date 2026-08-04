@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
+import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 
 export const categorySchema = z.object({
   id: z.string(),
@@ -15,8 +16,8 @@ export const productSchema = z.object({
   stock: z.number().int().nonnegative(),
   reorderLevel: z.number().int().nonnegative(),
   active: z.boolean(),
-  createdAt: z.iso.datetime(),
-  updatedAt: z.iso.datetime(),
+  createdAt: isoDateTimeSchema,
+  updatedAt: isoDateTimeSchema,
 })
 
 const productsSchema = z.array(productSchema)

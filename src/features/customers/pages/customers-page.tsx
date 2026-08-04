@@ -122,7 +122,7 @@ function CustomerDetail({
       <dl className="grid gap-4 border-b border-slate-200 p-5 sm:grid-cols-2">
         <DetailItem icon={Mail} label="E-posta" value={customer.email} />
         <DetailItem icon={Phone} label="Telefon" value={customer.phone} />
-        <DetailItem icon={Building2} label="Kayit tarihi" value={dateFormatter.format(new Date(customer.createdAt))} />
+        <DetailItem icon={Building2} label="Kayit tarihi" value={dateFormatter.format(customer.createdAt)} />
       </dl>
       <div className="p-5">
         <h3 className="text-sm font-semibold text-slate-950">Siparis gecmisi</h3>
@@ -141,7 +141,7 @@ function CustomerDetail({
               <li key={order.id} className="flex items-center justify-between gap-4 py-3">
                 <div>
                   <p className="text-sm font-medium text-slate-900">{order.id.toUpperCase()}</p>
-                  <p className="mt-1 text-xs text-slate-500">{dateFormatter.format(new Date(order.createdAt))}</p>
+                  <p className="mt-1 text-xs text-slate-500">{dateFormatter.format(order.createdAt)}</p>
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-slate-950">{currencyFormatter.format(order.total)}</p>

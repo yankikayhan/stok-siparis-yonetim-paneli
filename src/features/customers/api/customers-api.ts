@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
+import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 import { orderSchema, type Order } from '../../orders/api/orders-api'
 
 const customerSchema = z.object({
@@ -8,7 +9,7 @@ const customerSchema = z.object({
   email: z.email(),
   phone: z.string(),
   company: z.string(),
-  createdAt: z.iso.datetime(),
+  createdAt: isoDateTimeSchema,
 })
 
 const customersSchema = z.array(customerSchema)

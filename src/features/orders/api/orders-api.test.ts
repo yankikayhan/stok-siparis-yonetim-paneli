@@ -11,8 +11,9 @@ const products = [
     stock: 18,
     reorderLevel: 8,
     active: true,
-    createdAt: '2026-06-02T09:30:00.000Z',
-    updatedAt: '2026-07-10T10:00:00.000Z',
+    // Product['createdAt'] artik Date; sema output'u degistigi icin fixture da degisti.
+    createdAt: new Date('2026-06-02T09:30:00.000Z'),
+    updatedAt: new Date('2026-07-10T10:00:00.000Z'),
   },
 ]
 

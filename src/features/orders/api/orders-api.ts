@@ -1,5 +1,6 @@
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
+import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 import type { Product } from '../../products/api/products-api'
 
 // API response schemas
@@ -10,7 +11,7 @@ export const orderSchema = z.object({
   customerId: z.string(),
   status: orderStatusSchema,
   total: z.number().nonnegative(),
-  createdAt: z.iso.datetime(),
+  createdAt: isoDateTimeSchema,
   items: z.array(
     z.object({
       productId: z.string(),

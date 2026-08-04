@@ -121,7 +121,7 @@ export function OrdersPage() {
                 <tr key={order.id}>
                   <td className="px-5 py-4 font-medium text-slate-950">{order.id.toUpperCase()}</td>
                   <td className="px-5 py-4 text-slate-700">{customerNames.get(order.customerId) ?? '-'}</td>
-                  <td className="px-5 py-4 text-slate-700">{dateFormatter.format(new Date(order.createdAt))}</td>
+                  <td className="px-5 py-4 text-slate-700">{dateFormatter.format(order.createdAt)}</td>
                   <td className="px-5 py-4 text-right font-medium text-slate-950">{currencyFormatter.format(order.total)}</td>
                   <td className="px-5 py-4">
                     <label className="sr-only" htmlFor={`order-status-${order.id}`}>Siparis durumu</label>

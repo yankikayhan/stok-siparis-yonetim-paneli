@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { environment } from '../../app/config/env'
 import { ApiError } from './api-error'
+import { formatZodError } from './format-zod-error'
 
 const errorBodySchema = z.object({ message: z.string() })
 
@@ -79,6 +80,11 @@ export async function request<TSchema extends z.ZodType>(
   const result = schema.safeParse(payload)
 
   if (!result.success) {
+    // Kullaniciya sabit mesaj gider; alan bazli detay yalnizca gelistirme ortaminda loglanir.
+    if (import.meta.env.DEV) {
+      console.error(`Sema hatasi (${path}):\n${formatZodError(result.error)}`)
+    }
+
     throw new ApiError('Sunucudan beklenmeyen bir veri formati alindi.', response.status, result.error)
   }
 

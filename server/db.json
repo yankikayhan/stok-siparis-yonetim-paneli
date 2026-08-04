@@ -120,6 +120,40 @@
           "lineTotal": 17998.800000000003
         }
       ]
+    },
+    {
+      "id": "ord-002",
+      "customerId": "cus-002",
+      "status": "shipped",
+      "trackingNumber": "TRK-7F3A2B1C",
+      "total": 8299.5,
+      "createdAt": "2026-07-05T09:20:00.000Z",
+      "items": [
+        {
+          "productId": "prd-002",
+          "productName": "27 Inc Monitor",
+          "quantity": 1,
+          "unitPrice": 8299.5,
+          "lineTotal": 8299.5
+        }
+      ]
+    },
+    {
+      "id": "ord-003",
+      "customerId": "cus-002",
+      "status": "cancelled",
+      "cancelReason": "Musteri talebiyle iptal edildi.",
+      "total": 249,
+      "createdAt": "2026-07-18T15:40:00.000Z",
+      "items": [
+        {
+          "productId": "prd-004",
+          "productName": "Kargo Kutusu Orta Boy",
+          "quantity": 10,
+          "unitPrice": 24.9,
+          "lineTotal": 249
+        }
+      ]
     }
   ],
   "profile": {

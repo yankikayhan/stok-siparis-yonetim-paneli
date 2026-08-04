@@ -4,12 +4,12 @@ import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 import type { Product } from '../../products/api/products-api'
 
 // API response schemas
+// NOT: Bu liste orderSchema'daki z.literal'lerle ayni kalmali; birini degistirirken digerini guncelle.
 const orderStatusSchema = z.enum(['pending', 'paid', 'shipped', 'cancelled'])
 
-export const orderSchema = z.object({
+const orderBaseSchema = z.object({
   id: z.string(),
   customerId: z.string(),
-  status: orderStatusSchema,
   total: z.number().nonnegative(),
   createdAt: isoDateTimeSchema,
   items: z.array(
@@ -23,6 +23,14 @@ export const orderSchema = z.object({
   ),
 })
 
+// Durum bazli alanlar: shipped -> trackingNumber, cancelled -> cancelReason.
+export const orderSchema = z.discriminatedUnion('status', [
+  orderBaseSchema.extend({ status: z.literal('pending') }),
+  orderBaseSchema.extend({ status: z.literal('paid') }),
+  orderBaseSchema.extend({ status: z.literal('shipped'), trackingNumber: z.string() }),
+  orderBaseSchema.extend({ status: z.literal('cancelled'), cancelReason: z.string() }),
+])
+
 const customerSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -33,7 +41,8 @@ const orderStatusUpdateSchema = z.object({ status: orderStatusSchema })
 const customerNamesSchema = z.array(customerSchema)
 
 export type Order = z.output<typeof orderSchema>
-export type OrderStatus = z.output<typeof orderStatusSchema>
+// Tek kaynak: union'in discriminant'indan turer, enum'la ayrisirsa derleme hatasi cikar.
+export type OrderStatus = Order['status']
 
 // Form validation schemas
 const orderItemFormSchema = z.object({

@@ -25,6 +25,27 @@ const orderStatusLabels: Record<OrderStatus, string> = {
   cancelled: 'Iptal',
 }
 
+// Optimistic update icin gecerli bir union uyesi kurar; gercek degerler onSettled refetch'iyle gelir.
+function applyStatus(order: Order, status: OrderStatus): Order {
+  const base = {
+    id: order.id,
+    customerId: order.customerId,
+    total: order.total,
+    createdAt: order.createdAt,
+    items: order.items,
+  }
+
+  switch (status) {
+    case 'pending':
+    case 'paid':
+      return { ...base, status }
+    case 'shipped':
+      return { ...base, status, trackingNumber: order.status === 'shipped' ? order.trackingNumber : 'Ataniyor...' }
+    case 'cancelled':
+      return { ...base, status, cancelReason: order.status === 'cancelled' ? order.cancelReason : 'Belirtilmedi' }
+  }
+}
+
 export function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
@@ -39,7 +60,7 @@ export function OrdersPage() {
       const previousOrders = queryClient.getQueryData<Order[]>(orderQueryKeys.list())
 
       queryClient.setQueryData<Order[]>(orderQueryKeys.list(), (orders) =>
-        orders?.map((order) => (order.id === id ? { ...order, status } : order)),
+        orders?.map((order) => (order.id === id ? applyStatus(order, status) : order)),
       )
 
       return { previousOrders }
@@ -128,6 +149,8 @@ export function OrdersPage() {
                     <select id={`order-status-${order.id}`} value={order.status} disabled={updateStatusMutation.isPending} onChange={(event) => updateStatusMutation.mutate({ id: order.id, status: event.target.value as OrderStatus })} className="h-9 border border-slate-300 bg-white px-2 text-sm text-slate-700 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100 disabled:opacity-60">
                       {orderStatuses.map((status) => <option key={status} value={status}>{orderStatusLabels[status]}</option>)}
                     </select>
+                    {order.status === 'shipped' && <p className="mt-1 text-xs text-slate-500">Takip: {order.trackingNumber}</p>}
+                    {order.status === 'cancelled' && <p className="mt-1 text-xs text-slate-500">Neden: {order.cancelReason}</p>}
                   </td>
                 </tr>
               ))}

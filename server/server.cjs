@@ -82,6 +82,36 @@ server.post('/orders', (request, response) => {
   return response.status(201).json(order)
 })
 
+server.patch('/orders/:id', (request, response) => {
+  const existingOrder = router.db.get('orders').find({ id: request.params.id }).value()
+
+  if (!existingOrder) {
+    return response.status(404).json({ message: 'Siparis bulunamadi.' })
+  }
+
+  const { status, cancelReason } = request.body ?? {}
+
+  if (!['pending', 'paid', 'shipped', 'cancelled'].includes(status)) {
+    return response.status(400).json({ message: 'Gecersiz siparis durumu.' })
+  }
+
+  router.db
+    .get('orders')
+    .find({ id: existingOrder.id })
+    .assign({
+      status,
+      // undefined atanan key'ler JSON'a yazilmaz; durumla ilgisiz alanlar boylece temizlenir.
+      trackingNumber:
+        status === 'shipped'
+          ? existingOrder.trackingNumber ?? `TRK-${randomUUID().slice(0, 8).toUpperCase()}`
+          : undefined,
+      cancelReason: status === 'cancelled' ? cancelReason ?? 'Belirtilmedi' : undefined,
+    })
+    .write()
+
+  return response.json(router.db.get('orders').find({ id: existingOrder.id }).value())
+})
+
 server.use(router)
 
 server.listen(3001, () => {

@@ -30,15 +30,15 @@ Mevcut durum: `useQuery` + `useMutation` + `invalidateQueries`, siparis durumund
 
 Mevcut durum: Response parse, form semalari, bir `superRefine` (stok kurali). Sema tekrari var (dashboard-api urun/siparis semasini kopyalamis).
 
-- [ ] **Sema tekilligi ve paylasim:** `dashboard-api.ts` icindeki kopya `productSchema`/`orderSchema`'yi kaldir; semalari tek yerden (ilgili feature'dan veya `shared/schemas`'tan) import et. "Tek dogruluk kaynagi" ilkesini semalara uygula.
-- [ ] **`z.input` vs `z.output` ayrimini netlestir:** `z.coerce` iceren form semalarinda iki tipin neden farkli oldugunu kucuk bir ornekle belgeye not et; RHF generic'lerinde (`useForm<Input, unknown, Output>`) bu ayrimin rolunu acikla.
-- [ ] **Sema kompozisyonu:** `productFormSchema`'yi `productSchema.pick(...)` / `omit(...)` / `extend(...)` ile turet; create ve update senaryolari icin `partial()` kullanarak fark yaratmayi dene.
-- [ ] **`transform` ve `pipe`:** API'den gelen `createdAt` ISO string'ini `z.iso.datetime().pipe(...)` veya `transform` ile `Date` nesnesine cevir; formatlamanin bilesenden sema katmanina tasinmasinin etkisini degerlendir.
-- [ ] **`discriminatedUnion`:** Siparis durumlarina bagli farkli alanlar kurgula (or. `shipped` siparislerde zorunlu `trackingNumber`, `cancelled` siparislerde `cancelReason`). Semayi `z.discriminatedUnion('status', [...])` ile yaz, UI'da tip daraltmayla kullan.
-- [ ] **Server hata govdesini parse et:** `http-client.ts`'te `!response.ok` durumunda `{ message: string }` govdesini bir `errorBodySchema` ile parse edip `ApiError.message`'a tasi. Su an server'in dondurdugu anlamli mesajlar (or. "yeterli stok yok") kayboluyor.
-- [ ] **Ortak hata haritasi:** Zod v4 `z.config()` / hata ozelleştirme ile Turkce varsayilan hata mesajlarini merkezi tanimla; sema basina tekrar eden mesajlari azalt.
-- [ ] **Env dogrulamayi derinlestir:** `app/config/env.ts`'i incele; `import.meta.env`'i `z.object` ile parse eden, eksik degiskende build/boot aninda anlamli hata firlatan yapiya donustur (yoksa kur).
-- [ ] **`safeParse` sonucunu isleme:** `result.error.issues`'u kullaniciya donusturen kucuk bir `formatZodError` yardimcisi yaz ve test et; `flatten`/`treeifyError` cikti farklarini incele.
+- [x] **Sema tekilligi ve paylasim:** `dashboard-api.ts` icindeki kopya `productSchema`/`orderSchema`'yi kaldir; semalari tek yerden (ilgili feature'dan veya `shared/schemas`'tan) import et. "Tek dogruluk kaynagi" ilkesini semalara uygula.
+- [x] **`z.input` vs `z.output` ayrimini netlestir:** `z.coerce` iceren form semalarinda iki tipin neden farkli oldugunu kucuk bir ornekle belgeye not et; RHF generic'lerinde (`useForm<Input, unknown, Output>`) bu ayrimin rolunu acikla.
+- [x] **Sema kompozisyonu:** `productFormSchema`'yi `productSchema.pick(...)` / `omit(...)` / `extend(...)` ile turet; create ve update senaryolari icin `partial()` kullanarak fark yaratmayi dene.
+- [x] **`transform` ve `pipe`:** API'den gelen `createdAt` ISO string'ini `z.iso.datetime().pipe(...)` veya `transform` ile `Date` nesnesine cevir; formatlamanin bilesenden sema katmanina tasinmasinin etkisini degerlendir.
+- [x] **`discriminatedUnion`:** Siparis durumlarina bagli farkli alanlar kurgula (or. `shipped` siparislerde zorunlu `trackingNumber`, `cancelled` siparislerde `cancelReason`). Semayi `z.discriminatedUnion('status', [...])` ile yaz, UI'da tip daraltmayla kullan.
+- [x] **Server hata govdesini parse et:** `http-client.ts`'te `!response.ok` durumunda `{ message: string }` govdesini bir `errorBodySchema` ile parse edip `ApiError.message`'a tasi. Su an server'in dondurdugu anlamli mesajlar (or. "yeterli stok yok") kayboluyor.
+- [x] **Ortak hata haritasi:** Zod v4 `z.config()` / hata ozelleştirme ile Turkce varsayilan hata mesajlarini merkezi tanimla; sema basina tekrar eden mesajlari azalt.
+- [x] **Env dogrulamayi derinlestir:** `app/config/env.ts`'i incele; `import.meta.env`'i `z.object` ile parse eden, eksik degiskende build/boot aninda anlamli hata firlatan yapiya donustur (yoksa kur).
+- [x] **`safeParse` sonucunu isleme:** `result.error.issues`'u kullaniciya donusturen kucuk bir `formatZodError` yardimcisi yaz ve test et; `flatten`/`treeifyError` cikti farklarini incele.
 - [ ] **Refine performans bilinci:** `createOrderFormSchema(products)`'in her render'da yeniden olusmasinin maliyetini `useMemo` ile karsilastir; sema fabrikasi pattern'inin arti/eksisini not et.
 
 ---
@@ -86,10 +86,10 @@ Mevcut durum: Zod'dan turetilen tipler, generic `request<TSchema>`. Ileri tip pa
 - [ ] **Discriminated union ile UI state:** Sayfa durumlarini `{ status: 'loading' } | { status: 'error'; error: ApiError } | { status: 'success'; data: ... }` seklinde modelleyen kucuk bir deney yap; TanStack Query'nin kendi tiplerinin bunu zaten nasil yaptigini incele (`isPending` daralttiktan sonra `data`'nin tanimli olmasi).
 - [ ] **Generic bilesen:** Urunler ve siparisler tablosundaki tekrar icin `DataTable<T>` generic bileseni yaz: `columns: Array<{ header: string; cell: (row: T) => ReactNode }>`. Generic constraint'leri ve JSX'te generic sozdizimini ogren.
 - [ ] **`as const` + tip turetme:** Query key factory'lerdeki `as const` kullaniminin donus tiplerini nasil daralttigini incele; bir key'in tipini `ReturnType<typeof orderQueryKeys.list>` ile cikar.
-- [ ] **Tip daraltma fonksiyonlari:** `ApiError` icin `isApiError(error: unknown): error is ApiError` type guard'i yaz; `instanceof` kontrollerinin dagildigi yerlerde kullan.
-- [ ] **Utility type pratigi:** `ProductFormValues`'tan `Partial`, `Pick`, `Omit` ile update payload tipleri turet; kendi `Nullable<T>` gibi kucuk bir mapped type yaz.
+- [x] **Tip daraltma fonksiyonlari:** `ApiError` icin `isApiError(error: unknown): error is ApiError` type guard'i yaz; `instanceof` kontrollerinin dagildigi yerlerde kullan.
+- [x] **Utility type pratigi:** `ProductFormValues`'tan `Partial`, `Pick`, `Omit` ile update payload tipleri turet; kendi `Nullable<T>` gibi kucuk bir mapped type yaz.
 - [ ] **Template literal types:** Route path'lerini (`'/urunler' | '/musteriler' | ...`) tek bir union'dan turet; sidebar linklerinin yanlis path almasini derleme zamaninda engelle.
-- [ ] **`unknown` disiplini:** `http-client.ts`'teki `payload: unknown` akisini takip et; `any` kullanmadan unknown → parse → tipli veri zincirinin neden guvenli oldugunu belgele.
+- [x] **`unknown` disiplini:** `http-client.ts`'teki `payload: unknown` akisini takip et; `any` kullanmadan unknown → parse → tipli veri zincirinin neden guvenli oldugunu belgele.
 - [ ] **Strict ayarlar:** `tsconfig`'e `noUncheckedIndexedAccess` ekle; patlayan yerleri (or. `watchedItems[index]`) duzgun sekilde coz. Bu ayarin gercek hatalari nasil yakaladigini not et.
 
 ---

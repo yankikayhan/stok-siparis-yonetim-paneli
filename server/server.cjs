@@ -112,6 +112,46 @@ server.patch('/orders/:id', (request, response) => {
   return response.json(router.db.get('orders').find({ id: existingOrder.id }).value())
 })
 
+// json-server'in hazir sorgulari yetmiyor: arama ad VEYA SKU'da calisir,
+// dusuk stok ise iki alanin karsilastirmasidir (stock <= reorderLevel).
+server.get('/products', (request, response) => {
+  const { search, categoryId, stock, _page, _limit } = request.query
+
+  let products = router.db.get('products').value()
+
+  if (typeof search === 'string' && search.trim() !== '') {
+    // Veri sozlesmesi ASCII (diakritiksiz); tr-TR locale burada I->i donusumunu bozar.
+    const term = search.trim().toLowerCase()
+    products = products.filter((product) =>
+      `${product.name} ${product.sku}`.toLowerCase().includes(term),
+    )
+  }
+
+  if (typeof categoryId === 'string' && categoryId !== '') {
+    products = products.filter((product) => product.categoryId === categoryId)
+  }
+
+  if (stock === 'low' || stock === 'in-stock') {
+    products = products.filter(
+      (product) => (product.stock <= product.reorderLevel) === (stock === 'low'),
+    )
+  }
+
+  // Toplam, sayfalama uygulanmadan onceki filtrelenmis sayidir.
+  response.set('X-Total-Count', String(products.length))
+  // Cross-origin istemci bu header'i ancak expose edilirse okuyabilir.
+  response.set('Access-Control-Expose-Headers', 'X-Total-Count')
+
+  const page = Number(_page)
+  const limit = Number(_limit)
+
+  if (Number.isInteger(page) && page > 0 && Number.isInteger(limit) && limit > 0) {
+    products = products.slice((page - 1) * limit, page * limit)
+  }
+
+  return response.json(products)
+})
+
 server.use(router)
 
 server.listen(3001, () => {

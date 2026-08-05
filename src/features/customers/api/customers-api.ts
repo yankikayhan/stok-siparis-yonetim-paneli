@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
@@ -31,4 +32,18 @@ export function getCustomers() {
 export function getCustomerOrders(customerId: string) {
   const searchParams = new URLSearchParams({ customerId })
   return request(`/orders?${searchParams.toString()}`, { schema: ordersSchema })
+}
+
+export function customersOptions() {
+  return queryOptions({
+    queryKey: customerQueryKeys.list(),
+    queryFn: getCustomers,
+  })
+}
+
+export function customerOrdersOptions(customerId: string) {
+  return queryOptions({
+    queryKey: customerQueryKeys.orders(customerId),
+    queryFn: () => getCustomerOrders(customerId),
+  })
 }

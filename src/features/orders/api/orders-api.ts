@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
@@ -61,6 +62,13 @@ export const orderQueryKeys = {
 // API operations
 export function getOrders() {
   return request('/orders', { schema: ordersSchema })
+}
+
+export function ordersOptions() {
+  return queryOptions({
+    queryKey: orderQueryKeys.list(),
+    queryFn: getOrders,
+  })
 }
 
 export function updateOrderStatus({ id, status }: { id: string; status: OrderStatus }) {

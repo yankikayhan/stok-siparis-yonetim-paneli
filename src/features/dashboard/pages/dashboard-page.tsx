@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, CircleDollarSign, PackageCheck, ShoppingBag } from 'lucide-react'
-import { dashboardQueryKeys, getDashboardSummary } from '../api/dashboard-api'
+import { dashboardSummaryOptions } from '../api/dashboard-api'
 
 const numberFormatter = new Intl.NumberFormat('tr-TR')
 const currencyFormatter = new Intl.NumberFormat('tr-TR', {
@@ -10,10 +10,7 @@ const currencyFormatter = new Intl.NumberFormat('tr-TR', {
 })
 
 export function DashboardPage() {
-  const dashboardQuery = useQuery({
-    queryKey: dashboardQueryKeys.summary(),
-    queryFn: getDashboardSummary,
-  })
+  const dashboardQuery = useQuery(dashboardSummaryOptions())
 
   if (dashboardQuery.isPending) {
     return <DashboardLoadingState />

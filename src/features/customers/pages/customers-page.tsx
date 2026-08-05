@@ -3,9 +3,8 @@ import { Building2, Mail, Phone, ReceiptText, UsersRound } from 'lucide-react'
 import { useState } from 'react'
 import { isApiError } from '../../../shared/api/api-error'
 import {
-  customerQueryKeys,
-  getCustomerOrders,
-  getCustomers,
+  customerOrdersOptions,
+  customersOptions,
   type Customer,
   type CustomerOrder,
 } from '../api/customers-api'
@@ -26,13 +25,10 @@ const orderStatusLabels = {
 
 export function CustomersPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
-  const customersQuery = useQuery({
-    queryKey: customerQueryKeys.list(),
-    queryFn: getCustomers,
-  })
+  const customersQuery = useQuery(customersOptions())
   const customerOrdersQuery = useQuery({
-    queryKey: customerQueryKeys.orders(selectedCustomerId ?? ''),
-    queryFn: () => getCustomerOrders(selectedCustomerId!),
+    ...customerOrdersOptions(selectedCustomerId ?? ''),
+    // Dependent query: enabled sayfa state'ine bagli oldugu icin cagri yerinde kalir.
     enabled: selectedCustomerId !== null,
   })
 

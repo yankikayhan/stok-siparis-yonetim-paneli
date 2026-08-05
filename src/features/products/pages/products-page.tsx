@@ -3,9 +3,9 @@ import { Search, TriangleAlert } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
 import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
 import {
+  categoriesOptions,
   deleteProduct,
-  getCategories,
-  getProductsPage,
+  productListOptions,
   PRODUCTS_PAGE_SIZE,
   productQueryKeys,
   type Product,
@@ -46,11 +46,11 @@ export function ProductsPage() {
   }
 
   const productsQuery = useQuery({
-    queryKey: productQueryKeys.list(listParams),
-    queryFn: () => getProductsPage(listParams),
+    ...productListOptions(listParams),
+    // Sunum davranisi veri sozlesmesine degil cagri yerine aittir; spread ile eklenir.
     placeholderData: keepPreviousData,
   })
-  const categoriesQuery = useQuery({ queryKey: productQueryKeys.categories(), queryFn: getCategories })
+  const categoriesQuery = useQuery(categoriesOptions())
   const deleteProductMutation = useMutation({
     mutationFn: deleteProduct,
     // Onay dialogu acik kaldigi icin hata inline gosterilir; global toast susturulur.

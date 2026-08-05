@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
 
@@ -19,6 +20,13 @@ export const profileQueryKeys = {
 
 export function getProfile() {
   return request('/profile', { schema: profileSchema })
+}
+
+export function profileOptions() {
+  return queryOptions({
+    queryKey: profileQueryKeys.detail(),
+    queryFn: getProfile,
+  })
 }
 
 export function updateProfile(values: ProfileFormValues) {

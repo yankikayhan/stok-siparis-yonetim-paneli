@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
 import { orderSchema } from '../../orders/api/orders-api'
@@ -32,4 +33,11 @@ export async function getDashboardSummary(): Promise<DashboardSummary> {
       .filter((order) => order.status !== 'cancelled')
       .reduce((total, order) => total + order.total, 0),
   }
+}
+
+export function dashboardSummaryOptions() {
+  return queryOptions({
+    queryKey: dashboardQueryKeys.summary(),
+    queryFn: getDashboardSummary,
+  })
 }

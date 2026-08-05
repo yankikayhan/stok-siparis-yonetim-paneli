@@ -4,8 +4,7 @@ import { Moon, Rows3, Sun } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { useUiStore } from '../../../shared/stores/ui-store'
 import {
-  getProfile,
-  profileQueryKeys,
+  profileOptions,
   profileSchema,
   updateProfile,
   type Profile,
@@ -17,7 +16,7 @@ export function SettingsPage() {
   const setTheme = useUiStore((state) => state.setTheme)
   const tableDensity = useUiStore((state) => state.tableDensity)
   const setTableDensity = useUiStore((state) => state.setTableDensity)
-  const profileQuery = useQuery({ queryKey: profileQueryKeys.detail(), queryFn: getProfile })
+  const profileQuery = useQuery(profileOptions())
 
   if (profileQuery.isPending) {
     return <SettingsLoadingState />
@@ -79,7 +78,8 @@ function ProfileSettingsForm({ profile }: { profile: Profile }) {
     // Form hata ve basari mesajlarini kendi icinde gosterir; global toast susturulur.
     meta: { suppressErrorToast: true },
     onSuccess: (updatedProfile) => {
-      queryClient.setQueryData(profileQueryKeys.detail(), updatedProfile)
+      // Tipli key: setQueryData'ya elle generic vermeye gerek kalmaz.
+      queryClient.setQueryData(profileOptions().queryKey, updatedProfile)
       form.reset(updatedProfile)
     },
   })

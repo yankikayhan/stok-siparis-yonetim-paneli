@@ -1,12 +1,12 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowUpDown, ClipboardList } from 'lucide-react'
 import { useState } from 'react'
-import { customerQueryKeys, getCustomers } from '../../customers/api/customers-api'
+import { customerQueryKeys, customersOptions } from '../../customers/api/customers-api'
 import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
-import { getProducts, productQueryKeys } from '../../products/api/products-api'
+import { productListAllOptions } from '../../products/api/products-api'
 import { OrderCreateDialog } from '../components/order-create-dialog'
 import {
-  getOrders,
+  ordersOptions,
   orderQueryKeys,
   orderStatuses,
   type Order,
@@ -49,18 +49,20 @@ export function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const queryClient = useQueryClient()
-  const ordersQuery = useQuery({ queryKey: orderQueryKeys.list(), queryFn: getOrders })
-  const customersQuery = useQuery({ queryKey: customerQueryKeys.list(), queryFn: getCustomers })
-  const productsQuery = useQuery({ queryKey: productQueryKeys.listAll(), queryFn: getProducts })
+  const ordersQuery = useQuery(ordersOptions())
+  const customersQuery = useQuery(customersOptions())
+  const productsQuery = useQuery(productListAllOptions())
   const updateStatusMutation = useMutation({
     mutationFn: updateOrderStatus,
     // Tetikle-ve-devam-et aksiyonu: hata inline degil toast'la bildirilir; rollback bilgisi eklenir.
     meta: { successMessage: 'Siparis durumu guncellendi.', errorSuffix: 'Degisiklik geri alindi.' },
     onMutate: async ({ id, status }) => {
-      await queryClient.cancelQueries({ queryKey: orderQueryKeys.list() })
-      const previousOrders = queryClient.getQueryData<Order[]>(orderQueryKeys.list())
+      // queryOptions'in tipli key'i sayesinde getQueryData/setQueryData elle generic istemez.
+      const { queryKey } = ordersOptions()
+      await queryClient.cancelQueries({ queryKey })
+      const previousOrders = queryClient.getQueryData(queryKey)
 
-      queryClient.setQueryData<Order[]>(orderQueryKeys.list(), (orders) =>
+      queryClient.setQueryData(queryKey, (orders) =>
         orders?.map((order) => (order.id === id ? applyStatus(order, status) : order)),
       )
 
@@ -68,7 +70,7 @@ export function OrdersPage() {
     },
     onError: (_error, _variables, context) => {
       if (context?.previousOrders) {
-        queryClient.setQueryData(orderQueryKeys.list(), context.previousOrders)
+        queryClient.setQueryData(ordersOptions().queryKey, context.previousOrders)
       }
     },
     onSettled: async () => {

@@ -1,3 +1,4 @@
+import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { request, requestPage } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
@@ -88,6 +89,29 @@ export function getProductsPage(params: ProductListParams) {
 
 export function getCategories() {
   return request('/categories', { schema: categoriesSchema })
+}
+
+// queryOptions: key ve queryFn eslesmesini tip duzeyinde baglar; sunum davranislari
+// (placeholderData, enabled) cagri yerinde spread ile eklenir.
+export function productListOptions(params: ProductListParams) {
+  return queryOptions({
+    queryKey: productQueryKeys.list(params),
+    queryFn: () => getProductsPage(params),
+  })
+}
+
+export function productListAllOptions() {
+  return queryOptions({
+    queryKey: productQueryKeys.listAll(),
+    queryFn: getProducts,
+  })
+}
+
+export function categoriesOptions() {
+  return queryOptions({
+    queryKey: productQueryKeys.categories(),
+    queryFn: getCategories,
+  })
 }
 
 export function createProduct(values: ProductFormValues) {

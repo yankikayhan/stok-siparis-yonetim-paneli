@@ -15,7 +15,7 @@ Mevcut durum: `useQuery` + `useMutation` + `invalidateQueries`, siparis durumund
 - [ ] **Prefetching:** Sidebar'daki "Urunler" linkine hover'da `queryClient.prefetchQuery` ekle. Network panelinde istegin onceden gittigini, sayfaya gecince cache'ten okundugunu izle.
 - [ ] **Dependent query'yi derinlestir:** Musteriler sayfasindaki `enabled` kullanimini koru; buna ek olarak secilen musteri icin `initialData` veya `placeholderData`'yi liste cache'inden besle (`queryClient.getQueryData` ile seed).
 - [ ] **Para birimi tercihini islevsel yap:** Profildeki `currency` (TRY/USD/EUR) su an kaydediliyor ama hicbir seyi etkilemiyor; tum `Intl.NumberFormat` cagrilari TRY'ye sabit. Formatlayicilari profil query'sindeki `currency` degerinden besle (or. `useCurrencyFormatter()` hook'u profile cache'ini okur). Server verisinden turetilmis degerin bilesenlere kopyasiz tasinmasini pratik et.
-- [ ] **Global hata yonetimi:** `QueryClient`'a `QueryCache.onError` / `MutationCache.onError` ekle; ApiError'lari Zustand toast kuyruguna bagla. Sayfa ici hata gosterimi ile global toast'in sorumluluk ayrimini kur.
+- [x] **Global hata yonetimi:** `QueryClient`'a `QueryCache.onError` / `MutationCache.onError` ekle; ApiError'lari Zustand toast kuyruguna bagla. Sayfa ici hata gosterimi ile global toast'in sorumluluk ayrimini kur.
 - [ ] **`setQueryData` vs `invalidateQueries` deneyi:** Urun olusturma mutation'inda once `invalidateQueries` (mevcut), sonra ayni akisi `setQueryData` ile cache'e dogrudan yazarak yap. Network panelinde refetch farkini gozlemle, notunu belgeye ekle.
 - [ ] **Optimistic update'i yayginlastir:** Siparis durumundaki pattern'i urun silmeye uygula (listeden aninda kaldir, hatada geri getir). `onMutate`/`onError`/`onSettled` akisini ezber degil kavrayarak yazdigini test et.
 - [ ] **`useSuspenseQuery` + Suspense:** Dashboard'u `useSuspenseQuery`'ye gecir; loading state'i `<Suspense fallback>` ile, hata durumunu Error Boundary ile yakala. Klasik `isPending` yaklasimiyla farkini karsilastir.
@@ -65,16 +65,16 @@ Mevcut durum: `useForm` + `zodResolver` + `useFieldArray` + `useWatch`. Validasy
 
 Mevcut durum: Tek store, `persist` + `partialize`. Belgede planlanan toast kuyrugu hic yazilmamis.
 
-- [ ] **Toast kuyrugu store'u:** `toast-store.ts` kur: `toasts: Toast[]`, `addToast`, `dismissToast`, otomatik kapanma. Mutation basari/hatalarini buraya bagla. Server verisi TASIMADIGINA dikkat et — sadece UI olayi.
-- [ ] **Store'a component disindan erisim:** `QueryCache.onError` icinden (React disi kod) `useToastStore.getState().addToast(...)` cagir; hook ile `getState` farkini ve nerede hangisinin dogru oldugunu ogren.
-- [ ] **Selector disiplini:** `useUiStore((s) => s.theme)` gibi dar selector'larin neden onemli oldugunu olc: tum store'u alan bir bilesenle (`useUiStore()`) karsilastirip gereksiz render'lari React DevTools Profiler'da izle.
-- [ ] **`useShallow`:** Birden fazla alani tek selector'la alirken `useShallow` kullan; obje donduren selector'un her render'da yeni referans uretme tuzagini bizzat yasa ve coz.
+- [x] **Toast kuyrugu store'u:** `toast-store.ts` kur: `toasts: Toast[]`, `addToast`, `dismissToast`, otomatik kapanma. Mutation basari/hatalarini buraya bagla. Server verisi TASIMADIGINA dikkat et — sadece UI olayi.
+- [x] **Store'a component disindan erisim:** `QueryCache.onError` icinden (React disi kod) `useToastStore.getState().addToast(...)` cagir; hook ile `getState` farkini ve nerede hangisinin dogru oldugunu ogren.
+- [x] **Selector disiplini:** `useUiStore((s) => s.theme)` gibi dar selector'larin neden onemli oldugunu olc: tum store'u alan bir bilesenle (`useUiStore()`) karsilastirip gereksiz render'lari React DevTools Profiler'da izle.
+- [x] **`useShallow`:** Birden fazla alani tek selector'la alirken `useShallow` kullan; obje donduren selector'un her render'da yeni referans uretme tuzagini bizzat yasa ve coz.
 - [ ] **Slice pattern:** UI store'u buyudugunde (tema + sidebar + tablo + toast) slice'lara bol: `createThemeSlice`, `createToastSlice`... Tek store icinde birlesecek sekilde tipleriyle kur.
 - [ ] **`subscribeWithSelector`:** Tema degistiginde `document.documentElement`'e `dark` class'ini yazan bir subscription kur (React render dongusu disinda yan etki). Tailwind dark mode ile birlestir.
 - [ ] **Persist derinligi:** `version` + `migrate` ekle: store semasi degistiginde (or. `tableDensity`'ye yeni deger) eski localStorage verisinin nasil goc ettirildigini dene. `onRehydrateStorage` ile hydration anini logla.
 - [ ] **Siparis taslagi (draft) store'u:** Dialog kapaninca kaybolan siparis formunu opsiyonel olarak taslak store'una yaz ("kaldigin yerden devam et"). Form state ↔ client state sinirini bilerek ihlal edip geri duzelterek sinirin nedenini kavra.
-- [ ] **Store testi:** Vitest ile toast store'unun saf logigini test et (`useToastStore.getState()` uzerinden, render gerektirmeden). Store'larin test edilebilirlik avantajini gor.
-- [ ] **Devtools middleware:** `devtools` middleware ekleyip Redux DevTools uzantisinda action akisini izle; action'lara isim ver.
+- [x] **Store testi:** Vitest ile toast store'unun saf logigini test et (`useToastStore.getState()` uzerinden, render gerektirmeden). Store'larin test edilebilirlik avantajini gor.
+- [x] **Devtools middleware:** `devtools` middleware ekleyip Redux DevTools uzantisinda action akisini izle; action'lara isim ver.
 
 ---
 

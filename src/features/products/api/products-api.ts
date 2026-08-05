@@ -51,7 +51,11 @@ export type ProductListParams = {
   // 'all' degerleri filtre yok anlamina gelir ve query string'e yazilmaz.
   categoryId: string
   stock: ProductStockFilter
+  page: number
 }
+
+// Cagri basina degismedigi icin query key'e girmez; degisken olacagi gun parametreye tasinir.
+export const PRODUCTS_PAGE_SIZE = 10
 
 export const productQueryKeys = {
   all: ['products'] as const,
@@ -74,10 +78,10 @@ export function getProductsPage(params: ProductListParams) {
   if (params.search !== '') searchParams.set('search', params.search)
   if (params.categoryId !== 'all') searchParams.set('categoryId', params.categoryId)
   if (params.stock !== 'all') searchParams.set('stock', params.stock)
+  searchParams.set('_page', String(params.page))
+  searchParams.set('_limit', String(PRODUCTS_PAGE_SIZE))
 
-  const queryString = searchParams.toString()
-
-  return requestPage(queryString === '' ? '/products' : `/products?${queryString}`, {
+  return requestPage(`/products?${searchParams.toString()}`, {
     itemSchema: productSchema,
   })
 }

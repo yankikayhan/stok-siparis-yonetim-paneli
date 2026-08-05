@@ -1,4 +1,4 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, TriangleAlert } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
 import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
@@ -6,6 +6,7 @@ import {
   deleteProduct,
   getCategories,
   getProductsPage,
+  PRODUCTS_PAGE_SIZE,
   productQueryKeys,
   type Product,
   type ProductStockFilter,
@@ -22,6 +23,7 @@ export function ProductsPage() {
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('all')
   const [stockFilter, setStockFilter] = useState<ProductStockFilter>('all')
+  const [page, setPage] = useState(1)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [productToEdit, setProductToEdit] = useState<Product | null>(null)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
@@ -29,10 +31,24 @@ export function ProductsPage() {
   const queryClient = useQueryClient()
   const deferredSearch = useDeferredValue(search)
   // Key ve istek ayni nesneden beslenir; trim key kurulmadan once yapilir.
-  const listParams = { search: deferredSearch.trim(), categoryId, stock: stockFilter }
+  const listParams = { search: deferredSearch.trim(), categoryId, stock: stockFilter, page }
+
+  // Render sirasinda state uyarlama: reset deferredSearch'ten turedigi icin
+  // eski arama + page 1 kombinasyonu fetch'e donusmeden atilan render'da kalir.
+  const [prevFilters, setPrevFilters] = useState({ search: listParams.search, categoryId, stock: stockFilter })
+  if (
+    prevFilters.search !== listParams.search ||
+    prevFilters.categoryId !== categoryId ||
+    prevFilters.stock !== stockFilter
+  ) {
+    setPrevFilters({ search: listParams.search, categoryId, stock: stockFilter })
+    setPage(1)
+  }
+
   const productsQuery = useQuery({
     queryKey: productQueryKeys.list(listParams),
     queryFn: () => getProductsPage(listParams),
+    placeholderData: keepPreviousData,
   })
   const categoriesQuery = useQuery({ queryKey: productQueryKeys.categories(), queryFn: getCategories })
   const deleteProductMutation = useMutation({
@@ -75,7 +91,13 @@ export function ProductsPage() {
     )
   }
 
-  const products = productsQuery.data.items
+  const { items: products, totalCount } = productsQuery.data
+  const totalPages = Math.max(1, Math.ceil(totalCount / PRODUCTS_PAGE_SIZE))
+
+  // Bos kalan son sayfadan taze veriye gore geri cekilir; placeholder'in eski totalCount'u clamp'i yaniltmasin.
+  if (!productsQuery.isPlaceholderData && page > totalPages) {
+    setPage(totalPages)
+  }
 
   const categoryNames = new Map(categoriesQuery.data.map((category) => [category.id, category.name]))
   const tableCellPadding = tableDensity === 'compact' ? 'py-2.5' : 'py-4'
@@ -133,13 +155,17 @@ export function ProductsPage() {
         </label>
       </div>
 
-      {products.length === 0 ? (
+      {totalCount === 0 ? (
         <div className="border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
           <h2 className="text-base font-semibold text-slate-950">Eslesen urun yok</h2>
           <p className="mt-2 text-sm text-slate-600">Arama veya filtre secimlerinizi degistirin.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto border border-slate-200 bg-white">
+        <>
+          <div
+            aria-busy={productsQuery.isPlaceholderData}
+            className={`overflow-x-auto border border-slate-200 bg-white ${productsQuery.isPlaceholderData ? 'opacity-60' : ''}`}
+          >
           <table className="w-full min-w-180 text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
               <tr>
@@ -179,7 +205,32 @@ export function ProductsPage() {
               })}
             </tbody>
           </table>
-        </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border border-t-0 border-slate-200 bg-white px-5 py-3">
+            <p className="text-sm text-slate-600">
+              Toplam {totalCount} kayit · Sayfa {page} / {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setPage(page - 1)}
+                disabled={page === 1}
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Onceki
+              </button>
+              <button
+                type="button"
+                onClick={() => setPage(page + 1)}
+                // Placeholder gosterilirken yeni verinin totalPages'i bilinmez; tasmayi onlemek icin kilitli.
+                disabled={productsQuery.isPlaceholderData || page >= totalPages}
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                Sonraki
+              </button>
+            </div>
+          </div>
+        </>
       )}
       {isCreateDialogOpen && <ProductCreateDialog categories={categoriesQuery.data} onClose={() => setIsCreateDialogOpen(false)} />}
       {productToEdit && <ProductCreateDialog categories={categoriesQuery.data} product={productToEdit} onClose={() => setProductToEdit(null)} />}

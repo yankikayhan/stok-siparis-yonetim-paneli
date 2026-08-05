@@ -8,10 +8,10 @@
 
 Mevcut durum: `useQuery` + `useMutation` + `invalidateQueries`, siparis durumunda tek bir optimistic update ornegi. Tum filtreleme client-side; query key'ler parametre icermiyor.
 
-- [ ] **Server-side filtreleme + parametreli query key:** Urunler sayfasindaki arama/kategori/stok filtrelerini `GET /products?name_like=&categoryId=` gibi query string'e tasi. `productQueryKeys.list()` yerine `list(filters)` yap; filtre degisince yeni key'in yeni cache girdisi olusturdugunu Devtools'ta izle.
-- [ ] **`queryOptions` helper:** Her feature'in API dosyasinda `queryOptions({ queryKey, queryFn })` tanimla; sayfalarda `useQuery(productListOptions(filters))` seklinde kullan. Tip cikarimi ve tekrar kullanimin farkini gor.
-- [ ] **Sayfalama + `placeholderData: keepPreviousData`:** Urun listesine `_page`/`_limit` ile server-side sayfalama ekle. Sayfa degisirken eski verinin ekranda kalmasini ve `isPlaceholderData` ile "soluk" gosterimi uygula.
-- [ ] **`select` ile veri donusumu:** Dashboard'daki `getDashboardSummary` hesaplamasini `select` opsiyonuna tasiyarak karsilastir; `select`'in referans kararliligi ve yeniden hesaplama davranisini incele.
+- [x] **Server-side filtreleme + parametreli query key:** Urunler sayfasindaki arama/kategori/stok filtrelerini `GET /products?name_like=&categoryId=` gibi query string'e tasi. `productQueryKeys.list()` yerine `list(filters)` yap; filtre degisince yeni key'in yeni cache girdisi olusturdugunu Devtools'ta izle.
+- [x] **`queryOptions` helper:** Her feature'in API dosyasinda `queryOptions({ queryKey, queryFn })` tanimla; sayfalarda `useQuery(productListOptions(filters))` seklinde kullan. Tip cikarimi ve tekrar kullanimin farkini gor.
+- [x] **Sayfalama + `placeholderData: keepPreviousData`:** Urun listesine `_page`/`_limit` ile server-side sayfalama ekle. Sayfa degisirken eski verinin ekranda kalmasini ve `isPlaceholderData` ile "soluk" gosterimi uygula.
+- [x] **`select` ile veri donusumu:** Dashboard'daki `getDashboardSummary` hesaplamasini `select` opsiyonuna tasiyarak karsilastir; `select`'in referans kararliligi ve yeniden hesaplama davranisini incele.
 - [ ] **Prefetching:** Sidebar'daki "Urunler" linkine hover'da `queryClient.prefetchQuery` ekle. Network panelinde istegin onceden gittigini, sayfaya gecince cache'ten okundugunu izle.
 - [ ] **Dependent query'yi derinlestir:** Musteriler sayfasindaki `enabled` kullanimini koru; buna ek olarak secilen musteri icin `initialData` veya `placeholderData`'yi liste cache'inden besle (`queryClient.getQueryData` ile seed).
 - [ ] **Para birimi tercihini islevsel yap:** Profildeki `currency` (TRY/USD/EUR) su an kaydediliyor ama hicbir seyi etkilemiyor; tum `Intl.NumberFormat` cagrilari TRY'ye sabit. Formatlayicilari profil query'sindeki `currency` degerinden besle (or. `useCurrencyFormatter()` hook'u profile cache'ini okur). Server verisinden turetilmis degerin bilesenlere kopyasiz tasinmasini pratik et.
@@ -21,7 +21,7 @@ Mevcut durum: `useQuery` + `useMutation` + `invalidateQueries`, siparis durumund
 - [ ] **`useSuspenseQuery` + Suspense:** Dashboard'u `useSuspenseQuery`'ye gecir; loading state'i `<Suspense fallback>` ile, hata durumunu Error Boundary ile yakala. Klasik `isPending` yaklasimiyla farkini karsilastir.
 - [ ] **`useQueries` ile paralel sorgular:** Siparisler sayfasindaki uc ayri `useQuery`'yi `useQueries`'e cevir; `combine` opsiyonu ile tek sonuc nesnesi uret.
 - [ ] **Infinite query:** Siparis listesini `useInfiniteQuery` + "daha fazla yukle" butonuna cevir (json-server `_page` destegiyle). `getNextPageParam` ve `pages` yapisini incele.
-- [ ] **`staleTime`/`gcTime` deneyleri:** Farkli degerlerle sayfalar arasi gecislerde request sayisini olc; kategoriler gibi nadiren degisen veriye uzun `staleTime` ver ve karari yorum satiriyla gerekcelendir.
+- [x] **`staleTime`/`gcTime` deneyleri:** Farkli degerlerle sayfalar arasi gecislerde request sayisini olc; kategoriler gibi nadiren degisen veriye uzun `staleTime` ver ve karari yorum satiriyla gerekcelendir.
 - [ ] **Mutation state paylasimi:** `useMutationState` ile devam eden siparis olusturma mutation'ini baska bir bilesenden (or. header'da "kaydediliyor..." gostergesi) izle.
 
 ---
@@ -85,7 +85,7 @@ Mevcut durum: Zod'dan turetilen tipler, generic `request<TSchema>`. Ileri tip pa
 - [ ] **`satisfies` operatoru:** `orderStatusLabels: Record<OrderStatus, string>` tanimlarini `satisfies` ile yeniden yaz; tip genislemesini (widening) onlemenin ve eksik key yakalamanin farkini gor.
 - [ ] **Discriminated union ile UI state:** Sayfa durumlarini `{ status: 'loading' } | { status: 'error'; error: ApiError } | { status: 'success'; data: ... }` seklinde modelleyen kucuk bir deney yap; TanStack Query'nin kendi tiplerinin bunu zaten nasil yaptigini incele (`isPending` daralttiktan sonra `data`'nin tanimli olmasi).
 - [ ] **Generic bilesen:** Urunler ve siparisler tablosundaki tekrar icin `DataTable<T>` generic bileseni yaz: `columns: Array<{ header: string; cell: (row: T) => ReactNode }>`. Generic constraint'leri ve JSX'te generic sozdizimini ogren.
-- [ ] **`as const` + tip turetme:** Query key factory'lerdeki `as const` kullaniminin donus tiplerini nasil daralttigini incele; bir key'in tipini `ReturnType<typeof orderQueryKeys.list>` ile cikar.
+- [x] **`as const` + tip turetme:** Query key factory'lerdeki `as const` kullaniminin donus tiplerini nasil daralttigini incele; bir key'in tipini `ReturnType<typeof orderQueryKeys.list>` ile cikar.
 - [x] **Tip daraltma fonksiyonlari:** `ApiError` icin `isApiError(error: unknown): error is ApiError` type guard'i yaz; `instanceof` kontrollerinin dagildigi yerlerde kullan.
 - [x] **Utility type pratigi:** `ProductFormValues`'tan `Partial`, `Pick`, `Omit` ile update payload tipleri turet; kendi `Nullable<T>` gibi kucuk bir mapped type yaz.
 - [ ] **Template literal types:** Route path'lerini (`'/urunler' | '/musteriler' | ...`) tek bir union'dan turet; sidebar linklerinin yanlis path almasini derleme zamaninda engelle.

@@ -1,5 +1,6 @@
 import { ChartNoAxesCombined, Menu, Package, Settings, ShoppingCart, UsersRound } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { useShallow } from 'zustand/react/shallow'
 import { Toaster } from '../../shared/components/toaster'
 import { useUiStore } from '../../shared/stores/ui-store'
 
@@ -12,9 +13,13 @@ const navigationItems = [
 ]
 
 export function AppShell() {
-  const theme = useUiStore((state) => state.theme)
-  const isSidebarOpen = useUiStore((state) => state.isSidebarOpen)
-  const toggleSidebar = useUiStore((state) => state.toggleSidebar)
+  const { theme, isSidebarOpen, toggleSidebar } = useUiStore(
+    useShallow((state) => ({
+      theme: state.theme,
+      isSidebarOpen: state.isSidebarOpen,
+      toggleSidebar: state.toggleSidebar,
+    })),
+  )
 
   return (
     <div data-theme={theme} className={theme === 'dark' ? 'flex min-h-screen flex-col bg-slate-950 text-slate-50' : 'flex min-h-screen flex-col bg-slate-50 text-slate-950'}>

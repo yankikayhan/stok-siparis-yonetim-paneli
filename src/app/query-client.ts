@@ -49,6 +49,8 @@ export const queryClient = new QueryClient({
   }),
   defaultOptions: {
     queries: {
+      // Varsayilan tazelik penceresi: kisa gezinmelerde refetch firtinasini onler,
+      // 30 sn sonrasinda veri bayat sayilip arka planda tazelenir.
       staleTime: 30_000,
       retry: (failureCount, error) =>
         !(isApiError(error) && error.status !== undefined && error.status < 500) && failureCount < 2,

@@ -111,6 +111,10 @@ export function categoriesOptions() {
   return queryOptions({
     queryKey: productQueryKeys.categories(),
     queryFn: getCategories,
+    // Uygulamada kategori CRUD'u yok; veri ancak seed degisikligiyle degisir.
+    // Oturum boyunca taze kabul edilir; sayfa yenilemesi tek tazeleme yoludur.
+    staleTime: Infinity,
+    gcTime: Infinity,
   })
 }
 

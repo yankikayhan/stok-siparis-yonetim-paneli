@@ -31,14 +31,8 @@ export const orderSchema = z.discriminatedUnion('status', [
   orderBaseSchema.extend({ status: z.literal('cancelled'), cancelReason: z.string() }),
 ])
 
-const customerSchema = z.object({
-  id: z.string(),
-  name: z.string(),
-})
-
 const ordersSchema = z.array(orderSchema)
 const orderStatusUpdateSchema = z.object({ status: orderStatusSchema })
-const customerNamesSchema = z.array(customerSchema)
 
 export type Order = z.output<typeof orderSchema>
 // Tek kaynak: union'in discriminant'indan turer, enum'la ayrisirsa derleme hatasi cikar.
@@ -62,16 +56,11 @@ export type OrderFormValues = z.output<typeof orderFormSchema>
 export const orderQueryKeys = {
   all: ['orders'] as const,
   list: () => [...orderQueryKeys.all, 'list'] as const,
-  customerNames: () => [...orderQueryKeys.all, 'customer-names'] as const,
 }
 
 // API operations
 export function getOrders() {
   return request('/orders', { schema: ordersSchema })
-}
-
-export function getCustomerNames() {
-  return request('/customers', { schema: customerNamesSchema })
 }
 
 export function updateOrderStatus({ id, status }: { id: string; status: OrderStatus }) {

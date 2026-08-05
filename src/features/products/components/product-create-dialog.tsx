@@ -37,6 +37,8 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
   const createProductMutation = useMutation({
     mutationFn: (values: ProductFormValues) =>
       isEditing ? updateProduct(product.id, values) : createProduct(values),
+    // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
+    meta: { suppressErrorToast: true, successMessage: isEditing ? 'Urun guncellendi.' : 'Urun eklendi.' },
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: productQueryKeys.list() }),

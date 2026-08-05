@@ -76,6 +76,8 @@ function ProfileSettingsForm({ profile }: { profile: Profile }) {
   })
   const updateProfileMutation = useMutation({
     mutationFn: updateProfile,
+    // Form hata ve basari mesajlarini kendi icinde gosterir; global toast susturulur.
+    meta: { suppressErrorToast: true },
     onSuccess: (updatedProfile) => {
       queryClient.setQueryData(profileQueryKeys.detail(), updatedProfile)
       form.reset(updatedProfile)

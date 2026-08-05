@@ -32,6 +32,8 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
   const watchedItems = useWatch({ control: form.control, name: 'items' })
   const createOrderMutation = useMutation({
     mutationFn: createOrder,
+    // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
+    meta: { suppressErrorToast: true, successMessage: 'Siparis olusturuldu.' },
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.list() }),

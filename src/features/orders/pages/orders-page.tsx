@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowUpDown, ClipboardList } from 'lucide-react'
 import { useState } from 'react'
-import { isApiError } from '../../../shared/api/api-error'
 import { customerQueryKeys, getCustomers } from '../../customers/api/customers-api'
 import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
 import { getProducts, productQueryKeys } from '../../products/api/products-api'
@@ -55,6 +54,8 @@ export function OrdersPage() {
   const productsQuery = useQuery({ queryKey: productQueryKeys.list(), queryFn: getProducts })
   const updateStatusMutation = useMutation({
     mutationFn: updateOrderStatus,
+    // Tetikle-ve-devam-et aksiyonu: hata inline degil toast'la bildirilir; rollback bilgisi eklenir.
+    meta: { successMessage: 'Siparis durumu guncellendi.', errorSuffix: 'Degisiklik geri alindi.' },
     onMutate: async ({ id, status }) => {
       await queryClient.cancelQueries({ queryKey: orderQueryKeys.list() })
       const previousOrders = queryClient.getQueryData<Order[]>(orderQueryKeys.list())
@@ -118,12 +119,6 @@ export function OrdersPage() {
           </select>
         </label>
       </div>
-
-      {updateStatusMutation.isError && (
-        <p className="border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
-          {isApiError(updateStatusMutation.error) ? updateStatusMutation.error.message : 'Siparis durumu guncellenemedi. Degisiklik geri alindi.'}
-        </p>
-      )}
 
       {orders.length === 0 ? (
         <div className="border border-dashed border-slate-300 bg-white px-6 py-14 text-center">

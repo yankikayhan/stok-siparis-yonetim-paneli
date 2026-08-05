@@ -27,6 +27,8 @@ export function ProductsPage() {
   const categoriesQuery = useQuery({ queryKey: productQueryKeys.categories(), queryFn: getCategories })
   const deleteProductMutation = useMutation({
     mutationFn: deleteProduct,
+    // Onay dialogu acik kaldigi icin hata inline gosterilir; global toast susturulur.
+    meta: { suppressErrorToast: true, successMessage: 'Urun silindi.' },
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: productQueryKeys.list() }),

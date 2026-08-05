@@ -36,8 +36,45 @@ type RequestOptions<TSchema extends z.ZodType> = {
 
 export async function request<TSchema extends z.ZodType>(
   path: string,
-  { body, headers, schema, ...options }: RequestOptions<TSchema>,
+  options: RequestOptions<TSchema>,
 ): Promise<z.output<TSchema>> {
+  const { data } = await execute(path, options)
+  return data
+}
+
+export type Page<TItem> = {
+  items: TItem[]
+  totalCount: number
+}
+
+// Liste yanitlari icin: govdeye ek olarak X-Total-Count header'ini okur.
+// `itemSchema` tek elemanin semasidir; diziye sarma burada yapilir.
+export async function requestPage<TItemSchema extends z.ZodType>(
+  path: string,
+  { itemSchema, ...options }: Omit<RequestOptions<z.ZodType>, 'schema'> & { itemSchema: TItemSchema },
+): Promise<Page<z.output<TItemSchema>>> {
+  const { data, response } = await execute(path, { ...options, schema: z.array(itemSchema) })
+
+  const headerValue = response.headers.get('X-Total-Count')
+
+  if (headerValue === null) {
+    // Number(null) sessizce 0 olurdu; eksik header'i hata olarak yuzeye cikar.
+    throw new ApiError('Sunucu toplam kayit sayisini dondurmedi.', response.status)
+  }
+
+  const totalCount = Number(headerValue)
+
+  if (!Number.isInteger(totalCount) || totalCount < 0) {
+    throw new ApiError('Sunucudan gecersiz toplam kayit sayisi alindi.', response.status)
+  }
+
+  return { items: data, totalCount }
+}
+
+async function execute<TSchema extends z.ZodType>(
+  path: string,
+  { body, headers, schema, ...options }: RequestOptions<TSchema>,
+): Promise<{ data: z.output<TSchema>; response: Response }> {
   let response: Response
 
   try {
@@ -88,5 +125,5 @@ export async function request<TSchema extends z.ZodType>(
     throw new ApiError('Sunucudan beklenmeyen bir veri formati alindi.', response.status, result.error)
   }
 
-  return result.data
+  return { data: result.data, response }
 }

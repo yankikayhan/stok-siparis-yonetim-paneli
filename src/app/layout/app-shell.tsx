@@ -1,5 +1,6 @@
 import { ChartNoAxesCombined, Menu, Package, Settings, ShoppingCart, UsersRound } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
+import { Toaster } from '../../shared/components/toaster'
 import { useUiStore } from '../../shared/stores/ui-store'
 
 const navigationItems = [
@@ -61,6 +62,7 @@ export function AppShell() {
           <Outlet />
         </main>
       </div>
+      <Toaster />
     </div>
   )
 }

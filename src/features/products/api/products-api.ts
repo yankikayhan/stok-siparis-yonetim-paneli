@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { request } from '../../../shared/api/http-client'
+import { request, requestPage } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 
 export const categorySchema = z.object({
@@ -44,14 +44,42 @@ export type ProductFormValues = z.infer<typeof productFormSchema>
 export type ProductFormInput = z.input<typeof productFormSchema>
 export type ProductUpdateValues = z.output<typeof productUpdateSchema>
 
+export type ProductStockFilter = 'all' | 'low' | 'in-stock'
+
+export type ProductListParams = {
+  search: string
+  // 'all' degerleri filtre yok anlamina gelir ve query string'e yazilmaz.
+  categoryId: string
+  stock: ProductStockFilter
+}
+
 export const productQueryKeys = {
   all: ['products'] as const,
-  list: () => [...productQueryKeys.all, 'list'] as const,
+  // Invalidation prefix'i: lists() tum filtre kombinasyonlarini kapsar.
+  lists: () => [...productQueryKeys.all, 'list'] as const,
+  list: (params: ProductListParams) => [...productQueryKeys.lists(), params] as const,
+  // Tam liste tuketicileri (siparis dialogu, stok dogrulamasi) icin sabit anahtar;
+  // gercek uygulamada dialog kendi arama endpoint'ini kullanirdi.
+  listAll: () => [...productQueryKeys.lists(), { scope: 'all' }] as const,
   categories: () => [...productQueryKeys.all, 'categories'] as const,
 }
 
 export function getProducts() {
   return request('/products', { schema: productsSchema })
+}
+
+export function getProductsPage(params: ProductListParams) {
+  const searchParams = new URLSearchParams()
+
+  if (params.search !== '') searchParams.set('search', params.search)
+  if (params.categoryId !== 'all') searchParams.set('categoryId', params.categoryId)
+  if (params.stock !== 'all') searchParams.set('stock', params.stock)
+
+  const queryString = searchParams.toString()
+
+  return requestPage(queryString === '' ? '/products' : `/products?${queryString}`, {
+    itemSchema: productSchema,
+  })
 }
 
 export function getCategories() {

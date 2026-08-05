@@ -37,7 +37,7 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.list() }),
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
         queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.summary() }),
       ])

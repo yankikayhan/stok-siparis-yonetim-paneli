@@ -51,7 +51,7 @@ export function OrdersPage() {
   const queryClient = useQueryClient()
   const ordersQuery = useQuery({ queryKey: orderQueryKeys.list(), queryFn: getOrders })
   const customersQuery = useQuery({ queryKey: customerQueryKeys.list(), queryFn: getCustomers })
-  const productsQuery = useQuery({ queryKey: productQueryKeys.list(), queryFn: getProducts })
+  const productsQuery = useQuery({ queryKey: productQueryKeys.listAll(), queryFn: getProducts })
   const updateStatusMutation = useMutation({
     mutationFn: updateOrderStatus,
     // Tetikle-ve-devam-et aksiyonu: hata inline degil toast'la bildirilir; rollback bilgisi eklenir.

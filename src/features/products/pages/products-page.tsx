@@ -2,11 +2,16 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, TriangleAlert } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
 import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
-import { deleteProduct, getCategories, getProducts, productQueryKeys, type Product } from '../api/products-api'
+import {
+  deleteProduct,
+  getCategories,
+  getProductsPage,
+  productQueryKeys,
+  type Product,
+  type ProductStockFilter,
+} from '../api/products-api'
 import { ProductCreateDialog } from '../components/product-create-dialog'
 import { useUiStore } from '../../../shared/stores/ui-store'
-
-type StockFilter = 'all' | 'low' | 'in-stock'
 
 const currencyFormatter = new Intl.NumberFormat('tr-TR', {
   style: 'currency',
@@ -16,14 +21,19 @@ const currencyFormatter = new Intl.NumberFormat('tr-TR', {
 export function ProductsPage() {
   const [search, setSearch] = useState('')
   const [categoryId, setCategoryId] = useState('all')
-  const [stockFilter, setStockFilter] = useState<StockFilter>('all')
+  const [stockFilter, setStockFilter] = useState<ProductStockFilter>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [productToEdit, setProductToEdit] = useState<Product | null>(null)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
   const tableDensity = useUiStore((state) => state.tableDensity)
   const queryClient = useQueryClient()
   const deferredSearch = useDeferredValue(search)
-  const productsQuery = useQuery({ queryKey: productQueryKeys.list(), queryFn: getProducts })
+  // Key ve istek ayni nesneden beslenir; trim key kurulmadan once yapilir.
+  const listParams = { search: deferredSearch.trim(), categoryId, stock: stockFilter }
+  const productsQuery = useQuery({
+    queryKey: productQueryKeys.list(listParams),
+    queryFn: () => getProductsPage(listParams),
+  })
   const categoriesQuery = useQuery({ queryKey: productQueryKeys.categories(), queryFn: getCategories })
   const deleteProductMutation = useMutation({
     mutationFn: deleteProduct,
@@ -31,7 +41,7 @@ export function ProductsPage() {
     meta: { suppressErrorToast: true, successMessage: 'Urun silindi.' },
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.summary() }),
       ])
       setProductToDelete(null)
@@ -65,17 +75,7 @@ export function ProductsPage() {
     )
   }
 
-  const products = productsQuery.data.filter((product) => {
-    const matchesSearch = `${product.name} ${product.sku}`.toLocaleLowerCase('tr-TR').includes(
-      deferredSearch.trim().toLocaleLowerCase('tr-TR'),
-    )
-    const matchesCategory = categoryId === 'all' || product.categoryId === categoryId
-    const isLowStock = product.stock <= product.reorderLevel
-    const matchesStock =
-      stockFilter === 'all' || (stockFilter === 'low' ? isLowStock : !isLowStock)
-
-    return matchesSearch && matchesCategory && matchesStock
-  })
+  const products = productsQuery.data.items
 
   const categoryNames = new Map(categoriesQuery.data.map((category) => [category.id, category.name]))
   const tableCellPadding = tableDensity === 'compact' ? 'py-2.5' : 'py-4'
@@ -123,7 +123,7 @@ export function ProductsPage() {
           <span className="sr-only">Stok durumu filtrele</span>
           <select
             value={stockFilter}
-            onChange={(event) => setStockFilter(event.target.value as StockFilter)}
+            onChange={(event) => setStockFilter(event.target.value as ProductStockFilter)}
             className="h-10 w-full border border-slate-300 bg-white px-3 text-sm outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
           >
             <option value="all">Tum stok durumlari</option>

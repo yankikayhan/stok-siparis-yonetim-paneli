@@ -41,7 +41,7 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
     meta: { suppressErrorToast: true, successMessage: isEditing ? 'Urun guncellendi.' : 'Urun eklendi.' },
     onSuccess: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.summary() }),
       ])
       onClose()

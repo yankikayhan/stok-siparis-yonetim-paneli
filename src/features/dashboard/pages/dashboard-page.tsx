@@ -1,6 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 import { AlertTriangle, CircleDollarSign, PackageCheck, ShoppingBag } from 'lucide-react'
-import { dashboardSummaryOptions } from '../api/dashboard-api'
+import { ordersOptions } from '../../orders/api/orders-api'
+import { productListAllOptions } from '../../products/api/products-api'
+import { selectOrderStats, selectProductStats } from '../api/dashboard-api'
 
 const numberFormatter = new Intl.NumberFormat('tr-TR')
 const currencyFormatter = new Intl.NumberFormat('tr-TR', {
@@ -10,20 +12,26 @@ const currencyFormatter = new Intl.NumberFormat('tr-TR', {
 })
 
 export function DashboardPage() {
-  const dashboardQuery = useQuery(dashboardSummaryOptions())
+  const productStatsQuery = useQuery({ ...productListAllOptions(), select: selectProductStats })
+  const orderStatsQuery = useQuery({ ...ordersOptions(), select: selectOrderStats })
 
-  if (dashboardQuery.isPending) {
+  if (productStatsQuery.isPending || orderStatsQuery.isPending) {
     return <DashboardLoadingState />
   }
 
-  if (dashboardQuery.isError) {
+  if (productStatsQuery.isError || orderStatsQuery.isError) {
+    const error = productStatsQuery.error ?? orderStatsQuery.error
+
     return (
       <section className="rounded-lg border border-rose-200 bg-rose-50 p-6">
         <h1 className="text-base font-semibold text-rose-950">Dashboard verileri yuklenemedi</h1>
-        <p className="mt-2 text-sm text-rose-800">{dashboardQuery.error.message}</p>
+        <p className="mt-2 text-sm text-rose-800">{error?.message ?? 'Beklenmeyen bir hata olustu.'}</p>
         <button
           type="button"
-          onClick={() => void dashboardQuery.refetch()}
+          onClick={() => {
+            void productStatsQuery.refetch()
+            void orderStatsQuery.refetch()
+          }}
           className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800"
         >
           Tekrar dene
@@ -32,7 +40,8 @@ export function DashboardPage() {
     )
   }
 
-  const { totalProducts, lowStockProducts, openOrders, totalRevenue } = dashboardQuery.data
+  const { totalProducts, lowStockProducts } = productStatsQuery.data
+  const { openOrders, totalRevenue } = orderStatsQuery.data
 
   return (
     <section className="space-y-6">

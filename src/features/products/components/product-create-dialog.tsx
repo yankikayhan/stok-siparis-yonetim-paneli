@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
 import { useForm } from 'react-hook-form'
-import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
 import {
   createProduct,
   productFormSchema,
@@ -40,10 +39,8 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
     // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
     meta: { suppressErrorToast: true, successMessage: isEditing ? 'Urun guncellendi.' : 'Urun eklendi.' },
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
-        queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.summary() }),
-      ])
+      // Dashboard ayni urun cache'ini okudugu icin ayrica invalidate edilmez.
+      await queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
       onClose()
     },
   })

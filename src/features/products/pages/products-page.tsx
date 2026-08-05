@@ -1,7 +1,6 @@
 import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Search, TriangleAlert } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
-import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
 import {
   categoriesOptions,
   deleteProduct,
@@ -56,10 +55,8 @@ export function ProductsPage() {
     // Onay dialogu acik kaldigi icin hata inline gosterilir; global toast susturulur.
     meta: { suppressErrorToast: true, successMessage: 'Urun silindi.' },
     onSuccess: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
-        queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.summary() }),
-      ])
+      // Dashboard ayni urun cache'ini okudugu icin ayrica invalidate edilmez.
+      await queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
       setProductToDelete(null)
     },
   })

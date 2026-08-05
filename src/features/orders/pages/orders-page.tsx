@@ -2,7 +2,6 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { ArrowUpDown, ClipboardList } from 'lucide-react'
 import { useState } from 'react'
 import { customerQueryKeys, customersOptions } from '../../customers/api/customers-api'
-import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
 import { productListAllOptions } from '../../products/api/products-api'
 import { OrderCreateDialog } from '../components/order-create-dialog'
 import {
@@ -77,7 +76,6 @@ export function OrdersPage() {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.list() }),
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
-        queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.summary() }),
       ])
     },
   })

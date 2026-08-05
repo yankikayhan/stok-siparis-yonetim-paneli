@@ -2,7 +2,6 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Minus, Plus, X } from 'lucide-react'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
-import { dashboardQueryKeys } from '../../dashboard/api/dashboard-api'
 import { customerQueryKeys, type Customer } from '../../customers/api/customers-api'
 import { productQueryKeys, type Product } from '../../products/api/products-api'
 import {
@@ -35,11 +34,11 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
     // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
     meta: { suppressErrorToast: true, successMessage: 'Siparis olusturuldu.' },
     onSuccess: async () => {
+      // Dashboard ayni siparis/urun cache'lerini okudugu icin ayrica invalidate edilmez.
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.list() }),
         queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
-        queryClient.invalidateQueries({ queryKey: dashboardQueryKeys.summary() }),
       ])
       onClose()
     },

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-import { persist } from 'zustand/middleware'
+import { devtools, persist } from 'zustand/middleware'
 
 type Theme = 'light' | 'dark'
 type TableDensity = 'compact' | 'comfortable'
@@ -14,22 +14,25 @@ type UiState = {
 }
 
 export const useUiStore = create<UiState>()(
-  persist(
-    (set) => ({
-      theme: 'light',
-      isSidebarOpen: true,
-      tableDensity: 'comfortable',
-      setTheme: (theme) => set({ theme }),
-      toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen })),
-      setTableDensity: (tableDensity) => set({ tableDensity }),
-    }),
-    {
-      name: 'stok-siparis-yonetim-paneli-preferences',
-      partialize: (state) => ({
-        theme: state.theme,
-        isSidebarOpen: state.isSidebarOpen,
-        tableDensity: state.tableDensity,
+  devtools(
+    persist(
+      (set) => ({
+        theme: 'light',
+        isSidebarOpen: true,
+        tableDensity: 'comfortable',
+        setTheme: (theme) => set({ theme }, false, 'setTheme'),
+        toggleSidebar: () => set((state) => ({ isSidebarOpen: !state.isSidebarOpen }), false, 'toggleSidebar'),
+        setTableDensity: (tableDensity) => set({ tableDensity }, false, 'setTableDensity'),
       }),
-    },
+      {
+        name: 'stok-siparis-yonetim-paneli-preferences',
+        partialize: (state) => ({
+          theme: state.theme,
+          isSidebarOpen: state.isSidebarOpen,
+          tableDensity: state.tableDensity,
+        }),
+      },
+    ),
+    { name: 'ui-store', enabled: import.meta.env.DEV },
   ),
 )

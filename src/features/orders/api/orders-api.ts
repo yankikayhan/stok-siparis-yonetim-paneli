@@ -1,6 +1,6 @@
-import { queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
-import { request } from '../../../shared/api/http-client'
+import { request, requestPage } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 import type { Product } from '../../products/api/products-api'
 
@@ -38,6 +38,8 @@ const orderStatusUpdateSchema = z.object({ status: orderStatusSchema })
 export type Order = z.output<typeof orderSchema>
 // Tek kaynak: union'in discriminant'indan turer, enum'la ayrisirsa derleme hatasi cikar.
 export type OrderStatus = Order['status']
+// 'all' filtre yok anlamina gelir ve query string'e yazilmaz.
+export type OrderStatusFilter = 'all' | OrderStatus
 
 // Form validation schemas
 const orderItemFormSchema = z.object({
@@ -57,6 +59,9 @@ export type OrderFormValues = z.output<typeof orderFormSchema>
 export const orderQueryKeys = {
   all: ['orders'] as const,
   list: () => [...orderQueryKeys.all, 'list'] as const,
+  // Invalidation prefix'i: infinites() tum durum filtresi girdilerini kapsar.
+  infinites: () => [...orderQueryKeys.all, 'infinite'] as const,
+  infinite: (status: OrderStatusFilter) => [...orderQueryKeys.infinites(), status] as const,
 }
 
 // useMutationState filtreleri bu key ile eslesir; string literal tuketicilere dagitilmaz.
@@ -73,6 +78,35 @@ export function ordersOptions() {
   return queryOptions({
     queryKey: orderQueryKeys.list(),
     queryFn: getOrders,
+  })
+}
+
+export const ORDERS_PAGE_SIZE = 10
+
+export function getOrdersPage({ status, page }: { status: OrderStatusFilter; page: number }) {
+  const searchParams = new URLSearchParams({
+    // Varsayilan siralama ekleme sirasiydi; yeni siparis ustte gorunsun diye tarihe cevrildi.
+    _sort: 'createdAt',
+    _order: 'desc',
+    _page: String(page),
+    _limit: String(ORDERS_PAGE_SIZE),
+  })
+
+  if (status !== 'all') searchParams.set('status', status)
+
+  return requestPage(`/orders?${searchParams.toString()}`, { itemSchema: orderSchema })
+}
+
+export function ordersInfiniteOptions(status: OrderStatusFilter) {
+  return infiniteQueryOptions({
+    queryKey: orderQueryKeys.infinite(status),
+    queryFn: ({ pageParam }) => getOrdersPage({ status, page: pageParam }),
+    initialPageParam: 1,
+    getNextPageParam: (lastPage, allPages, lastPageParam) => {
+      const loadedCount = allPages.reduce((total, page) => total + page.items.length, 0)
+      // Sunucunun bildirdigi toplama ulasildiysa siradaki sayfa yoktur.
+      return loadedCount < lastPage.totalCount ? lastPageParam + 1 : undefined
+    },
   })
 }
 

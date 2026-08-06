@@ -38,8 +38,9 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
     meta: { suppressErrorToast: true, successMessage: 'Siparis olusturuldu.' },
     onSuccess: async () => {
       // Dashboard ayni siparis/urun cache'lerini okudugu icin ayrica invalidate edilmez.
+      // orders prefix'i tam listeyle birlikte filtre basina infinite girdileri de kapsar.
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: orderQueryKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: orderQueryKeys.all }),
         queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
       ])

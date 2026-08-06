@@ -1,15 +1,25 @@
-import { useMutation, useQueries, useQueryClient, type UseQueryResult } from '@tanstack/react-query'
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useMutation,
+  useQueries,
+  useQueryClient,
+  type InfiniteData,
+  type UseQueryResult,
+} from '@tanstack/react-query'
 import { ArrowUpDown, ClipboardList } from 'lucide-react'
 import { useState } from 'react'
+import { type Page } from '../../../shared/api/http-client'
 import { customerQueryKeys, customersOptions, type Customer } from '../../customers/api/customers-api'
 import { productListAllOptions, type Product } from '../../products/api/products-api'
 import { OrderCreateDialog } from '../components/order-create-dialog'
 import {
-  ordersOptions,
+  ordersInfiniteOptions,
   orderQueryKeys,
   orderStatuses,
   type Order,
   type OrderStatus,
+  type OrderStatusFilter,
   updateOrderStatus,
 } from '../api/orders-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
@@ -44,28 +54,43 @@ function applyStatus(order: Order, status: OrderStatus): Order {
   }
 }
 
+// 'orders' prefix'i altinda iki farkli sekil yasar: list() -> Order[], infinite girdileri ->
+// InfiniteData<Page<Order>>; updater sekle gore dallanir (products'taki pattern'in muadili).
+type OrdersCache = Order[] | InfiniteData<Page<Order>>
+
+function applyStatusToCache(data: OrdersCache, id: string, status: OrderStatus): OrdersCache {
+  if (Array.isArray(data)) {
+    return data.map((order) => (order.id === id ? applyStatus(order, status) : order))
+  }
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      items: page.items.map((order) => (order.id === id ? applyStatus(order, status) : order)),
+    })),
+  }
+}
+
 // Modul seviyesi tanim sarttir (dashboard select emsali): memoizasyon guard'i combine'in
 // KENDI referansina da bakar; inline tanim + icinde uretilen closure'lar (refetchAll)
 // her render'da yeni sonuc nesnesi dogururdu.
-function combineOrdersPageQueries([ordersResult, customersResult, productsResult]: [
-  UseQueryResult<Order[]>,
+function combineReferenceQueries([customersResult, productsResult]: [
   UseQueryResult<Customer[]>,
   UseQueryResult<Product[]>,
 ]) {
   return {
-    isPending: ordersResult.isPending || customersResult.isPending || productsResult.isPending,
-    error: ordersResult.error ?? customersResult.error ?? productsResult.error ?? undefined,
+    isPending: customersResult.isPending || productsResult.isPending,
+    error: customersResult.error ?? productsResult.error ?? undefined,
     // isSuccess daraltmalari data'lari undefined'siz tipler; biri bile degilse sayfa veri gostermez.
     data:
-      ordersResult.isSuccess && customersResult.isSuccess && productsResult.isSuccess
+      customersResult.isSuccess && productsResult.isSuccess
         ? {
-            orders: ordersResult.data,
             customers: customersResult.data,
             products: productsResult.data,
           }
         : undefined,
     refetchAll: () => {
-      void ordersResult.refetch()
       void customersResult.refetch()
       void productsResult.refetch()
     },
@@ -73,62 +98,73 @@ function combineOrdersPageQueries([ordersResult, customersResult, productsResult
 }
 
 export function OrdersPage() {
-  const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
+  const [statusFilter, setStatusFilter] = useState<OrderStatusFilter>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const currencyFormatter = useCurrencyFormatter()
   const queryClient = useQueryClient()
-  // Uc paralel sorgu tek sonuc nesnesine indirgenir; sonuc referansi alt sorgular
-  // degismedikce sabittir (guard + yapisal paylasim).
-  const pageQueries = useQueries({
-    queries: [ordersOptions(), customersOptions(), productListAllOptions()],
-    combine: combineOrdersPageQueries,
+  const referenceQueries = useQueries({
+    queries: [customersOptions(), productListAllOptions()],
+    combine: combineReferenceQueries,
+  })
+  // Filtre degisimi = yeni key; eski liste keepPreviousData ile soluk kalir (urunler sayfasi pattern'i).
+  const ordersQuery = useInfiniteQuery({
+    ...ordersInfiniteOptions(statusFilter),
+    placeholderData: keepPreviousData,
   })
   const updateStatusMutation = useMutation({
     mutationFn: updateOrderStatus,
     // Tetikle-ve-devam-et aksiyonu: hata inline degil toast'la bildirilir; rollback bilgisi eklenir.
     meta: { successMessage: 'Siparis durumu guncellendi.', errorSuffix: 'Degisiklik geri alindi.' },
     onMutate: async ({ id, status }) => {
-      // queryOptions'in tipli key'i sayesinde getQueryData/setQueryData elle generic istemez.
-      const { queryKey } = ordersOptions()
-      await queryClient.cancelQueries({ queryKey })
-      const previousOrders = queryClient.getQueryData(queryKey)
+      // Prefix TUM siparis cache'lerini kapsar: dashboard'un tam listesi + filtre basina infinite girdiler.
+      await queryClient.cancelQueries({ queryKey: orderQueryKeys.all })
+      const snapshot = queryClient.getQueriesData<OrdersCache>({ queryKey: orderQueryKeys.all })
 
-      queryClient.setQueryData(queryKey, (orders) =>
-        orders?.map((order) => (order.id === id ? applyStatus(order, status) : order)),
+      queryClient.setQueriesData<OrdersCache>({ queryKey: orderQueryKeys.all }, (data) =>
+        data === undefined ? undefined : applyStatusToCache(data, id, status),
       )
 
-      return { previousOrders }
+      return { snapshot }
     },
     onError: (_error, _variables, context) => {
-      if (context?.previousOrders) {
-        queryClient.setQueryData(ordersOptions().queryKey, context.previousOrders)
-      }
+      context?.snapshot.forEach(([queryKey, data]) => queryClient.setQueryData(queryKey, data))
     },
+    // Durum degisimi filtre uyeligini de degistirir; yerinde boyamanin mutabakati invalidation'dadir.
     onSettled: async () => {
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: orderQueryKeys.list() }),
+        queryClient.invalidateQueries({ queryKey: orderQueryKeys.all }),
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
       ])
     },
   })
 
-  if (pageQueries.isPending) {
+  if (referenceQueries.isPending || ordersQuery.isPending) {
     return <OrdersLoadingState />
   }
 
-  if (pageQueries.data === undefined) {
+  if (referenceQueries.data === undefined || ordersQuery.data === undefined) {
     return (
       <section className="border border-rose-200 bg-rose-50 p-6">
         <h1 className="text-base font-semibold text-rose-950">Siparisler yuklenemedi</h1>
-        <p className="mt-2 text-sm text-rose-800">{pageQueries.error?.message ?? 'Beklenmeyen bir hata olustu.'}</p>
-        <button type="button" onClick={pageQueries.refetchAll} className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Tekrar dene</button>
+        <p className="mt-2 text-sm text-rose-800">{(referenceQueries.error ?? ordersQuery.error)?.message ?? 'Beklenmeyen bir hata olustu.'}</p>
+        <button
+          type="button"
+          onClick={() => {
+            referenceQueries.refetchAll()
+            void ordersQuery.refetch()
+          }}
+          className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800"
+        >
+          Tekrar dene
+        </button>
       </section>
     )
   }
 
-  const { customers, products } = pageQueries.data
+  const { customers, products } = referenceQueries.data
   const customerNames = new Map(customers.map((customer) => [customer.id, customer.name]))
-  const orders = statusFilter === 'all' ? pageQueries.data.orders : pageQueries.data.orders.filter((order) => order.status === statusFilter)
+  const orders = ordersQuery.data.pages.flatMap((page) => page.items)
+  const totalCount = ordersQuery.data.pages[0].totalCount
 
   return (
     <section className="space-y-6">
@@ -145,7 +181,7 @@ export function OrdersPage() {
         <ArrowUpDown size={18} className="text-slate-500" aria-hidden="true" />
         <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
           Durum
-          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as 'all' | OrderStatus)} className="form-input w-48">
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value as OrderStatusFilter)} className="form-input w-48">
             <option value="all">Tum durumlar</option>
             {orderStatuses.map((status) => <option key={status} value={status}>{orderStatusLabels[status]}</option>)}
           </select>
@@ -159,7 +195,11 @@ export function OrdersPage() {
           <p className="mt-2 text-sm text-slate-600">Durum filtresini degistirerek tekrar deneyin.</p>
         </div>
       ) : (
-        <div className="overflow-x-auto border border-slate-200 bg-white">
+        <>
+          <div
+            aria-busy={ordersQuery.isPlaceholderData}
+            className={`overflow-x-auto border border-slate-200 bg-white ${ordersQuery.isPlaceholderData ? 'opacity-60' : ''}`}
+          >
           <table className="w-full min-w-190 text-left text-sm">
             <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
               <tr><th className="px-5 py-3">Siparis</th><th className="px-5 py-3">Musteri</th><th className="px-5 py-3">Tarih</th><th className="px-5 py-3 text-right">Toplam</th><th className="px-5 py-3">Durum</th></tr>
@@ -183,7 +223,22 @@ export function OrdersPage() {
               ))}
             </tbody>
           </table>
-        </div>
+          </div>
+          <div className="flex flex-wrap items-center justify-between gap-3 border border-t-0 border-slate-200 bg-white px-5 py-3">
+            <p className="text-sm text-slate-600">Toplam {totalCount} siparisin {orders.length} tanesi goruntuleniyor</p>
+            {ordersQuery.hasNextPage && (
+              <button
+                type="button"
+                onClick={() => void ordersQuery.fetchNextPage()}
+                // Placeholder'da eski filtrenin listesi gorunur; yeni key'in ilk sayfasi gelmeden devami istenmez.
+                disabled={ordersQuery.isFetchingNextPage || ordersQuery.isPlaceholderData}
+                className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {ordersQuery.isFetchingNextPage ? 'Yukleniyor...' : 'Daha fazla yukle'}
+              </button>
+            )}
+          </div>
+        </>
       )}
       {isCreateDialogOpen && <OrderCreateDialog customers={customers} products={products} onClose={() => setIsCreateDialogOpen(false)} />}
     </section>

@@ -1,7 +1,8 @@
-import { type UseQueryResult, useQuery } from '@tanstack/react-query'
+import { type UseQueryResult, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Building2, Mail, Phone, ReceiptText, UsersRound } from 'lucide-react'
 import { useState } from 'react'
 import { isApiError } from '../../../shared/api/api-error'
+import { ordersOptions } from '../../orders/api/orders-api'
 import {
   customerOrdersOptions,
   customersOptions,
@@ -25,11 +26,19 @@ const orderStatusLabels = {
 
 export function CustomersPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)
+  const queryClient = useQueryClient()
   const customersQuery = useQuery(customersOptions())
   const customerOrdersQuery = useQuery({
     ...customerOrdersOptions(selectedCustomerId ?? ''),
     // Dependent query: enabled sayfa state'ine bagli oldugu icin cagri yerinde kalir.
     enabled: selectedCustomerId !== null,
+    // Tam siparis listesi cache'inden (Dashboard doldurur) gosterimlik seed; fetch yine gider.
+    // initialData bilerek secilmedi: cache'e gercek veri olarak yazilir ve staleTime boyunca
+    // fetch'i bastirir — eksik/bayat liste "dogru veri" muamelesi gorurdu.
+    placeholderData: () =>
+      queryClient
+        .getQueryData(ordersOptions().queryKey)
+        ?.filter((order) => order.customerId === selectedCustomerId),
   })
 
   if (customersQuery.isPending) {
@@ -133,7 +142,10 @@ function CustomerDetail({
         ) : ordersQuery.data?.length === 0 ? (
           <p className="mt-4 text-sm text-slate-600">Bu musteriye ait siparis bulunmuyor.</p>
         ) : (
-          <ul className="mt-4 divide-y divide-slate-100 border-y border-slate-100">
+          <ul
+            aria-busy={ordersQuery.isPlaceholderData}
+            className={`mt-4 divide-y divide-slate-100 border-y border-slate-100 ${ordersQuery.isPlaceholderData ? 'opacity-60' : ''}`}
+          >
             {ordersQuery.data?.map((order) => (
               <li key={order.id} className="flex items-center justify-between gap-4 py-3">
                 <div>

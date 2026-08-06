@@ -1,8 +1,8 @@
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueries, useQueryClient, type UseQueryResult } from '@tanstack/react-query'
 import { ArrowUpDown, ClipboardList } from 'lucide-react'
 import { useState } from 'react'
-import { customerQueryKeys, customersOptions } from '../../customers/api/customers-api'
-import { productListAllOptions } from '../../products/api/products-api'
+import { customerQueryKeys, customersOptions, type Customer } from '../../customers/api/customers-api'
+import { productListAllOptions, type Product } from '../../products/api/products-api'
 import { OrderCreateDialog } from '../components/order-create-dialog'
 import {
   ordersOptions,
@@ -44,14 +44,45 @@ function applyStatus(order: Order, status: OrderStatus): Order {
   }
 }
 
+// Modul seviyesi tanim sarttir (dashboard select emsali): memoizasyon guard'i combine'in
+// KENDI referansina da bakar; inline tanim + icinde uretilen closure'lar (refetchAll)
+// her render'da yeni sonuc nesnesi dogururdu.
+function combineOrdersPageQueries([ordersResult, customersResult, productsResult]: [
+  UseQueryResult<Order[]>,
+  UseQueryResult<Customer[]>,
+  UseQueryResult<Product[]>,
+]) {
+  return {
+    isPending: ordersResult.isPending || customersResult.isPending || productsResult.isPending,
+    error: ordersResult.error ?? customersResult.error ?? productsResult.error ?? undefined,
+    // isSuccess daraltmalari data'lari undefined'siz tipler; biri bile degilse sayfa veri gostermez.
+    data:
+      ordersResult.isSuccess && customersResult.isSuccess && productsResult.isSuccess
+        ? {
+            orders: ordersResult.data,
+            customers: customersResult.data,
+            products: productsResult.data,
+          }
+        : undefined,
+    refetchAll: () => {
+      void ordersResult.refetch()
+      void customersResult.refetch()
+      void productsResult.refetch()
+    },
+  }
+}
+
 export function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const currencyFormatter = useCurrencyFormatter()
   const queryClient = useQueryClient()
-  const ordersQuery = useQuery(ordersOptions())
-  const customersQuery = useQuery(customersOptions())
-  const productsQuery = useQuery(productListAllOptions())
+  // Uc paralel sorgu tek sonuc nesnesine indirgenir; sonuc referansi alt sorgular
+  // degismedikce sabittir (guard + yapisal paylasim).
+  const pageQueries = useQueries({
+    queries: [ordersOptions(), customersOptions(), productListAllOptions()],
+    combine: combineOrdersPageQueries,
+  })
   const updateStatusMutation = useMutation({
     mutationFn: updateOrderStatus,
     // Tetikle-ve-devam-et aksiyonu: hata inline degil toast'la bildirilir; rollback bilgisi eklenir.
@@ -81,23 +112,23 @@ export function OrdersPage() {
     },
   })
 
-  if (ordersQuery.isPending || customersQuery.isPending || productsQuery.isPending) {
+  if (pageQueries.isPending) {
     return <OrdersLoadingState />
   }
 
-  if (ordersQuery.isError || customersQuery.isError || productsQuery.isError) {
-    const error = ordersQuery.error ?? customersQuery.error ?? productsQuery.error
+  if (pageQueries.data === undefined) {
     return (
       <section className="border border-rose-200 bg-rose-50 p-6">
         <h1 className="text-base font-semibold text-rose-950">Siparisler yuklenemedi</h1>
-        <p className="mt-2 text-sm text-rose-800">{error?.message ?? 'Beklenmeyen bir hata olustu.'}</p>
-        <button type="button" onClick={() => { void ordersQuery.refetch(); void customersQuery.refetch(); void productsQuery.refetch() }} className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Tekrar dene</button>
+        <p className="mt-2 text-sm text-rose-800">{pageQueries.error?.message ?? 'Beklenmeyen bir hata olustu.'}</p>
+        <button type="button" onClick={pageQueries.refetchAll} className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Tekrar dene</button>
       </section>
     )
   }
 
-  const customerNames = new Map(customersQuery.data.map((customer) => [customer.id, customer.name]))
-  const orders = statusFilter === 'all' ? ordersQuery.data : ordersQuery.data.filter((order) => order.status === statusFilter)
+  const { customers, products } = pageQueries.data
+  const customerNames = new Map(customers.map((customer) => [customer.id, customer.name]))
+  const orders = statusFilter === 'all' ? pageQueries.data.orders : pageQueries.data.orders.filter((order) => order.status === statusFilter)
 
   return (
     <section className="space-y-6">
@@ -154,7 +185,7 @@ export function OrdersPage() {
           </table>
         </div>
       )}
-      {isCreateDialogOpen && <OrderCreateDialog customers={customersQuery.data} products={productsQuery.data} onClose={() => setIsCreateDialogOpen(false)} />}
+      {isCreateDialogOpen && <OrderCreateDialog customers={customers} products={products} onClose={() => setIsCreateDialogOpen(false)} />}
     </section>
   )
 }

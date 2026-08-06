@@ -130,6 +130,21 @@ export function replaceProductInListCache(data: ProductListCache, product: Produ
   return { ...data, items: data.items.map((item) => (item.id === product.id ? product : item)) }
 }
 
+export function removeProductFromListCache(data: ProductListCache, productId: string): ProductListCache {
+  if (Array.isArray(data)) {
+    return data.filter((item) => item.id !== productId)
+  }
+
+  const items = data.items.filter((item) => item.id !== productId)
+
+  return {
+    items,
+    // totalCount yalnizca urun bu girdide gorunuyorsa dusurulur: baska sayfadaki uyelik
+    // istemcide bilinemez; kesin mutabakat onSettled invalidation'inin isidir.
+    totalCount: items.length === data.items.length ? data.totalCount : data.totalCount - 1,
+  }
+}
+
 export function createProduct(values: ProductFormValues) {
   const now = new Date().toISOString()
 

@@ -7,7 +7,9 @@ import {
   productListOptions,
   PRODUCTS_PAGE_SIZE,
   productQueryKeys,
+  removeProductFromListCache,
   type Product,
+  type ProductListCache,
   type ProductStockFilter,
 } from '../api/products-api'
 import { ProductCreateDialog } from '../components/product-create-dialog'
@@ -52,13 +54,26 @@ export function ProductsPage() {
   const categoriesQuery = useQuery(categoriesOptions())
   const deleteProductMutation = useMutation({
     mutationFn: deleteProduct,
-    // Onay dialogu acik kaldigi icin hata inline gosterilir; global toast susturulur.
-    meta: { suppressErrorToast: true, successMessage: 'Urun silindi.' },
-    onSuccess: async () => {
-      // Dashboard ayni urun cache'ini okudugu icin ayrica invalidate edilmez.
-      await queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
+    // Tetikle-ve-devam-et aksiyonu: dialog mutate aninda kapanir, hata toast'la bildirilir.
+    meta: { successMessage: 'Urun silindi.', errorSuffix: 'Urun geri getirildi.' },
+    onMutate: async (productId) => {
+      // Ucustaki refetch'lerin optimistic yazimin uzerine eski veriyle binmesi engellenir.
+      await queryClient.cancelQueries({ queryKey: productQueryKeys.lists() })
+      // Prefix'le eslesen TUM girdiler (sayfali listeler + listAll) yedeklenir; rollback birebir geri yazar.
+      const snapshot = queryClient.getQueriesData<ProductListCache>({ queryKey: productQueryKeys.lists() })
+
+      queryClient.setQueriesData<ProductListCache>({ queryKey: productQueryKeys.lists() }, (data) =>
+        data === undefined ? undefined : removeProductFromListCache(data, productId),
+      )
       setProductToDelete(null)
+
+      return { snapshot }
     },
+    onError: (_error, _productId, context) => {
+      context?.snapshot.forEach(([queryKey, data]) => queryClient.setQueryData(queryKey, data))
+    },
+    // Basari veya hata fark etmeksizin sunucuyla mutabakat: sayfa kaymasi ve totalCount duzeltilir.
+    onSettled: () => queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
   })
 
   if (productsQuery.isPending || categoriesQuery.isPending) {
@@ -236,10 +251,9 @@ export function ProductsPage() {
           <section role="dialog" aria-modal="true" aria-labelledby="product-delete-title" className="w-full max-w-md bg-white p-5 shadow-xl">
             <h2 id="product-delete-title" className="text-base font-semibold text-slate-950">Urunu sil</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600"><strong>{productToDelete.name}</strong> urununu kalici olarak silmek istiyor musunuz?</p>
-            {deleteProductMutation.isError && <p className="mt-3 text-sm text-rose-700">{deleteProductMutation.error.message}</p>}
             <div className="mt-5 flex justify-end gap-3">
               <button type="button" onClick={() => setProductToDelete(null)} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
-              <button type="button" disabled={deleteProductMutation.isPending} onClick={() => deleteProductMutation.mutate(productToDelete.id)} className="rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800 disabled:opacity-60">{deleteProductMutation.isPending ? 'Siliniyor...' : 'Urunu sil'}</button>
+              <button type="button" onClick={() => deleteProductMutation.mutate(productToDelete.id)} className="rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Urunu sil</button>
             </div>
           </section>
         </div>

@@ -6,10 +6,12 @@ import {
   createProduct,
   productFormSchema,
   productQueryKeys,
+  replaceProductInListCache,
   type Category,
   type Product,
   type ProductFormInput,
   type ProductFormValues,
+  type ProductListCache,
   updateProduct,
 } from '../api/products-api'
 
@@ -38,8 +40,23 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
       isEditing ? updateProduct(product.id, values) : createProduct(values),
     // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
     meta: { suppressErrorToast: true, successMessage: isEditing ? 'Urun guncellendi.' : 'Urun eklendi.' },
-    onSuccess: async () => {
+    onSuccess: async (savedProduct) => {
       // Dashboard ayni urun cache'ini okudugu icin ayrica invalidate edilmez.
+      if (isEditing) {
+        // Hibrit strateji: setQueriesData refetch beklemeden anlik boyar (UI hizi); ardindan
+        // invalidation dogrulugu garanti eder — filtre uyeligi (ad/kategori/stok) server-side
+        // belirlendigi icin yerinde boyama tek basina urunu ait olmadigi filtrede gosterebilirdi.
+        queryClient.setQueriesData<ProductListCache>({ queryKey: productQueryKeys.lists() }, (data) =>
+          data === undefined ? undefined : replaceProductInListCache(data, savedProduct),
+        )
+        // Liste zaten dogru boyandi; dialog refetch'i beklemeden kapanir.
+        onClose()
+        await queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
+        return
+      }
+
+      // Yeni urunun hangi sayfa/filtre girdisine dusecegini istemci bilemez (totalCount dahil);
+      // create icin dogru arac invalidation'dir.
       await queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() })
       onClose()
     },

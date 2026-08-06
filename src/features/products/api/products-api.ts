@@ -1,6 +1,6 @@
 import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
-import { request, requestPage } from '../../../shared/api/http-client'
+import { request, requestPage, type Page } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 
 export const categorySchema = z.object({
@@ -116,6 +116,18 @@ export function categoriesOptions() {
     staleTime: Infinity,
     gcTime: Infinity,
   })
+}
+
+// lists() prefix'i altinda iki farkli sekil yasar: list(params) -> Page<Product>, listAll() -> Product[].
+// setQueriesData updater'lari bu yuzden sekle gore dallanmak zorundadir.
+export type ProductListCache = Product[] | Page<Product>
+
+export function replaceProductInListCache(data: ProductListCache, product: Product): ProductListCache {
+  if (Array.isArray(data)) {
+    return data.map((item) => (item.id === product.id ? product : item))
+  }
+
+  return { ...data, items: data.items.map((item) => (item.id === product.id ? product : item)) }
 }
 
 export function createProduct(values: ProductFormValues) {

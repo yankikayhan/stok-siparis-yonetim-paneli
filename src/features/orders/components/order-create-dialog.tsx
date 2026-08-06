@@ -7,6 +7,7 @@ import { productQueryKeys, type Product } from '../../products/api/products-api'
 import {
   createOrder,
   createOrderFormSchema,
+  orderMutationKeys,
   orderQueryKeys,
   type OrderFormInput,
   type OrderFormValues,
@@ -30,6 +31,8 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
   const orderItems = useFieldArray({ control: form.control, name: 'items' })
   const watchedItems = useWatch({ control: form.control, name: 'items' })
   const createOrderMutation = useMutation({
+    // Key, mutation'i cache'te adreslenebilir yapar: header gostergesi useMutationState ile izler.
+    mutationKey: orderMutationKeys.create,
     mutationFn: createOrder,
     // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
     meta: { suppressErrorToast: true, successMessage: 'Siparis olusturuldu.' },

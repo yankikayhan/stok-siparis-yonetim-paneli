@@ -1,7 +1,8 @@
-import { useQueryClient } from '@tanstack/react-query'
-import { ChartNoAxesCombined, Menu, Package, Settings, ShoppingCart, UsersRound } from 'lucide-react'
+import { useMutationState, useQueryClient } from '@tanstack/react-query'
+import { ChartNoAxesCombined, LoaderCircle, Menu, Package, Settings, ShoppingCart, UsersRound } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
+import { orderMutationKeys } from '../../features/orders/api/orders-api'
 import {
   categoriesOptions,
   DEFAULT_PRODUCT_LIST_PARAMS,
@@ -34,6 +35,12 @@ export function AppShell() {
     void queryClient.prefetchQuery(categoriesOptions())
   }
 
+  // Dialog'un disindan, mutation cache'i uzerinden izleme: dialog kapansa bile gosterge dogru kalir.
+  const pendingOrderCreations = useMutationState({
+    filters: { mutationKey: orderMutationKeys.create, status: 'pending' },
+  })
+  const isCreatingOrder = pendingOrderCreations.length > 0
+
   return (
     <div data-theme={theme} className={theme === 'dark' ? 'flex min-h-screen flex-col bg-slate-950 text-slate-50' : 'flex min-h-screen flex-col bg-slate-50 text-slate-950'}>
       <header className={theme === 'dark' ? 'flex h-16 shrink-0 items-center border-b border-slate-700 bg-slate-900 px-4 sm:px-6' : 'flex h-16 shrink-0 items-center border-b border-slate-200 bg-white px-4 sm:px-6'}>
@@ -46,6 +53,12 @@ export function AppShell() {
           <Menu size={20} aria-hidden="true" />
         </button>
         <p className={theme === 'dark' ? 'ml-3 text-sm font-semibold tracking-wide text-white' : 'ml-3 text-sm font-semibold tracking-wide text-slate-900'}>Noktasi Isletme</p>
+        {isCreatingOrder && (
+          <span role="status" className={theme === 'dark' ? 'ml-auto flex items-center gap-2 text-sm text-slate-300' : 'ml-auto flex items-center gap-2 text-sm text-slate-600'}>
+            <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />
+            Siparis kaydediliyor...
+          </span>
+        )}
       </header>
 
       <div className="mx-auto flex w-full max-w-screen-2xl flex-1">

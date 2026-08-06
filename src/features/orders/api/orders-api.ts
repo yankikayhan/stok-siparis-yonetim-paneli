@@ -59,6 +59,11 @@ export const orderQueryKeys = {
   list: () => [...orderQueryKeys.all, 'list'] as const,
 }
 
+// useMutationState filtreleri bu key ile eslesir; string literal tuketicilere dagitilmaz.
+export const orderMutationKeys = {
+  create: ['orders', 'create'] as const,
+}
+
 // API operations
 export function getOrders() {
   return request('/orders', { schema: ordersSchema })

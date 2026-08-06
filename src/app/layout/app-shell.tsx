@@ -1,6 +1,12 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { ChartNoAxesCombined, Menu, Package, Settings, ShoppingCart, UsersRound } from 'lucide-react'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
+import {
+  categoriesOptions,
+  DEFAULT_PRODUCT_LIST_PARAMS,
+  productListOptions,
+} from '../../features/products/api/products-api'
 import { Toaster } from '../../shared/components/toaster'
 import { useUiStore } from '../../shared/stores/ui-store'
 
@@ -13,6 +19,7 @@ const navigationItems = [
 ]
 
 export function AppShell() {
+  const queryClient = useQueryClient()
   const { theme, isSidebarOpen, toggleSidebar } = useUiStore(
     useShallow((state) => ({
       theme: state.theme,
@@ -20,6 +27,12 @@ export function AppShell() {
       toggleSidebar: state.toggleSidebar,
     })),
   )
+
+  // prefetchQuery staleTime'a saygilidir: cache'te taze veri varken tekrarlanan hover istek atmaz.
+  const prefetchProductsPage = () => {
+    void queryClient.prefetchQuery(productListOptions(DEFAULT_PRODUCT_LIST_PARAMS))
+    void queryClient.prefetchQuery(categoriesOptions())
+  }
 
   return (
     <div data-theme={theme} className={theme === 'dark' ? 'flex min-h-screen flex-col bg-slate-950 text-slate-50' : 'flex min-h-screen flex-col bg-slate-50 text-slate-950'}>
@@ -47,6 +60,8 @@ export function AppShell() {
                 key={to}
                 to={to}
                 end={to === '/'}
+                onMouseEnter={to === '/urunler' ? prefetchProductsPage : undefined}
+                onFocus={to === '/urunler' ? prefetchProductsPage : undefined}
                 className={({ isActive }) =>
                   `mb-1 flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors ${
                     isActive

@@ -58,6 +58,14 @@ export type ProductListParams = {
 // Cagri basina degismedigi icin query key'e girmez; degisken olacagi gun parametreye tasinir.
 export const PRODUCTS_PAGE_SIZE = 10
 
+// Sayfanin baslangic state'i ile sidebar prefetch'i AYNI key'i kurmak zorunda; tek kaynak burasi.
+export const DEFAULT_PRODUCT_LIST_PARAMS: ProductListParams = {
+  search: '',
+  categoryId: 'all',
+  stock: 'all',
+  page: 1,
+}
+
 export const productQueryKeys = {
   all: ['products'] as const,
   // Invalidation prefix'i: lists() tum filtre kombinasyonlarini kapsar.

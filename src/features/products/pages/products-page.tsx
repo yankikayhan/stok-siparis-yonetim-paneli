@@ -3,6 +3,7 @@ import { Search, TriangleAlert } from 'lucide-react'
 import { useDeferredValue, useState } from 'react'
 import {
   categoriesOptions,
+  DEFAULT_PRODUCT_LIST_PARAMS,
   deleteProduct,
   productListOptions,
   PRODUCTS_PAGE_SIZE,
@@ -21,10 +22,10 @@ const currencyFormatter = new Intl.NumberFormat('tr-TR', {
 })
 
 export function ProductsPage() {
-  const [search, setSearch] = useState('')
-  const [categoryId, setCategoryId] = useState('all')
-  const [stockFilter, setStockFilter] = useState<ProductStockFilter>('all')
-  const [page, setPage] = useState(1)
+  const [search, setSearch] = useState(DEFAULT_PRODUCT_LIST_PARAMS.search)
+  const [categoryId, setCategoryId] = useState(DEFAULT_PRODUCT_LIST_PARAMS.categoryId)
+  const [stockFilter, setStockFilter] = useState<ProductStockFilter>(DEFAULT_PRODUCT_LIST_PARAMS.stock)
+  const [page, setPage] = useState(DEFAULT_PRODUCT_LIST_PARAMS.page)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
   const [productToEdit, setProductToEdit] = useState<Product | null>(null)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)

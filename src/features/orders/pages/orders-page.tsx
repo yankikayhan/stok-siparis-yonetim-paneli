@@ -12,8 +12,8 @@ import {
   type OrderStatus,
   updateOrderStatus,
 } from '../api/orders-api'
+import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 
-const currencyFormatter = new Intl.NumberFormat('tr-TR', { style: 'currency', currency: 'TRY' })
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' })
 
 const orderStatusLabels: Record<OrderStatus, string> = {
@@ -47,6 +47,7 @@ function applyStatus(order: Order, status: OrderStatus): Order {
 export function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<'all' | OrderStatus>('all')
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
+  const currencyFormatter = useCurrencyFormatter()
   const queryClient = useQueryClient()
   const ordersQuery = useQuery(ordersOptions())
   const customersQuery = useQuery(customersOptions())

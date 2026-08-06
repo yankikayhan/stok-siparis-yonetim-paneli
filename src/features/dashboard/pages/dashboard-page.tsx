@@ -3,15 +3,12 @@ import { AlertTriangle, CircleDollarSign, PackageCheck, ShoppingBag } from 'luci
 import { ordersOptions } from '../../orders/api/orders-api'
 import { productListAllOptions } from '../../products/api/products-api'
 import { selectOrderStats, selectProductStats } from '../api/dashboard-api'
+import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 
 const numberFormatter = new Intl.NumberFormat('tr-TR')
-const currencyFormatter = new Intl.NumberFormat('tr-TR', {
-  style: 'currency',
-  currency: 'TRY',
-  maximumFractionDigits: 0,
-})
 
 export function DashboardPage() {
+  const currencyFormatter = useCurrencyFormatter(0)
   const productStatsQuery = useQuery({ ...productListAllOptions(), select: selectProductStats })
   const orderStatsQuery = useQuery({ ...ordersOptions(), select: selectOrderStats })
 

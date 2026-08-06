@@ -26,6 +26,11 @@ export function profileOptions() {
   return queryOptions({
     queryKey: profileQueryKeys.detail(),
     queryFn: getProfile,
+    // Profil yalnizca uygulama icinden degisir ve mutation basarisi cache'i setQueryData ile
+    // gunceller; arka plan refetch'i bilgi katmaz, formatter tuketicilerinde toast gurultusu da keser.
+    // gcTime default kalir (kategorilerden farki): formatter'lar her sayfada aktif gozlemci
+    // oldugu icin girdi zaten GC'ye dusmez.
+    staleTime: Infinity,
   })
 }
 

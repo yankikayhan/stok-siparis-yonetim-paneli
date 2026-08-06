@@ -15,11 +15,7 @@ import {
 } from '../api/products-api'
 import { ProductCreateDialog } from '../components/product-create-dialog'
 import { useUiStore } from '../../../shared/stores/ui-store'
-
-const currencyFormatter = new Intl.NumberFormat('tr-TR', {
-  style: 'currency',
-  currency: 'TRY',
-})
+import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 
 export function ProductsPage() {
   const [search, setSearch] = useState(DEFAULT_PRODUCT_LIST_PARAMS.search)
@@ -30,6 +26,7 @@ export function ProductsPage() {
   const [productToEdit, setProductToEdit] = useState<Product | null>(null)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
   const tableDensity = useUiStore((state) => state.tableDensity)
+  const currencyFormatter = useCurrencyFormatter()
   const queryClient = useQueryClient()
   const deferredSearch = useDeferredValue(search)
   // Key ve istek ayni nesneden beslenir; trim key kurulmadan once yapilir.

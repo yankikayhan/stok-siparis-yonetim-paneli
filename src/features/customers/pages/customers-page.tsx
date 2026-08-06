@@ -9,11 +9,7 @@ import {
   type Customer,
   type CustomerOrder,
 } from '../api/customers-api'
-
-const currencyFormatter = new Intl.NumberFormat('tr-TR', {
-  style: 'currency',
-  currency: 'TRY',
-})
+import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' })
 
@@ -107,6 +103,8 @@ function CustomerDetail({
   customer: Customer | null
   ordersQuery: UseQueryResult<CustomerOrder[], Error>
 }) {
+  const currencyFormatter = useCurrencyFormatter()
+
   if (!customer) {
     return (
       <div className="grid min-h-80 place-items-center border border-dashed border-slate-300 bg-white p-6 text-center">

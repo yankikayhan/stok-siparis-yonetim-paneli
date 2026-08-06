@@ -12,17 +12,17 @@ Mevcut durum: `useQuery` + `useMutation` + `invalidateQueries`, siparis durumund
 - [x] **`queryOptions` helper:** Her feature'in API dosyasinda `queryOptions({ queryKey, queryFn })` tanimla; sayfalarda `useQuery(productListOptions(filters))` seklinde kullan. Tip cikarimi ve tekrar kullanimin farkini gor.
 - [x] **Sayfalama + `placeholderData: keepPreviousData`:** Urun listesine `_page`/`_limit` ile server-side sayfalama ekle. Sayfa degisirken eski verinin ekranda kalmasini ve `isPlaceholderData` ile "soluk" gosterimi uygula.
 - [x] **`select` ile veri donusumu:** Dashboard'daki `getDashboardSummary` hesaplamasini `select` opsiyonuna tasiyarak karsilastir; `select`'in referans kararliligi ve yeniden hesaplama davranisini incele.
-- [ ] **Prefetching:** Sidebar'daki "Urunler" linkine hover'da `queryClient.prefetchQuery` ekle. Network panelinde istegin onceden gittigini, sayfaya gecince cache'ten okundugunu izle.
-- [ ] **Dependent query'yi derinlestir:** Musteriler sayfasindaki `enabled` kullanimini koru; buna ek olarak secilen musteri icin `initialData` veya `placeholderData`'yi liste cache'inden besle (`queryClient.getQueryData` ile seed).
-- [ ] **Para birimi tercihini islevsel yap:** Profildeki `currency` (TRY/USD/EUR) su an kaydediliyor ama hicbir seyi etkilemiyor; tum `Intl.NumberFormat` cagrilari TRY'ye sabit. Formatlayicilari profil query'sindeki `currency` degerinden besle (or. `useCurrencyFormatter()` hook'u profile cache'ini okur). Server verisinden turetilmis degerin bilesenlere kopyasiz tasinmasini pratik et.
+- [x] **Prefetching:** Sidebar'daki "Urunler" linkine hover'da `queryClient.prefetchQuery` ekle. Network panelinde istegin onceden gittigini, sayfaya gecince cache'ten okundugunu izle.
+- [x] **Dependent query'yi derinlestir:** Musteriler sayfasindaki `enabled` kullanimini koru; buna ek olarak secilen musteri icin `initialData` veya `placeholderData`'yi liste cache'inden besle (`queryClient.getQueryData` ile seed).
+- [x] **Para birimi tercihini islevsel yap:** Profildeki `currency` (TRY/USD/EUR) su an kaydediliyor ama hicbir seyi etkilemiyor; tum `Intl.NumberFormat` cagrilari TRY'ye sabit. Formatlayicilari profil query'sindeki `currency` degerinden besle (or. `useCurrencyFormatter()` hook'u profile cache'ini okur). Server verisinden turetilmis degerin bilesenlere kopyasiz tasinmasini pratik et.
 - [x] **Global hata yonetimi:** `QueryClient`'a `QueryCache.onError` / `MutationCache.onError` ekle; ApiError'lari Zustand toast kuyruguna bagla. Sayfa ici hata gosterimi ile global toast'in sorumluluk ayrimini kur.
-- [ ] **`setQueryData` vs `invalidateQueries` deneyi:** Urun olusturma mutation'inda once `invalidateQueries` (mevcut), sonra ayni akisi `setQueryData` ile cache'e dogrudan yazarak yap. Network panelinde refetch farkini gozlemle, notunu belgeye ekle.
-- [ ] **Optimistic update'i yayginlastir:** Siparis durumundaki pattern'i urun silmeye uygula (listeden aninda kaldir, hatada geri getir). `onMutate`/`onError`/`onSettled` akisini ezber degil kavrayarak yazdigini test et.
+- [x] **`setQueryData` vs `invalidateQueries` deneyi:** Urun olusturma mutation'inda once `invalidateQueries` (mevcut), sonra ayni akisi `setQueryData` ile cache'e dogrudan yazarak yap. Network panelinde refetch farkini gozlemle, notunu belgeye ekle.
+- [x] **Optimistic update'i yayginlastir:** Siparis durumundaki pattern'i urun silmeye uygula (listeden aninda kaldir, hatada geri getir). `onMutate`/`onError`/`onSettled` akisini ezber degil kavrayarak yazdigini test et.
 - [ ] **`useSuspenseQuery` + Suspense:** Dashboard'u `useSuspenseQuery`'ye gecir; loading state'i `<Suspense fallback>` ile, hata durumunu Error Boundary ile yakala. Klasik `isPending` yaklasimiyla farkini karsilastir.
-- [ ] **`useQueries` ile paralel sorgular:** Siparisler sayfasindaki uc ayri `useQuery`'yi `useQueries`'e cevir; `combine` opsiyonu ile tek sonuc nesnesi uret.
-- [ ] **Infinite query:** Siparis listesini `useInfiniteQuery` + "daha fazla yukle" butonuna cevir (json-server `_page` destegiyle). `getNextPageParam` ve `pages` yapisini incele.
+- [x] **`useQueries` ile paralel sorgular:** Siparisler sayfasindaki uc ayri `useQuery`'yi `useQueries`'e cevir; `combine` opsiyonu ile tek sonuc nesnesi uret.
+- [x] **Infinite query:** Siparis listesini `useInfiniteQuery` + "daha fazla yukle" butonuna cevir (json-server `_page` destegiyle). `getNextPageParam` ve `pages` yapisini incele.
 - [x] **`staleTime`/`gcTime` deneyleri:** Farkli degerlerle sayfalar arasi gecislerde request sayisini olc; kategoriler gibi nadiren degisen veriye uzun `staleTime` ver ve karari yorum satiriyla gerekcelendir.
-- [ ] **Mutation state paylasimi:** `useMutationState` ile devam eden siparis olusturma mutation'ini baska bir bilesenden (or. header'da "kaydediliyor..." gostergesi) izle.
+- [x] **Mutation state paylasimi:** `useMutationState` ile devam eden siparis olusturma mutation'ini baska bir bilesenden (or. header'da "kaydediliyor..." gostergesi) izle.
 
 ---
 

@@ -7,6 +7,7 @@
     "dev": "vite",
     "api": "node server/server.cjs",
     "api:delay": "node server/server.cjs --delay=700",
+    "seed": "node server/seed-cli.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "test": "vitest run",

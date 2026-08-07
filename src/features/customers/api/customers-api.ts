@@ -4,7 +4,7 @@ import { request } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 import { orderSchema, type Order } from '../../orders/api/orders-api'
 
-const customerSchema = z.object({
+export const customerSchema = z.object({
   id: z.string(),
   name: z.string(),
   email: z.email(),

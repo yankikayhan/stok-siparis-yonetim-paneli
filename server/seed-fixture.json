@@ -1,0 +1,228 @@
+{
+  "categories": [
+    { "id": "cat-electronics", "name": "Elektronik" },
+    { "id": "cat-office", "name": "Ofis" },
+    { "id": "cat-packaging", "name": "Paketleme" }
+  ],
+  "categoryCodes": {
+    "cat-electronics": "ELK",
+    "cat-office": "OFS",
+    "cat-packaging": "PKT"
+  },
+  "productBases": {
+    "cat-electronics": [
+      { "name": "Kablosuz Klavye", "code": "KLV", "price": 1499.9 },
+      { "name": "27 Inc Monitor", "code": "MNT", "price": 8299.5 },
+      { "name": "Kablosuz Mouse", "code": "MSE", "price": 649.9 },
+      { "name": "USB-C Hub 7 Port", "code": "HUB", "price": 1249 },
+      { "name": "Webcam Full HD", "code": "CAM", "price": 1899.5 },
+      { "name": "Bluetooth Kulaklik", "code": "KLK", "price": 2749 },
+      { "name": "Tasinabilir SSD 1TB", "code": "SSD", "price": 3499.9 },
+      { "name": "Laptop Standi Aluminyum", "code": "STD", "price": 899 },
+      { "name": "HDMI Kablo 2m", "code": "KBL", "price": 179.9 },
+      { "name": "Mekanik Klavye RGB", "code": "MKL", "price": 3199 },
+      { "name": "Akilli Priz Wi-Fi", "code": "PRZ", "price": 449.5 },
+      { "name": "Monitor Isigi LED Bar", "code": "ISK", "price": 1099.9 }
+    ],
+    "cat-office": [
+      { "name": "A4 Fotokopi Kagidi", "code": "KGT", "price": 189.75 },
+      { "name": "Zimba Makinesi Metal", "code": "ZMB", "price": 259.9 },
+      { "name": "Dosya Klasoru Genis", "code": "KLS", "price": 89.5 },
+      { "name": "Beyaz Tahta Kalemi", "code": "KLM", "price": 34.9 },
+      { "name": "Masaustu Organizer", "code": "ORG", "price": 279 },
+      { "name": "Evrak Rafi Uc Katli", "code": "RAF", "price": 549.9 },
+      { "name": "Kalem Kutusu Deri", "code": "KTS", "price": 199.5 },
+      { "name": "Not Defteri Ciltli", "code": "NDF", "price": 149.9 },
+      { "name": "Delgec Metal Govde", "code": "DLG", "price": 319 },
+      { "name": "Yapiskanli Not Kagidi", "code": "YNK", "price": 64.9 },
+      { "name": "Hesap Makinesi Masaustu", "code": "HSP", "price": 429.5 },
+      { "name": "Arsiv Kutusu Karton", "code": "ARS", "price": 74.9 }
+    ],
+    "cat-packaging": [
+      { "name": "Kargo Kutusu Orta Boy", "code": "KTU", "price": 24.9 },
+      { "name": "Balonlu Naylon Rulo", "code": "BLN", "price": 189.9 },
+      { "name": "Koli Bandi Seffaf", "code": "BND", "price": 39.5 },
+      { "name": "Strec Film Rulo", "code": "STR", "price": 129.9 },
+      { "name": "Kargo Poseti Orta", "code": "PST", "price": 14.9 },
+      { "name": "Kopuk Dolgu Malzemesi", "code": "KPK", "price": 249.5 },
+      { "name": "Palet Ortusu", "code": "PLT", "price": 89.9 },
+      { "name": "Etiket Rulosu Termal", "code": "ETK", "price": 159.9 },
+      { "name": "Kagit Bant Rulo", "code": "KGB", "price": 44.9 },
+      { "name": "Kose Koruyucu Karton", "code": "KSE", "price": 34.5 },
+      { "name": "Cember Bandi Plastik", "code": "CMB", "price": 219 },
+      { "name": "Ambalaj Kagidi Rulo", "code": "AMB", "price": 99.9 }
+    ]
+  },
+  "productVariants": [
+    "Standart",
+    "Pro",
+    "Max",
+    "Lite",
+    "Plus",
+    "Eco",
+    "Titan",
+    "Neo",
+    "Prime",
+    "Ultra",
+    "Compact",
+    "Classic",
+    "Nova",
+    "Vertex",
+    "Zenith",
+    "Aura",
+    "Delta",
+    "Orbit",
+    "Pulse",
+    "Quantum",
+    "Vista",
+    "Solstice",
+    "Horizon",
+    "Matrix",
+    "Fusion",
+    "Apex",
+    "Element",
+    "Origin",
+    "Spectrum",
+    "Legacy"
+  ],
+  "productSeed": {
+    "count": 1000,
+    "firstCreatedAt": "2026-01-05T08:00:00.000Z",
+    "createdAtStepHours": 4,
+    "priceVariantStep": 25
+  },
+  "customers": [
+    {
+      "id": "cus-001",
+      "name": "Deniz Arslan",
+      "email": "deniz.arslan@example.com",
+      "phone": "+90 532 555 01 01",
+      "company": "Arslan Tasarim",
+      "createdAt": "2026-03-10T09:00:00.000Z"
+    },
+    {
+      "id": "cus-002",
+      "name": "Ece Demir",
+      "email": "ece.demir@example.com",
+      "phone": "+90 533 555 02 02",
+      "company": "Demir Ofis",
+      "createdAt": "2026-04-21T12:15:00.000Z"
+    },
+    {
+      "id": "cus-003",
+      "name": "Baris Yildirim",
+      "email": "baris.yildirim@example.com",
+      "phone": "+90 534 555 03 03",
+      "company": "Yildirim Lojistik",
+      "createdAt": "2026-01-18T08:45:00.000Z"
+    },
+    {
+      "id": "cus-004",
+      "name": "Selin Kaya",
+      "email": "selin.kaya@example.com",
+      "phone": "+90 535 555 04 04",
+      "company": "Kaya Matbaa",
+      "createdAt": "2026-02-07T14:30:00.000Z"
+    },
+    {
+      "id": "cus-005",
+      "name": "Onur Tekin",
+      "email": "onur.tekin@example.com",
+      "phone": "+90 536 555 05 05",
+      "company": "Tekin Bilisim",
+      "createdAt": "2026-02-25T10:10:00.000Z"
+    },
+    {
+      "id": "cus-006",
+      "name": "Zeynep Aydin",
+      "email": "zeynep.aydin@example.com",
+      "phone": "+90 537 555 06 06",
+      "company": "Aydin Mimarlik",
+      "createdAt": "2026-03-29T16:20:00.000Z"
+    },
+    {
+      "id": "cus-007",
+      "name": "Mert Ozturk",
+      "email": "mert.ozturk@example.com",
+      "phone": "+90 538 555 07 07",
+      "company": "Ozturk Ticaret",
+      "createdAt": "2026-05-12T11:05:00.000Z"
+    },
+    {
+      "id": "cus-008",
+      "name": "Ayse Cetin",
+      "email": "ayse.cetin@example.com",
+      "phone": "+90 539 555 08 08",
+      "company": "Cetin Egitim",
+      "createdAt": "2026-06-03T13:40:00.000Z"
+    }
+  ],
+  "orderSeed": {
+    "firstCreatedAt": "2026-02-02T09:00:00.000Z",
+    "createdAtStepHours": 84,
+    "primaryCustomerId": "cus-001",
+    "primaryOrderCount": 12,
+    "rotationCustomerIds": ["cus-002", "cus-003", "cus-004", "cus-005", "cus-006", "cus-007"]
+  },
+  "orderStatusPattern": [
+    "pending",
+    "paid",
+    "pending",
+    "shipped",
+    "pending",
+    "cancelled",
+    "paid",
+    "pending",
+    "shipped",
+    "pending",
+    "paid",
+    "pending",
+    "shipped",
+    "pending",
+    "cancelled",
+    "paid",
+    "pending",
+    "shipped",
+    "pending",
+    "paid",
+    "pending",
+    "shipped",
+    "pending",
+    "cancelled",
+    "paid",
+    "pending",
+    "shipped",
+    "pending",
+    "paid",
+    "paid",
+    "shipped",
+    "pending",
+    "cancelled",
+    "paid",
+    "pending",
+    "shipped",
+    "pending",
+    "paid",
+    "paid",
+    "shipped",
+    "pending",
+    "cancelled",
+    "paid",
+    "pending",
+    "shipped"
+  ],
+  "cancelReasons": [
+    "Musteri talebiyle iptal edildi.",
+    "Teslimat adresi dogrulanamadi.",
+    "Odeme onaylanmadi.",
+    "Stok tedarikinde gecikme.",
+    "Yanlis urun secimi bildirildi."
+  ],
+  "profile": {
+    "id": "profile-001",
+    "name": "Merve Kaya",
+    "email": "merve.kaya@example.com",
+    "companyName": "Noktasi Isletme",
+    "currency": "TRY"
+  }
+}

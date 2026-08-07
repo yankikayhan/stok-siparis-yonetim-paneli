@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Minus, Plus, X } from 'lucide-react'
 import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { isApiError } from '../../../shared/api/api-error'
 import { customerQueryKeys, type Customer } from '../../customers/api/customers-api'
 import { productQueryKeys, type Product } from '../../products/api/products-api'
 import {
@@ -49,6 +50,29 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
       ])
       onClose()
+    },
+    // Mock sozlesmesi geregi alan cikarimi mesaj metninden yapilir (bilinçli kirilganlik);
+    // gercek bir API alan bazli yapisal hata govdesi dondururdu.
+    onError: (error) => {
+      if (isApiError(error) && error.status === 404 && error.message === 'Musteri bulunamadi.') {
+        form.setError('customerId', { type: 'server', message: error.message })
+        return
+      }
+
+      if (isApiError(error) && error.status === 409) {
+        // Mesaj urun adiyla baslar; startsWith, bir adin digerinin alt dizesi olmasina yanilmaz.
+        const failingProduct = products.find((product) => error.message.startsWith(`${product.name} `))
+        // Index guncel form dizisinde aranir: istek ucustayken satir eklenebilir/silinebilir,
+        // submit aninin index'i kaymis olabilir. Ayni urun birden fazla kalemdeyse ILK satir (bilinçli kural).
+        const index = form.getValues('items').findIndex((item) => item.productId === failingProduct?.id)
+
+        if (index !== -1) {
+          form.setError(`items.${index}.quantity`, { type: 'server', message: error.message })
+          return
+        }
+      }
+
+      form.setError('root.serverError', { type: 'server', message: error.message })
     },
   })
 
@@ -104,7 +128,7 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
             {form.formState.errors.items?.message && <p className="mt-2 text-xs text-rose-700">{form.formState.errors.items.message}</p>}
           </div>
 
-          {createOrderMutation.isError && <p className="text-sm text-rose-700">{createOrderMutation.error.message}</p>}
+          {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700">{form.formState.errors.root.serverError.message}</p>}
           <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
             <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
             {/* isDirty: degisiklik yokken submit anlamsiz; isSubmitting degil mutation.isPending —

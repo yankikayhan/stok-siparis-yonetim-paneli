@@ -26,6 +26,10 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
   const isEditing = product !== undefined
   const form = useForm<ProductFormInput, unknown, ProductFormValues>({
     resolver: zodResolver(productFormSchema),
+    // onTouched dengesi: onSubmit ilk hatayi cok gec, onChange dokunulmamis alanda cok erken gosterir.
+    mode: 'onTouched',
+    // Hata bir kez gorunduginde duzeltme geri bildirimi tus vurusunda gelir.
+    reValidateMode: 'onChange',
     defaultValues: {
       name: product?.name ?? '',
       sku: product?.sku ?? '',

@@ -23,6 +23,10 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
   const queryClient = useQueryClient()
   const form = useForm<OrderFormInput, unknown, OrderFormValues>({
     resolver: zodResolver(createOrderFormSchema(products)),
+    // onTouched dengesi: onSubmit ilk hatayi cok gec, onChange dokunulmamis alanda cok erken gosterir.
+    mode: 'onTouched',
+    // Hata bir kez gorunduginde duzeltme geri bildirimi tus vurusunda gelir.
+    reValidateMode: 'onChange',
     defaultValues: {
       customerId: '',
       items: [{ productId: '', quantity: 1 }],

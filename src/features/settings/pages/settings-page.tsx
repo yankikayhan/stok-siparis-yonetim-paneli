@@ -71,6 +71,10 @@ function ProfileSettingsForm({ profile }: { profile: Profile }) {
   const queryClient = useQueryClient()
   const form = useForm<ProfileFormValues>({
     resolver: zodResolver(profileSchema),
+    // onTouched dengesi: onSubmit ilk hatayi cok gec, onChange dokunulmamis alanda cok erken gosterir.
+    mode: 'onTouched',
+    // Hata bir kez gorunduginde duzeltme geri bildirimi tus vurusunda gelir.
+    reValidateMode: 'onChange',
     defaultValues: profile,
   })
   const updateProfileMutation = useMutation({

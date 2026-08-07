@@ -20,7 +20,7 @@ describe('products-api tip turetmeleri', () => {
 
   it('Zod pick(...) ciktisi TS Pick<T, K> ile ayni tipi uretir', () => {
     expectTypeOf<ProductFormValues>().toEqualTypeOf<
-      Pick<Product, 'name' | 'sku' | 'categoryId' | 'price' | 'stock' | 'reorderLevel'>
+      Pick<Product, 'name' | 'sku' | 'categoryId' | 'price' | 'stock' | 'reorderLevel' | 'active'>
     >()
   })
 

@@ -28,7 +28,7 @@ export type Product = z.output<typeof productSchema>
 export type Category = z.output<typeof categorySchema>
 
 export const productFormSchema = productSchema
-  .pick({ name: true, sku: true, categoryId: true, price: true, stock: true, reorderLevel: true })
+  .pick({ name: true, sku: true, categoryId: true, price: true, stock: true, reorderLevel: true, active: true })
   .extend({
     name: z.string().trim().min(2, 'Urun adi en az 2 karakter olmali.'),
     sku: z.string().trim().min(3, 'SKU en az 3 karakter olmali.'),
@@ -158,9 +158,9 @@ export function createProduct(values: ProductFormValues) {
 
   return request('/products', {
     method: 'POST',
+    // active degerini form tasir; spread sonrasi sabit deger form secimini sessizce ezerdi.
     body: {
       ...values,
-      active: true,
       createdAt: now,
       updatedAt: now,
     },

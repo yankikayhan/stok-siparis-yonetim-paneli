@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
-import { useForm } from 'react-hook-form'
+import { Controller, useForm } from 'react-hook-form'
 import {
   createProduct,
   productFormSchema,
@@ -39,6 +39,7 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
       price: product?.price ?? '',
       stock: product?.stock ?? 0,
       reorderLevel: product?.reorderLevel ?? 0,
+      active: product?.active ?? true,
     },
   })
   const createProductMutation = useMutation({
@@ -105,6 +106,22 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
               <input {...form.register('reorderLevel')} type="number" min="0" step="1" className="form-input" />
             </FormField>
           </div>
+          {/* Controller: register ref+DOM event'i olan native input ister; buton tabanli
+              segmented control'un boyle bir elemani yok, deger RHF'e field.onChange ile akar. */}
+          <Controller
+            control={form.control}
+            name="active"
+            render={({ field }) => (
+              <fieldset>
+                <legend className="text-sm font-medium text-slate-700">Durum</legend>
+                <div className="mt-1 grid grid-cols-2 gap-2">
+                  <SegmentButton active={field.value === true} label="Aktif" onClick={() => field.onChange(true)} />
+                  <SegmentButton active={field.value === false} label="Pasif" onClick={() => field.onChange(false)} />
+                </div>
+                <p className="mt-1 text-xs font-normal text-slate-500">Pasif urunler siparis formunda secilemez.</p>
+              </fieldset>
+            )}
+          />
           {createProductMutation.isError && <p className="text-sm text-rose-700">{createProductMutation.error.message}</p>}
           <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
             <button type="button" onClick={onClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
@@ -115,6 +132,21 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
         </form>
       </section>
     </div>
+  )
+}
+
+function SegmentButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      aria-pressed={active}
+      onClick={onClick}
+      className={`flex h-10 items-center justify-center border text-sm font-medium ${
+        active ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+      }`}
+    >
+      {label}
+    </button>
   )
 }
 

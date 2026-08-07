@@ -103,7 +103,8 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
           <div>
             <div className="mb-2 flex items-center justify-between gap-4">
               <h3 className="text-sm font-semibold text-slate-950">Siparis kalemleri</h3>
-              <button type="button" onClick={() => orderItems.append({ productId: '', quantity: 1 })} className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"><Plus size={16} aria-hidden="true" /> Kalem ekle</button>
+              {/* shouldFocus: odak yeni satirin ilk kayitli alanina (urun select) gider; index hesabi + zamanlama isteyen elle setFocus'a gerek kalmaz. */}
+              <button type="button" onClick={() => orderItems.append({ productId: '', quantity: 1 }, { shouldFocus: true })} className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"><Plus size={16} aria-hidden="true" /> Kalem ekle</button>
             </div>
             <div className="space-y-3">
               {orderItems.fields.map((field, index) => {

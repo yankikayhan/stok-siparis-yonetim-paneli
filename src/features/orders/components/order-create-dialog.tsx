@@ -14,7 +14,7 @@ type OrderCreateDialogProps = {
 }
 
 export function OrderCreateDialog({ customers, products, onClose }: OrderCreateDialogProps) {
-  const { form, orderItems, createOrderMutation, requestClose, submit } = useOrderCreateForm({ products, onClose })
+  const { form, orderItems, createOrderMutation, requestClose, submit, hasDraft, discardDraft } = useOrderCreateForm({ products, onClose })
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/35 p-4" role="presentation">
@@ -25,6 +25,12 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
         </div>
         <FormProvider {...form}>
           <form className="space-y-5 p-5" onSubmit={submit}>
+          {hasDraft && (
+            <div className="flex items-center justify-between gap-3 border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900" role="status">
+              <span>Taslaktan devam ediliyor.</span>
+              <button type="button" onClick={discardDraft} className="font-medium underline hover:opacity-70">Taslagi temizle</button>
+            </div>
+          )}
           <FormField label="Musteri" error={form.formState.errors.customerId?.message}>
             <select {...form.register('customerId')} className="form-input">
               <option value="">Musteri secin</option>

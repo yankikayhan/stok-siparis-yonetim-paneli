@@ -13,6 +13,12 @@ import {
   type OrderFormInput,
   type OrderFormValues,
 } from '../api/orders-api'
+import { useOrderDraftStore } from '../stores/order-draft-store'
+
+const emptyOrderForm: OrderFormInput = {
+  customerId: '',
+  items: [{ productId: '', quantity: 1 }],
+}
 
 type UseOrderCreateFormOptions = {
   products: Product[]
@@ -23,6 +29,9 @@ type UseOrderCreateFormOptions = {
 // dialog bileseni yalnizca gorunumden sorumlu kalir.
 export function useOrderCreateForm({ products, onClose }: UseOrderCreateFormOptions) {
   const queryClient = useQueryClient()
+  const draft = useOrderDraftStore((state) => state.draft)
+  const saveDraft = useOrderDraftStore((state) => state.saveDraft)
+  const clearDraft = useOrderDraftStore((state) => state.clearDraft)
   // Sema fabrikasi memoize: superRefine + Map kurulumu her render'da degil,
   // yalnizca products referansi degisince calisir (refine performans bilinci).
   const schema = useMemo(() => createOrderFormSchema(products), [products])
@@ -32,10 +41,8 @@ export function useOrderCreateForm({ products, onClose }: UseOrderCreateFormOpti
     mode: 'onTouched',
     // Hata bir kez gorunduginde duzeltme geri bildirimi tus vurusunda gelir.
     reValidateMode: 'onChange',
-    defaultValues: {
-      customerId: '',
-      items: [{ productId: '', quantity: 1 }],
-    },
+    // defaultValues yalnizca mount'ta okunur: acilista taslak varsa form ondan dogar.
+    defaultValues: draft ?? emptyOrderForm,
   })
   const orderItems = useFieldArray({ control: form.control, name: 'items' })
   const createOrderMutation = useMutation({
@@ -52,6 +59,8 @@ export function useOrderCreateForm({ products, onClose }: UseOrderCreateFormOpti
         queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
       ])
+      // Siparis kaydedildi; yarim is kalmadigi icin taslak da silinir.
+      clearDraft()
       onClose()
     },
     // Mock sozlesmesi geregi alan cikarimi mesaj metninden yapilir (bilinçli kirilganlik);
@@ -79,15 +88,21 @@ export function useOrderCreateForm({ products, onClose }: UseOrderCreateFormOpti
     },
   })
 
-  // Yalnizca kullanici kaynakli kapatmalar (X / Vazgec) buradan gecer; basari kapanisi
-  // onSuccess icinde dogrudan onClose cagirir — veri kaydedildigi icin onay anlamsizdir.
-  // isSubmitSuccessful guard olamaz: mutate senkron dondugu icin mutation sonucundan bagimsiz true olur.
+  // K4'un confirm'i evrildi: kaydedilmemis degisiklik kapatmayi engellemez, taslaga yazilir
+  // (urun dialogunda confirm bilinçli birakildi — ayni probleme iki cozumun karsilastirmasi).
+  // Basari kapanisi onSuccess'ta dogrudan onClose cagirir; oradan taslak da silinir.
   const requestClose = () => {
-    if (form.formState.isDirty && !window.confirm('Kaydedilmemis degisiklikler var. Kapatilsin mi?')) return
+    if (form.formState.isDirty) saveDraft(form.getValues())
     onClose()
+  }
+
+  // Taslagi atmak formu da sifirlar; yeni baseline bos form olur.
+  const discardDraft = () => {
+    clearDraft()
+    form.reset(emptyOrderForm)
   }
 
   const submit = form.handleSubmit((values) => createOrderMutation.mutate(values))
 
-  return { form, orderItems, createOrderMutation, requestClose, submit }
+  return { form, orderItems, createOrderMutation, requestClose, submit, hasDraft: draft !== null, discardDraft }
 }

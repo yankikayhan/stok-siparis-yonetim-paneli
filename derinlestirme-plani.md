@@ -39,7 +39,7 @@ Mevcut durum: Response parse, form semalari, bir `superRefine` (stok kurali). Se
 - [x] **Ortak hata haritasi:** Zod v4 `z.config()` / hata ozelleştirme ile Turkce varsayilan hata mesajlarini merkezi tanimla; sema basina tekrar eden mesajlari azalt.
 - [x] **Env dogrulamayi derinlestir:** `app/config/env.ts`'i incele; `import.meta.env`'i `z.object` ile parse eden, eksik degiskende build/boot aninda anlamli hata firlatan yapiya donustur (yoksa kur).
 - [x] **`safeParse` sonucunu isleme:** `result.error.issues`'u kullaniciya donusturen kucuk bir `formatZodError` yardimcisi yaz ve test et; `flatten`/`treeifyError` cikti farklarini incele.
-- [ ] **Refine performans bilinci:** `createOrderFormSchema(products)`'in her render'da yeniden olusmasinin maliyetini `useMemo` ile karsilastir; sema fabrikasi pattern'inin arti/eksisini not et.
+- [x] **Refine performans bilinci:** `createOrderFormSchema(products)`'in her render'da yeniden olusmasinin maliyetini `useMemo` ile karsilastir; sema fabrikasi pattern'inin arti/eksisini not et.
 
 ---
 
@@ -47,17 +47,17 @@ Mevcut durum: Response parse, form semalari, bir `superRefine` (stok kurali). Se
 
 Mevcut durum: `useForm` + `zodResolver` + `useFieldArray` + `useWatch`. Validasyon modu, server hatasi eslestirme, reset stratejileri yok.
 
-- [ ] **Validasyon modlari:** Siparis formunda `mode: 'onTouched'`, `reValidateMode: 'onChange'` gibi kombinasyonlari dene; kullanici deneyimi farkini gozlemleyip sectigin stratejiyi gerekcesiyle sabitle.
-- [ ] **Server hatasini alana esle:** `POST /orders` 409 dondugunde ("yeterli stok yok") `form.setError('items.0.quantity', ...)` veya `setError('root.serverError', ...)` ile hatayi forma tasi; generic hata paragrafi yerine alan bazli gosterim yap.
-- [ ] **`formState` derinligi:** `isDirty`, `dirtyFields`, `isSubmitting`, `isSubmitSuccessful`'i kullan: kaydedilmemis degisiklik varken dialog kapatilirken onay iste; submit butonunu `isDirty` degilse pasif yap.
-- [ ] **Reset pattern'leri:** Urun duzenleme dialogunda `reset(product)` ile formu doldur; basarili submit sonrasi `reset()` cagrisinin `defaultValues` ile iliskisini incele. `values` prop'u ile `reset` farkini karsilastir.
-- [ ] **`price` varsayilan degeri celiskisini coz:** Urun formunda `defaultValues.price` `0` ama sema `positive()` istiyor; alana dokunmayan kullanici dogrudan hata gorur. Sayisal alanlarda "bos" baslangic degerinin (`''`/`undefined`/`NaN`) `valueAsNumber` ve Zod `coerce` ile etkilesimini incele; secimini gerekcesiyle not et.
-- [ ] **`useWatch` vs `watch` vs `getValues`:** Siparis dialogundaki canli toplam tutari hesapla (kalem sayisi × birim fiyat). Once `watch` ile yap, render sayisini olc; sonra `useWatch`'i izole bir `<OrderTotal>` bilesenine tasiyip farki gor.
-- [ ] **`Controller` ihtiyacini gor:** Native olmayan bir input ekle (or. urun formuna basit bir toggle/segmented control) ve `Controller` ile bagla; register/Controller ayrimini netlestir.
-- [ ] **`useFieldArray` ileri kullanim:** Kalem satirlarinda `replace`, `insert`, `move` operasyonlarini dene; ayni urunun ikinci kez secilmesini engelleyen veya mevcut kaleme miktar ekleyen akil yurut.
-- [ ] **Form bilesenini ayristir:** `OrderCreateDialog` icindeki form mantigini `useOrderCreateForm` custom hook'una cikar; `FormProvider` + `useFormContext` ile kalem satirini ayri bilesene tasi ve prop drilling'i kaldir.
-- [ ] **Odak yonetimi:** `setFocus` ile ilk hatali alana odaklan; yeni kalem eklendiginde yeni satirin urun secimine odak ver.
-- [ ] **Cok adimli form (opsiyonel buyuk egzersiz):** Siparis olusturmayi 2 adima bol (musteri secimi → kalemler + ozet). Adimlar arasi state'in RHF'te nasil korunacagini, `trigger` ile adim bazli validasyonu ogren.
+- [x] **Validasyon modlari:** Siparis formunda `mode: 'onTouched'`, `reValidateMode: 'onChange'` gibi kombinasyonlari dene; kullanici deneyimi farkini gozlemleyip sectigin stratejiyi gerekcesiyle sabitle.
+- [x] **Server hatasini alana esle:** `POST /orders` 409 dondugunde ("yeterli stok yok") `form.setError('items.0.quantity', ...)` veya `setError('root.serverError', ...)` ile hatayi forma tasi; generic hata paragrafi yerine alan bazli gosterim yap.
+- [x] **`formState` derinligi:** `isDirty`, `dirtyFields`, `isSubmitting`, `isSubmitSuccessful`'i kullan: kaydedilmemis degisiklik varken dialog kapatilirken onay iste; submit butonunu `isDirty` degilse pasif yap.
+- [x] **Reset pattern'leri:** Urun duzenleme dialogunda `reset(product)` ile formu doldur; basarili submit sonrasi `reset()` cagrisinin `defaultValues` ile iliskisini incele. `values` prop'u ile `reset` farkini karsilastir.
+- [x] **`price` varsayilan degeri celiskisini coz:** Urun formunda `defaultValues.price` `0` ama sema `positive()` istiyor; alana dokunmayan kullanici dogrudan hata gorur. Sayisal alanlarda "bos" baslangic degerinin (`''`/`undefined`/`NaN`) `valueAsNumber` ve Zod `coerce` ile etkilesimini incele; secimini gerekcesiyle not et.
+- [x] **`useWatch` vs `watch` vs `getValues`:** Siparis dialogundaki canli toplam tutari hesapla (kalem sayisi × birim fiyat). Once `watch` ile yap, render sayisini olc; sonra `useWatch`'i izole bir `<OrderTotal>` bilesenine tasiyip farki gor.
+- [x] **`Controller` ihtiyacini gor:** Native olmayan bir input ekle (or. urun formuna basit bir toggle/segmented control) ve `Controller` ile bagla; register/Controller ayrimini netlestir.
+- [x] **`useFieldArray` ileri kullanim:** Kalem satirlarinda `replace`, `insert`, `move` operasyonlarini dene; ayni urunun ikinci kez secilmesini engelleyen veya mevcut kaleme miktar ekleyen akil yurut.
+- [x] **Form bilesenini ayristir:** `OrderCreateDialog` icindeki form mantigini `useOrderCreateForm` custom hook'una cikar; `FormProvider` + `useFormContext` ile kalem satirini ayri bilesene tasi ve prop drilling'i kaldir.
+- [x] **Odak yonetimi:** `setFocus` ile ilk hatali alana odaklan; yeni kalem eklendiginde yeni satirin urun secimine odak ver.
+- [ ] **Cok adimli form (opsiyonel buyuk egzersiz):** Siparis olusturmayi 2 adima bol (musteri secimi → kalemler + ozet). Adimlar arasi state'in RHF'te nasil korunacagini, `trigger` ile adim bazli validasyonu ogren. *(2026-08-07: bilincli atlandi — kullanici + kontrolcu karari, maliyet/kazanim dengesi.)*
 
 ---
 
@@ -72,7 +72,7 @@ Mevcut durum: Tek store, `persist` + `partialize`. Belgede planlanan toast kuyru
 - [ ] **Slice pattern:** UI store'u buyudugunde (tema + sidebar + tablo + toast) slice'lara bol: `createThemeSlice`, `createToastSlice`... Tek store icinde birlesecek sekilde tipleriyle kur.
 - [ ] **`subscribeWithSelector`:** Tema degistiginde `document.documentElement`'e `dark` class'ini yazan bir subscription kur (React render dongusu disinda yan etki). Tailwind dark mode ile birlestir.
 - [ ] **Persist derinligi:** `version` + `migrate` ekle: store semasi degistiginde (or. `tableDensity`'ye yeni deger) eski localStorage verisinin nasil goc ettirildigini dene. `onRehydrateStorage` ile hydration anini logla.
-- [ ] **Siparis taslagi (draft) store'u:** Dialog kapaninca kaybolan siparis formunu opsiyonel olarak taslak store'una yaz ("kaldigin yerden devam et"). Form state ↔ client state sinirini bilerek ihlal edip geri duzelterek sinirin nedenini kavra.
+- [x] **Siparis taslagi (draft) store'u:** Dialog kapaninca kaybolan siparis formunu opsiyonel olarak taslak store'una yaz ("kaldigin yerden devam et"). Form state ↔ client state sinirini bilerek ihlal edip geri duzelterek sinirin nedenini kavra.
 - [x] **Store testi:** Vitest ile toast store'unun saf logigini test et (`useToastStore.getState()` uzerinden, render gerektirmeden). Store'larin test edilebilirlik avantajini gor.
 - [x] **Devtools middleware:** `devtools` middleware ekleyip Redux DevTools uzantisinda action akisini izle; action'lara isim ver.
 
@@ -105,7 +105,7 @@ Mevcut durum: Fonksiyonel bilesenler, `useState`, `useDeferredValue`. Sayfalar s
 - [ ] **Portal ile dialog:** Dialoglari `createPortal` ile `document.body`'ye tasi; ardindan native `<dialog>` elementi + `showModal()` yaklasimiyla karsilastir. Focus trap, `Escape` ile kapanma ve arka plan scroll kilidi ekle.
 - [ ] **`useEffect` disiplinini gor:** Projede su an neredeyse hic `useEffect` yok — bu iyi. Hangi isler icin effect'in GEREKMEDIGINI (veri cekme → Query, abonelik → Zustand subscribe) kisa notlarla belgele; gercekten gereken bir ornek ekle (or. dialog acikken `Escape` dinleme).
 - [ ] **Memoizasyon bilinci:** `useMemo`/`useCallback`/`memo`'yu once OLCMEDEN ekleme; Profiler ile urun listesinde gercek bir yeniden render sorunu bul, sonra hedefli optimize et. "Her seyi memo'la" anti-pattern'ini not et.
-- [ ] **`useId` ve erisilebilirlik:** Dialog ve form alanlarindaki elle yazilmis id'leri (`order-status-${order.id}` vb.) gozden gecir; form label iliskilerinde `useId` kullan.
+- [x] **`useId` ve erisilebilirlik:** Dialog ve form alanlarindaki elle yazilmis id'leri (`order-status-${order.id}` vb.) gozden gecir; form label iliskilerinde `useId` kullan.
 - [ ] **Concurrent ozellikler:** Mevcut `useDeferredValue`'ya ek olarak filtre degisimini `useTransition` ile sarmala; `isPending` gostergesiyle iki yaklasimin farkini karsilastir.
 - [ ] **Liste render optimizasyonu (opsiyonel):** Urun listesi buyurse (seed'i 500 kayda cikar) sanal liste (`@tanstack/react-virtual`) dene.
 

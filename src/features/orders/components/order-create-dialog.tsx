@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Minus, Plus, X } from 'lucide-react'
-import { useFieldArray, useForm, useWatch } from 'react-hook-form'
+import { useFieldArray, useForm, useWatch, type Control } from 'react-hook-form'
 import { isApiError } from '../../../shared/api/api-error'
 import { customerQueryKeys, type Customer } from '../../customers/api/customers-api'
 import { productQueryKeys, type Product } from '../../products/api/products-api'
+import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 import {
   createOrder,
   createOrderFormSchema,
@@ -128,6 +129,8 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
             {form.formState.errors.items?.message && <p className="mt-2 text-xs text-rose-700">{form.formState.errors.items.message}</p>}
           </div>
 
+          <OrderTotal control={form.control} products={products} />
+
           {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700">{form.formState.errors.root.serverError.message}</p>}
           <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
             <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
@@ -137,6 +140,28 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
           </div>
         </form>
       </section>
+    </div>
+  )
+}
+
+// useWatch bu bilesene izole: her tus vurusu yalnizca burayi render eder, dialog agacini degil.
+// getValues ile yazilsaydi deger render'a bagli okunan reaktif olmayan snapshot'ta kalirdi.
+function OrderTotal({ control, products }: { control: Control<OrderFormInput>; products: Product[] }) {
+  const items = useWatch({ control, name: 'items' })
+  const currencyFormatter = useCurrencyFormatter()
+
+  const total = items.reduce((sum, item) => {
+    const product = products.find((candidate) => candidate.id === item?.productId)
+    const quantity = Number(item?.quantity)
+
+    return product && Number.isInteger(quantity) && quantity > 0 ? sum + product.price * quantity : sum
+  }, 0)
+
+  return (
+    <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-sm">
+      {/* Sunucu fiyati kayitli urunden alir; toplam bu yuzden 'tahmini'dir. */}
+      <span className="text-slate-600">Tahmini toplam</span>
+      <strong className="text-base text-slate-950">{currencyFormatter.format(total)}</strong>
     </div>
   )
 }

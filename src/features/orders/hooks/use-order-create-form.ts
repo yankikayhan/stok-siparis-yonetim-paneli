@@ -1,0 +1,93 @@
+import { zodResolver } from '@hookform/resolvers/zod'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMemo } from 'react'
+import { useFieldArray, useForm } from 'react-hook-form'
+import { isApiError } from '../../../shared/api/api-error'
+import { customerQueryKeys } from '../../customers/api/customers-api'
+import { productQueryKeys, type Product } from '../../products/api/products-api'
+import {
+  createOrder,
+  createOrderFormSchema,
+  orderMutationKeys,
+  orderQueryKeys,
+  type OrderFormInput,
+  type OrderFormValues,
+} from '../api/orders-api'
+
+type UseOrderCreateFormOptions = {
+  products: Product[]
+  onClose: () => void
+}
+
+// Form kurulumu, mutation, server hata eslemesi ve kapatma akisi tek yerde;
+// dialog bileseni yalnizca gorunumden sorumlu kalir.
+export function useOrderCreateForm({ products, onClose }: UseOrderCreateFormOptions) {
+  const queryClient = useQueryClient()
+  // Sema fabrikasi memoize: superRefine + Map kurulumu her render'da degil,
+  // yalnizca products referansi degisince calisir (refine performans bilinci).
+  const schema = useMemo(() => createOrderFormSchema(products), [products])
+  const form = useForm<OrderFormInput, unknown, OrderFormValues>({
+    resolver: zodResolver(schema),
+    // onTouched dengesi: onSubmit ilk hatayi cok gec, onChange dokunulmamis alanda cok erken gosterir.
+    mode: 'onTouched',
+    // Hata bir kez gorunduginde duzeltme geri bildirimi tus vurusunda gelir.
+    reValidateMode: 'onChange',
+    defaultValues: {
+      customerId: '',
+      items: [{ productId: '', quantity: 1 }],
+    },
+  })
+  const orderItems = useFieldArray({ control: form.control, name: 'items' })
+  const createOrderMutation = useMutation({
+    // Key, mutation'i cache'te adreslenebilir yapar: header gostergesi useMutationState ile izler.
+    mutationKey: orderMutationKeys.create,
+    mutationFn: createOrder,
+    // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
+    meta: { suppressErrorToast: true, successMessage: 'Siparis olusturuldu.' },
+    onSuccess: async () => {
+      // Dashboard ayni siparis/urun cache'lerini okudugu icin ayrica invalidate edilmez.
+      // orders prefix'i tam listeyle birlikte filtre basina infinite girdileri de kapsar.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: orderQueryKeys.all }),
+        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
+      ])
+      onClose()
+    },
+    // Mock sozlesmesi geregi alan cikarimi mesaj metninden yapilir (bilinçli kirilganlik);
+    // gercek bir API alan bazli yapisal hata govdesi dondururdu.
+    onError: (error) => {
+      if (isApiError(error) && error.status === 404 && error.message === 'Musteri bulunamadi.') {
+        form.setError('customerId', { type: 'server', message: error.message })
+        return
+      }
+
+      if (isApiError(error) && error.status === 409) {
+        // Mesaj urun adiyla baslar; startsWith, bir adin digerinin alt dizesi olmasina yanilmaz.
+        const failingProduct = products.find((product) => error.message.startsWith(`${product.name} `))
+        // Index guncel form dizisinde aranir: istek ucustayken satir eklenebilir/silinebilir,
+        // submit aninin index'i kaymis olabilir. Ayni urun birden fazla kalemdeyse ILK satir (bilinçli kural).
+        const index = form.getValues('items').findIndex((item) => item.productId === failingProduct?.id)
+
+        if (index !== -1) {
+          form.setError(`items.${index}.quantity`, { type: 'server', message: error.message })
+          return
+        }
+      }
+
+      form.setError('root.serverError', { type: 'server', message: error.message })
+    },
+  })
+
+  // Yalnizca kullanici kaynakli kapatmalar (X / Vazgec) buradan gecer; basari kapanisi
+  // onSuccess icinde dogrudan onClose cagirir — veri kaydedildigi icin onay anlamsizdir.
+  // isSubmitSuccessful guard olamaz: mutate senkron dondugu icin mutation sonucundan bagimsiz true olur.
+  const requestClose = () => {
+    if (form.formState.isDirty && !window.confirm('Kaydedilmemis degisiklikler var. Kapatilsin mi?')) return
+    onClose()
+  }
+
+  const submit = form.handleSubmit((values) => createOrderMutation.mutate(values))
+
+  return { form, orderItems, createOrderMutation, requestClose, submit }
+}

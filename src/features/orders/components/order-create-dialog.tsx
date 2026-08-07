@@ -1,4 +1,5 @@
 import { ArrowDown, ArrowUp, Minus, Plus, X } from 'lucide-react'
+import { cloneElement, useId } from 'react'
 import { FormProvider, useFormContext, useWatch, type Control } from 'react-hook-form'
 import { type Customer } from '../../customers/api/customers-api'
 import { type Product } from '../../products/api/products-api'
@@ -109,11 +110,14 @@ function OrderItemRow({ index, products, isFirst, isLast, isOnly, onMoveUp, onMo
           ))}
         </select>
       </FormField>
-      <FormField label="Miktar" error={form.formState.errors.items?.[index]?.quantity?.message}>
+      <FormField
+        label="Miktar"
+        error={form.formState.errors.items?.[index]?.quantity?.message}
+        hint={selectedProduct ? `Kullanilabilir: ${selectedProduct.stock}` : undefined}
+      >
         {/* valueAsNumber yok (K2 simetrisi): donusum tek noktada Zod coerce, NaN yolu kapali —
             bos input '' -> coerce 0 -> positive() bizim ozel mesaji uretir. */}
         <input {...form.register(`items.${index}.quantity`)} type="number" min="1" step="1" className="form-input" />
-        {selectedProduct && <span className="mt-1 block text-xs font-normal text-slate-500">Kullanilabilir: {selectedProduct.stock}</span>}
       </FormField>
       {/* move, alan degerini hata/touched state'iyle birlikte tasir; key={field.id} DOM eslesmesini korur. */}
       <div className="mt-6 flex gap-1">
@@ -147,6 +151,24 @@ function OrderTotal({ control, products }: { control: Control<OrderFormInput>; p
   )
 }
 
-function FormField({ children, error, label }: { children: React.ReactNode; error?: string; label: string }) {
-  return <label className="block text-sm font-medium text-slate-700"><span>{label}</span><span className="mt-1 block">{children}</span>{error && <span className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}</label>
+type FieldElementProps = { id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string }
+
+// Implicit label hata metnini alana BAGLAMAZ; explicit id + aria-describedby/aria-invalid
+// iliskiyi ekran okuyucuya programatik bildirir. hint de describedby zincirine girer.
+function FormField({ children, error, hint, label }: { children: React.ReactElement<FieldElementProps>; error?: string; hint?: string; label: string }) {
+  const fieldId = useId()
+  const errorId = `${fieldId}-error`
+  const hintId = `${fieldId}-hint`
+  const describedBy = [hint ? hintId : undefined, error ? errorId : undefined].filter(Boolean).join(' ') || undefined
+
+  return (
+    <div className="block text-sm font-medium text-slate-700">
+      <label htmlFor={fieldId}>{label}</label>
+      <span className="mt-1 block">
+        {cloneElement(children, { id: fieldId, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy })}
+      </span>
+      {hint && <span id={hintId} className="mt-1 block text-xs font-normal text-slate-500">{hint}</span>}
+      {error && <span id={errorId} className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}
+    </div>
+  )
 }

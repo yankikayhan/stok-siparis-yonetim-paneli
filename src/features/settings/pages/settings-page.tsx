@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Moon, Rows3, Sun } from 'lucide-react'
+import { cloneElement, useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { useUiStore } from '../../../shared/stores/ui-store'
 import {
@@ -112,8 +113,23 @@ function PreferenceButton({ active, icon: Icon, label, onClick }: { active: bool
   return <button type="button" onClick={onClick} className={`flex h-10 items-center justify-center gap-2 border text-sm font-medium ${active ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}><Icon size={16} aria-hidden="true" />{label}</button>
 }
 
-function FormField({ children, error, label }: { children: React.ReactNode; error?: string; label: string }) {
-  return <label className="block text-sm font-medium text-slate-700"><span>{label}</span><span className="mt-1 block">{children}</span>{error && <span className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}</label>
+type FieldElementProps = { id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string }
+
+// Implicit label hata metnini alana BAGLAMAZ; explicit id + aria-describedby/aria-invalid
+// iliskiyi ekran okuyucuya programatik bildirir. useId cakismasiz ve render'lar arasi stabildir.
+function FormField({ children, error, label }: { children: React.ReactElement<FieldElementProps>; error?: string; label: string }) {
+  const fieldId = useId()
+  const errorId = `${fieldId}-error`
+
+  return (
+    <div className="block text-sm font-medium text-slate-700">
+      <label htmlFor={fieldId}>{label}</label>
+      <span className="mt-1 block">
+        {cloneElement(children, { id: fieldId, 'aria-invalid': error ? true : undefined, 'aria-describedby': error ? errorId : undefined })}
+      </span>
+      {error && <span id={errorId} className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}
+    </div>
+  )
 }
 
 function SettingsLoadingState() {

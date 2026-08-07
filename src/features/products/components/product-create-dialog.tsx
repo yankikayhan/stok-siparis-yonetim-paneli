@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
+import { cloneElement, useId } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import {
   createProduct,
@@ -172,6 +173,21 @@ function SegmentButton({ active, label, onClick }: { active: boolean; label: str
   )
 }
 
-function FormField({ children, error, label }: { children: React.ReactNode; error?: string; label: string }) {
-  return <label className="block text-sm font-medium text-slate-700"><span>{label}</span><span className="mt-1 block">{children}</span>{error && <span className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}</label>
+type FieldElementProps = { id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string }
+
+// Implicit label hata metnini alana BAGLAMAZ; explicit id + aria-describedby/aria-invalid
+// iliskiyi ekran okuyucuya programatik bildirir. useId cakismasiz ve render'lar arasi stabildir.
+function FormField({ children, error, label }: { children: React.ReactElement<FieldElementProps>; error?: string; label: string }) {
+  const fieldId = useId()
+  const errorId = `${fieldId}-error`
+
+  return (
+    <div className="block text-sm font-medium text-slate-700">
+      <label htmlFor={fieldId}>{label}</label>
+      <span className="mt-1 block">
+        {cloneElement(children, { id: fieldId, 'aria-invalid': error ? true : undefined, 'aria-describedby': error ? errorId : undefined })}
+      </span>
+      {error && <span id={errorId} className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}
+    </div>
+  )
 }

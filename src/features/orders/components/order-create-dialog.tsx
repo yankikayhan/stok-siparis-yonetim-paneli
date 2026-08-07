@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { Minus, Plus, X } from 'lucide-react'
+import { ArrowDown, ArrowUp, Minus, Plus, X } from 'lucide-react'
 import { useFieldArray, useForm, useWatch, type Control } from 'react-hook-form'
 import { isApiError } from '../../../shared/api/api-error'
 import { customerQueryKeys, type Customer } from '../../customers/api/customers-api'
@@ -114,14 +114,29 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
                     <FormField label={`Urun ${index + 1}`} error={form.formState.errors.items?.[index]?.productId?.message}>
                       <select {...form.register(`items.${index}.productId`)} className="form-input">
                         <option value="">Urun secin</option>
-                        {products.filter((product) => product.active).map((product) => <option key={product.id} value={product.id}>{product.name}</option>)}
+                        {products.filter((product) => product.active).map((product) => (
+                          // Baska satirda secili urun disabled: duplike kalem UI'da engellenir,
+                          // superRefine'daki toplam-stok kurali guvenlik agi olarak kalir.
+                          <option
+                            key={product.id}
+                            value={product.id}
+                            disabled={watchedItems.some((item, itemIndex) => itemIndex !== index && item?.productId === product.id)}
+                          >
+                            {product.name}
+                          </option>
+                        ))}
                       </select>
                     </FormField>
                     <FormField label="Miktar" error={form.formState.errors.items?.[index]?.quantity?.message}>
                       <input {...form.register(`items.${index}.quantity`, { valueAsNumber: true })} type="number" min="1" step="1" className="form-input" />
                       {selectedProduct && <span className="mt-1 block text-xs font-normal text-slate-500">Kullanilabilir: {selectedProduct.stock}</span>}
                     </FormField>
-                    <button type="button" onClick={() => orderItems.remove(index)} disabled={orderItems.fields.length === 1} className="mt-6 grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Kalem ${index + 1} sil`}><Minus size={17} aria-hidden="true" /></button>
+                    {/* move, alan degerini hata/touched state'iyle birlikte tasir; key={field.id} DOM eslesmesini korur. */}
+                    <div className="mt-6 flex gap-1">
+                      <button type="button" onClick={() => orderItems.move(index, index - 1)} disabled={index === 0} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Kalem ${index + 1} yukari tasi`}><ArrowUp size={17} aria-hidden="true" /></button>
+                      <button type="button" onClick={() => orderItems.move(index, index + 1)} disabled={index === orderItems.fields.length - 1} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Kalem ${index + 1} asagi tasi`}><ArrowDown size={17} aria-hidden="true" /></button>
+                      <button type="button" onClick={() => orderItems.remove(index)} disabled={orderItems.fields.length === 1} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Kalem ${index + 1} sil`}><Minus size={17} aria-hidden="true" /></button>
+                    </div>
                   </div>
                 )
               })}

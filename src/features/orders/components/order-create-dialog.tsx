@@ -67,9 +67,10 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
           {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700">{form.formState.errors.root.serverError.message}</p>}
           <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
             <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
-            {/* isDirty: degisiklik yokken submit anlamsiz; isSubmitting degil mutation.isPending —
+            {/* Kilit "kaydedilecek is var mi"yi sorar: bu oturumdaki degisiklik (isDirty) ya da onceki oturumdan tasinan taslak (hasDraft) —
+                taslaktan dogan form baseline oldugu icin isDirty false baslar. isSubmitting degil mutation.isPending:
                 mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
-            <button type="submit" disabled={!form.formState.isDirty || createOrderMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</button>
+            <button type="submit" disabled={(!form.formState.isDirty && !hasDraft) || createOrderMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</button>
           </div>
           </form>
         </FormProvider>

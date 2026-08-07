@@ -34,7 +34,9 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
       name: product?.name ?? '',
       sku: product?.sku ?? '',
       categoryId: product?.categoryId ?? '',
-      price: product?.price ?? 0,
+      // 0 varsayilani positive() kuralinda dokunulmamis alani pesinen hatali yapiyordu;
+      // '' bos baslar, Zod coerce submit'te sayiya cevirir. stock/reorderLevel'da 0 gecerli deger.
+      price: product?.price ?? '',
       stock: product?.stock ?? 0,
       reorderLevel: product?.reorderLevel ?? 0,
     },
@@ -92,14 +94,15 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
             </select>
           </FormField>
           <div className="grid gap-4 sm:grid-cols-3">
+            {/* valueAsNumber yok: string -> sayi donusumu tek noktada (Zod coerce), NaN yolu kapali. */}
             <FormField label="Fiyat" error={form.formState.errors.price?.message}>
-              <input {...form.register('price', { valueAsNumber: true })} type="number" min="0" step="0.01" className="form-input" />
+              <input {...form.register('price')} type="number" min="0" step="0.01" className="form-input" />
             </FormField>
             <FormField label="Stok" error={form.formState.errors.stock?.message}>
-              <input {...form.register('stock', { valueAsNumber: true })} type="number" min="0" step="1" className="form-input" />
+              <input {...form.register('stock')} type="number" min="0" step="1" className="form-input" />
             </FormField>
             <FormField label="Yeniden siparis" error={form.formState.errors.reorderLevel?.message}>
-              <input {...form.register('reorderLevel', { valueAsNumber: true })} type="number" min="0" step="1" className="form-input" />
+              <input {...form.register('reorderLevel')} type="number" min="0" step="1" className="form-input" />
             </FormField>
           </div>
           {createProductMutation.isError && <p className="text-sm text-rose-700">{createProductMutation.error.message}</p>}

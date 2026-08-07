@@ -23,7 +23,7 @@ export function ProductsPage() {
   const [stockFilter, setStockFilter] = useState<ProductStockFilter>(DEFAULT_PRODUCT_LIST_PARAMS.stock)
   const [page, setPage] = useState(DEFAULT_PRODUCT_LIST_PARAMS.page)
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false)
-  const [productToEdit, setProductToEdit] = useState<Product | null>(null)
+  const [productToEditId, setProductToEditId] = useState<string | null>(null)
   const [productToDelete, setProductToDelete] = useState<Product | null>(null)
   const tableDensity = useUiStore((state) => state.tableDensity)
   const currencyFormatter = useCurrencyFormatter()
@@ -111,6 +111,11 @@ export function ProductsPage() {
 
   const categoryNames = new Map(categoriesQuery.data.map((category) => [category.id, category.name]))
   const tableCellPadding = tableDensity === 'compact' ? 'py-2.5' : 'py-4'
+
+  // Dialog urunu snapshot degil guncel listeden turetir (tek dogruluk kaynagi): arkaplan
+  // refetch'inin getirdigi degisiklikler dialoga akar. Urun bu sayfadan duserse
+  // (filtre uyeligi/sayfa kaymasi) find undefined kalir ve dialog sessizce kapanir.
+  const productToEdit = products.find((product) => product.id === productToEditId)
 
   return (
     <section className="space-y-6">
@@ -206,7 +211,7 @@ export function ProductsPage() {
                     </td>
                     <td className={`px-5 ${tableCellPadding} text-right`}>
                       <div className="flex justify-end gap-3">
-                        <button type="button" onClick={() => setProductToEdit(product)} className="text-sm font-medium text-teal-700 hover:text-teal-900">Duzenle</button>
+                        <button type="button" onClick={() => setProductToEditId(product.id)} className="text-sm font-medium text-teal-700 hover:text-teal-900">Duzenle</button>
                         <button type="button" onClick={() => setProductToDelete(product)} className="text-sm font-medium text-rose-700 hover:text-rose-900">Sil</button>
                       </div>
                     </td>
@@ -243,7 +248,7 @@ export function ProductsPage() {
         </>
       )}
       {isCreateDialogOpen && <ProductCreateDialog categories={categoriesQuery.data} onClose={() => setIsCreateDialogOpen(false)} />}
-      {productToEdit && <ProductCreateDialog categories={categoriesQuery.data} product={productToEdit} onClose={() => setProductToEdit(null)} />}
+      {productToEdit && <ProductCreateDialog categories={categoriesQuery.data} product={productToEdit} onClose={() => setProductToEditId(null)} />}
       {productToDelete && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/35 p-4" role="presentation">
           <section role="dialog" aria-modal="true" aria-labelledby="product-delete-title" className="w-full max-w-md bg-white p-5 shadow-xl">

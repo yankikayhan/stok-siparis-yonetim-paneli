@@ -31,15 +31,27 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
     // Hata bir kez gorunduginde duzeltme geri bildirimi tus vurusunda gelir.
     reValidateMode: 'onChange',
     defaultValues: {
-      name: product?.name ?? '',
-      sku: product?.sku ?? '',
-      categoryId: product?.categoryId ?? '',
+      name: '',
+      sku: '',
+      categoryId: '',
       // 0 varsayilani positive() kuralinda dokunulmamis alani pesinen hatali yapiyordu;
       // '' bos baslar, Zod coerce submit'te sayiya cevirir. stock/reorderLevel'da 0 gecerli deger.
-      price: product?.price ?? '',
-      stock: product?.stock ?? 0,
-      reorderLevel: product?.reorderLevel ?? 0,
-      active: product?.active ?? true,
+      price: '',
+      stock: 0,
+      reorderLevel: 0,
+      active: true,
+    },
+    // values, reaktif reset'tir: duzenlemede arkaplan refetch'i yeni product referansi getirirse
+    // form server verisiyle senkronlanir ve kaydedilmemis girdiler bilerek ezilir.
+    // Product'in fazla alanlari (id, createdAt...) form state'ine sizmasin diye form sekline daraltilir.
+    values: product && {
+      name: product.name,
+      sku: product.sku,
+      categoryId: product.categoryId,
+      price: product.price,
+      stock: product.stock,
+      reorderLevel: product.reorderLevel,
+      active: product.active,
     },
   })
   const createProductMutation = useMutation({

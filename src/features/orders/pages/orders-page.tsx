@@ -164,7 +164,8 @@ export function OrdersPage() {
   const { customers, products } = referenceQueries.data
   const customerNames = new Map(customers.map((customer) => [customer.id, customer.name]))
   const orders = ordersQuery.data.pages.flatMap((page) => page.items)
-  const totalCount = ordersQuery.data.pages[0].totalCount
+  // useInfiniteQuery ilk sayfayi initialPageParam ile daima yukler; dizi bos olamaz.
+  const totalCount = ordersQuery.data.pages[0]?.totalCount ?? 0
 
   return (
     <section className="space-y-6">

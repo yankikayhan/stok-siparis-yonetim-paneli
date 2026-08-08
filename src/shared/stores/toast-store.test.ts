@@ -1,5 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { useToastStore } from './toast-store'
+import { useToastStore, type Toast } from './toast-store'
+
+// noUncheckedIndexedAccess altinda index erisimi T | undefined doner; `?.` ile susturmak
+// eksik elemani sessizce gecirirdi — assert'i zayiflatmamak icin burada patlatilir.
+function toastAt(toasts: Toast[], index: number): Toast {
+  const toast = toasts[index]
+
+  if (toast === undefined) throw new Error(`Kuyrukta ${index}. toast yok.`)
+
+  return toast
+}
 
 describe('useToastStore', () => {
   beforeEach(() => {
@@ -19,7 +29,7 @@ describe('useToastStore', () => {
 
     expect(toasts).toHaveLength(1)
     expect(toasts[0]).toMatchObject({ type: 'success', message: 'Kaydedildi.' })
-    expect(toasts[0].id).not.toBe('')
+    expect(toastAt(toasts, 0).id).not.toBe('')
   })
 
   it('ayni icerikli toastlar farkli id alir', () => {
@@ -29,20 +39,20 @@ describe('useToastStore', () => {
     const { toasts } = useToastStore.getState()
 
     expect(toasts).toHaveLength(2)
-    expect(toasts[0].id).not.toBe(toasts[1].id)
+    expect(toastAt(toasts, 0).id).not.toBe(toastAt(toasts, 1).id)
   })
 
   it('dismissToast sadece verilen id\'li toast\'i kaldirir', () => {
     useToastStore.getState().addToast({ type: 'error', message: 'Birinci' })
     useToastStore.getState().addToast({ type: 'error', message: 'Ikinci' })
 
-    const [first] = useToastStore.getState().toasts
+    const first = toastAt(useToastStore.getState().toasts, 0)
     useToastStore.getState().dismissToast(first.id)
 
     const { toasts } = useToastStore.getState()
 
     expect(toasts).toHaveLength(1)
-    expect(toasts[0].message).toBe('Ikinci')
+    expect(toastAt(toasts, 0).message).toBe('Ikinci')
   })
 
   it('toast suresi dolunca otomatik kapanir', () => {
@@ -58,7 +68,7 @@ describe('useToastStore', () => {
   it('elle kapatilan toast\'in gec tetiklenen timer\'i hata uretmez', () => {
     useToastStore.getState().addToast({ type: 'info', message: 'Elle kapatilacak' })
 
-    const [toast] = useToastStore.getState().toasts
+    const toast = toastAt(useToastStore.getState().toasts, 0)
     useToastStore.getState().dismissToast(toast.id)
 
     expect(() => vi.runAllTimers()).not.toThrow()

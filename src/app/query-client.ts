@@ -52,6 +52,9 @@ export const queryClient = new QueryClient({
       // Varsayilan tazelik penceresi: kisa gezinmelerde refetch firtinasini onler,
       // 30 sn sonrasinda veri bayat sayilip arka planda tazelenir.
       staleTime: 30_000,
+      // Yukaridaki QueryCache.onError'in tam tumleyeni: veri YOKKEN hata boundary'ye firlatilir,
+      // veri VARKEN firlatilmaz ve toast'a birakilir. Ayni hata iki kanaldan gosterilmez.
+      throwOnError: (_error, query) => query.state.data === undefined,
       retry: (failureCount, error) =>
         !(isApiError(error) && error.status !== undefined && error.status < 500) && failureCount < 2,
       refetchOnWindowFocus: false,

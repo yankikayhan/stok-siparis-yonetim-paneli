@@ -1,6 +1,7 @@
-import { useMutationState, useQueryClient } from '@tanstack/react-query'
+import { QueryErrorResetBoundary, useMutationState, useQueryClient } from '@tanstack/react-query'
 import { ChartNoAxesCombined, LoaderCircle, Menu, Package, Settings, ShoppingCart, UsersRound } from 'lucide-react'
-import { NavLink, Outlet } from 'react-router-dom'
+import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
 import { orderMutationKeys } from '../../features/orders/api/orders-api'
 import {
@@ -8,6 +9,8 @@ import {
   DEFAULT_PRODUCT_LIST_PARAMS,
   productListOptions,
 } from '../../features/products/api/products-api'
+import { isApiError } from '../../shared/api/api-error'
+import { ErrorState } from '../../shared/components/error-state'
 import { Toaster } from '../../shared/components/toaster'
 import { useUiStore } from '../../shared/stores/ui-store'
 import { type RoutePath } from '../routes'
@@ -22,6 +25,7 @@ const navigationItems: Array<{ to: RoutePath; label: string; icon: typeof Packag
 
 export function AppShell() {
   const queryClient = useQueryClient()
+  const { pathname } = useLocation()
   const { theme, isSidebarOpen, toggleSidebar } = useUiStore(
     useShallow((state) => ({
       theme: state.theme,
@@ -93,10 +97,29 @@ export function AppShell() {
           </nav>
         </aside>
         <main className="min-w-0 flex-1 p-4 sm:p-6 lg:p-8">
-          <Outlet />
+          {/* Boundary yalnizca sayfa icerigini sarar: header, sidebar ve Toaster disarida
+              kalir, boylece hata ekranindayken gezinme ve toast'lar calismaya devam eder. */}
+          <QueryErrorResetBoundary>
+            {({ reset }) => (
+              <ErrorBoundary onReset={reset} resetKeys={[pathname]} FallbackComponent={RouteErrorFallback}>
+                <Outlet />
+              </ErrorBoundary>
+            )}
+          </QueryErrorResetBoundary>
         </main>
       </div>
       <Toaster />
     </div>
+  )
+}
+
+// Export edilmez: AppShell disinda tuketicisi yok.
+function RouteErrorFallback({ error, resetErrorBoundary }: FallbackProps) {
+  return (
+    <ErrorState
+      title="Sayfa yuklenemedi"
+      message={isApiError(error) ? error.message : 'Beklenmeyen bir hata olustu.'}
+      onRetry={resetErrorBoundary}
+    />
   )
 }

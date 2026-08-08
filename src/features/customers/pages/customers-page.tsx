@@ -37,6 +37,8 @@ export function CustomersPage() {
       queryClient
         .getQueryData(ordersOptions().queryKey)
         ?.filter((order) => order.customerId === selectedCustomerId),
+    // Ikincil veri: musteri listesi ayakta kalmali, hata yalnizca detay panelinde inline gosterilir.
+    throwOnError: false,
   })
 
   if (customersQuery.isPending) {

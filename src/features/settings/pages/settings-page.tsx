@@ -4,6 +4,7 @@ import { Moon, Rows3, Sun } from 'lucide-react'
 import { cloneElement, useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { useUiStore } from '../../../shared/stores/ui-store'
+import { PageHeader } from '../../../shared/components/page-header'
 import {
   profileOptions,
   profileSchema,
@@ -35,11 +36,11 @@ export function SettingsPage() {
 
   return (
     <section className="space-y-6">
-      <div>
-        <p className="text-sm font-medium text-teal-700">Uygulama</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Ayarlar</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Profil bilgilerinizi ve calisma tercihlerinizi yonetin.</p>
-      </div>
+      <PageHeader
+        eyebrow="Uygulama"
+        title="Ayarlar"
+        description="Profil bilgilerinizi ve calisma tercihlerinizi yonetin."
+      />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <ProfileSettingsForm profile={profileQuery.data} />

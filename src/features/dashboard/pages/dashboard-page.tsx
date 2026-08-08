@@ -4,6 +4,7 @@ import { ordersOptions } from '../../orders/api/orders-api'
 import { productListAllOptions } from '../../products/api/products-api'
 import { selectOrderStats, selectProductStats } from '../api/dashboard-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
+import { PageHeader } from '../../../shared/components/page-header'
 
 const numberFormatter = new Intl.NumberFormat('tr-TR')
 
@@ -42,13 +43,11 @@ export function DashboardPage() {
 
   return (
     <section className="space-y-6">
-      <div>
-        <p className="text-sm font-medium text-teal-700">Genel Bakis</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Isletme durumu</h1>
-        <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">
-          Operasyonun bugunku gorunumu ve dikkat gerektiren stok seviyeleri.
-        </p>
-      </div>
+      <PageHeader
+        eyebrow="Genel Bakis"
+        title="Isletme durumu"
+        description="Operasyonun bugunku gorunumu ve dikkat gerektiren stok seviyeleri."
+      />
 
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Toplam urun" value={numberFormatter.format(totalProducts)} icon={PackageCheck} />

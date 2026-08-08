@@ -16,6 +16,8 @@ import {
 import { ProductCreateDialog } from '../components/product-create-dialog'
 import { useUiStore } from '../../../shared/stores/ui-store'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
+import { EmptyState } from '../../../shared/components/empty-state'
+import { PageHeader } from '../../../shared/components/page-header'
 
 export function ProductsPage() {
   const [search, setSearch] = useState(DEFAULT_PRODUCT_LIST_PARAMS.search)
@@ -120,11 +122,11 @@ export function ProductsPage() {
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-teal-700">Envanter</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Urunler</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Urun katalogunu ve stok seviyelerini yonetin.</p>
-        </div>
+        <PageHeader
+          eyebrow="Envanter"
+          title="Urunler"
+          description="Urun katalogunu ve stok seviyelerini yonetin."
+        />
         <button type="button" onClick={() => setIsCreateDialogOpen(true)} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800">
           Urun ekle
         </button>
@@ -171,10 +173,7 @@ export function ProductsPage() {
       </div>
 
       {totalCount === 0 ? (
-        <div className="border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-          <h2 className="text-base font-semibold text-slate-950">Eslesen urun yok</h2>
-          <p className="mt-2 text-sm text-slate-600">Arama veya filtre secimlerinizi degistirin.</p>
-        </div>
+        <EmptyState title="Eslesen urun yok" description="Arama veya filtre secimlerinizi degistirin." />
       ) : (
         <>
           <div

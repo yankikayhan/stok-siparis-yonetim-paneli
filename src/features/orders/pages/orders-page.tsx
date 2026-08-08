@@ -23,6 +23,8 @@ import {
   updateOrderStatus,
 } from '../api/orders-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
+import { EmptyState } from '../../../shared/components/empty-state'
+import { PageHeader } from '../../../shared/components/page-header'
 
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' })
 
@@ -170,11 +172,11 @@ export function OrdersPage() {
   return (
     <section className="space-y-6">
       <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p className="text-sm font-medium text-teal-700">Satislar</p>
-          <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Siparisler</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-600">Siparis durumlarini takip edin ve operasyon akisini yonetin.</p>
-        </div>
+        <PageHeader
+          eyebrow="Satislar"
+          title="Siparisler"
+          description="Siparis durumlarini takip edin ve operasyon akisini yonetin."
+        />
         <button type="button" onClick={() => setIsCreateDialogOpen(true)} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800">Siparis olustur</button>
       </div>
 
@@ -190,11 +192,11 @@ export function OrdersPage() {
       </div>
 
       {orders.length === 0 ? (
-        <div className="border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-          <ClipboardList size={28} className="mx-auto text-slate-400" aria-hidden="true" />
-          <h2 className="mt-3 text-base font-semibold text-slate-950">Eslesen siparis yok</h2>
-          <p className="mt-2 text-sm text-slate-600">Durum filtresini degistirerek tekrar deneyin.</p>
-        </div>
+        <EmptyState
+          icon={ClipboardList}
+          title="Eslesen siparis yok"
+          description="Durum filtresini degistirerek tekrar deneyin."
+        />
       ) : (
         <>
           <div

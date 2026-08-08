@@ -10,6 +10,8 @@ import {
   type CustomerOrder,
 } from '../api/customers-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
+import { EmptyState } from '../../../shared/components/empty-state'
+import { PageHeader } from '../../../shared/components/page-header'
 
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' })
 
@@ -49,17 +51,17 @@ export function CustomersPage() {
 
   return (
     <section className="space-y-6">
-      <div>
-        <p className="text-sm font-medium text-teal-700">Iliskiler</p>
-        <h1 className="mt-1 text-2xl font-semibold tracking-tight text-slate-950">Musteriler</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-600">Musteri kayitlarini ve siparis gecmislerini inceleyin.</p>
-      </div>
+      <PageHeader
+        eyebrow="Iliskiler"
+        title="Musteriler"
+        description="Musteri kayitlarini ve siparis gecmislerini inceleyin."
+      />
 
       {customersQuery.data.length === 0 ? (
-        <div className="border border-dashed border-slate-300 bg-white px-6 py-14 text-center">
-          <h2 className="text-base font-semibold text-slate-950">Henuz musteri yok</h2>
-          <p className="mt-2 text-sm text-slate-600">Musteri kayitlari eklendiginde burada gorunecek.</p>
-        </div>
+        <EmptyState
+          title="Henuz musteri yok"
+          description="Musteri kayitlari eklendiginde burada gorunecek."
+        />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[minmax(17rem,0.9fr)_minmax(0,1.5fr)]">
           <div className="border border-slate-200 bg-white">

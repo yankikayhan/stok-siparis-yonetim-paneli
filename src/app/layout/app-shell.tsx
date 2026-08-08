@@ -10,8 +10,9 @@ import {
 } from '../../features/products/api/products-api'
 import { Toaster } from '../../shared/components/toaster'
 import { useUiStore } from '../../shared/stores/ui-store'
+import { type RoutePath } from '../routes'
 
-const navigationItems = [
+const navigationItems: Array<{ to: RoutePath; label: string; icon: typeof Package }> = [
   { to: '/', label: 'Genel Bakis', icon: ChartNoAxesCombined },
   { to: '/urunler', label: 'Urunler', icon: Package },
   { to: '/musteriler', label: 'Musteriler', icon: UsersRound },

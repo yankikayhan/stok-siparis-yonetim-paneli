@@ -13,29 +13,9 @@ export function DashboardPage() {
   const productStatsQuery = useQuery({ ...productListAllOptions(), select: selectProductStats })
   const orderStatsQuery = useQuery({ ...ordersOptions(), select: selectOrderStats })
 
-  if (productStatsQuery.isPending || orderStatsQuery.isPending) {
+  // isError degil: veri varsa sayfa cizilir, hata toast kanalinda kalir (throwOnError ile ayni yuklem).
+  if (productStatsQuery.data === undefined || orderStatsQuery.data === undefined) {
     return <DashboardLoadingState />
-  }
-
-  if (productStatsQuery.isError || orderStatsQuery.isError) {
-    const error = productStatsQuery.error ?? orderStatsQuery.error
-
-    return (
-      <section className="rounded-lg border border-rose-200 bg-rose-50 p-6">
-        <h1 className="text-base font-semibold text-rose-950">Dashboard verileri yuklenemedi</h1>
-        <p className="mt-2 text-sm text-rose-800">{error?.message ?? 'Beklenmeyen bir hata olustu.'}</p>
-        <button
-          type="button"
-          onClick={() => {
-            void productStatsQuery.refetch()
-            void orderStatsQuery.refetch()
-          }}
-          className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800"
-        >
-          Tekrar dene
-        </button>
-      </section>
-    )
   }
 
   const { totalProducts, lowStockProducts } = productStatsQuery.data

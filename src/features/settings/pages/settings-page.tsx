@@ -20,18 +20,9 @@ export function SettingsPage() {
   const setTableDensity = useUiStore((state) => state.setTableDensity)
   const profileQuery = useQuery(profileOptions())
 
-  if (profileQuery.isPending) {
+  // isError degil: veri varsa sayfa cizilir, hata toast kanalinda kalir (throwOnError ile ayni yuklem).
+  if (profileQuery.data === undefined) {
     return <SettingsLoadingState />
-  }
-
-  if (profileQuery.isError) {
-    return (
-      <section className="border border-rose-200 bg-rose-50 p-6">
-        <h1 className="text-base font-semibold text-rose-950">Ayarlar yuklenemedi</h1>
-        <p className="mt-2 text-sm text-rose-800">{profileQuery.error.message}</p>
-        <button type="button" onClick={() => void profileQuery.refetch()} className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Tekrar dene</button>
-      </section>
-    )
   }
 
   return (

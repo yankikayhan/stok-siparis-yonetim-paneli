@@ -75,27 +75,21 @@ function applyStatusToCache(data: OrdersCache, id: string, status: OrderStatus):
 }
 
 // Modul seviyesi tanim sarttir (dashboard select emsali): memoizasyon guard'i combine'in
-// KENDI referansina da bakar; inline tanim + icinde uretilen closure'lar (refetchAll)
-// her render'da yeni sonuc nesnesi dogururdu.
+// KENDI referansina da bakar; inline tanim her render'da yeni sonuc nesnesi dogururdu.
+// Tek alanli kalmasinin sebebi asagidaki daraltma: iki sorgu tek ya-hep-ya-hic nesnesine iner.
 function combineReferenceQueries([customersResult, productsResult]: [
   UseQueryResult<Customer[]>,
   UseQueryResult<Product[]>,
 ]) {
   return {
-    isPending: customersResult.isPending || productsResult.isPending,
-    error: customersResult.error ?? productsResult.error ?? undefined,
-    // isSuccess daraltmalari data'lari undefined'siz tipler; biri bile degilse sayfa veri gostermez.
+    // isSuccess degil: veri varsa sayfa cizilir, hata toast kanalinda kalir (throwOnError ile ayni yuklem).
     data:
-      customersResult.isSuccess && productsResult.isSuccess
+      customersResult.data !== undefined && productsResult.data !== undefined
         ? {
             customers: customersResult.data,
             products: productsResult.data,
           }
         : undefined,
-    refetchAll: () => {
-      void customersResult.refetch()
-      void productsResult.refetch()
-    },
   }
 }
 
@@ -140,27 +134,9 @@ export function OrdersPage() {
     },
   })
 
-  if (referenceQueries.isPending || ordersQuery.isPending) {
-    return <OrdersLoadingState />
-  }
-
+  // isError degil: veri varsa sayfa cizilir, hata toast kanalinda kalir (throwOnError ile ayni yuklem).
   if (referenceQueries.data === undefined || ordersQuery.data === undefined) {
-    return (
-      <section className="border border-rose-200 bg-rose-50 p-6">
-        <h1 className="text-base font-semibold text-rose-950">Siparisler yuklenemedi</h1>
-        <p className="mt-2 text-sm text-rose-800">{(referenceQueries.error ?? ordersQuery.error)?.message ?? 'Beklenmeyen bir hata olustu.'}</p>
-        <button
-          type="button"
-          onClick={() => {
-            referenceQueries.refetchAll()
-            void ordersQuery.refetch()
-          }}
-          className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800"
-        >
-          Tekrar dene
-        </button>
-      </section>
-    )
+    return <OrdersLoadingState />
   }
 
   const { customers, products } = referenceQueries.data

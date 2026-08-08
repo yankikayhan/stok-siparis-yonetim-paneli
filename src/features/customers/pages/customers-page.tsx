@@ -41,12 +41,9 @@ export function CustomersPage() {
     throwOnError: false,
   })
 
-  if (customersQuery.isPending) {
+  // isError degil: veri varsa sayfa cizilir, hata toast kanalinda kalir (throwOnError ile ayni yuklem).
+  if (customersQuery.data === undefined) {
     return <CustomersLoadingState />
-  }
-
-  if (customersQuery.isError) {
-    return <QueryErrorState title="Musteriler yuklenemedi" message={customersQuery.error.message} onRetry={() => void customersQuery.refetch()} />
   }
 
   const selectedCustomer = customersQuery.data.find((customer) => customer.id === selectedCustomerId) ?? null
@@ -176,16 +173,6 @@ function DetailItem({ icon: Icon, label, value }: { icon: typeof Mail; label: st
         <dd className="mt-1 break-words text-sm text-slate-800">{value}</dd>
       </div>
     </div>
-  )
-}
-
-function QueryErrorState({ title, message, onRetry }: { title: string; message: string; onRetry: () => void }) {
-  return (
-    <section className="border border-rose-200 bg-rose-50 p-6">
-      <h1 className="text-base font-semibold text-rose-950">{title}</h1>
-      <p className="mt-2 text-sm text-rose-800">{message}</p>
-      <button type="button" onClick={onRetry} className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Tekrar dene</button>
-    </section>
   )
 }
 

@@ -76,31 +76,9 @@ export function ProductsPage() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
   })
 
-  if (productsQuery.isPending || categoriesQuery.isPending) {
+  // isError degil: veri varsa sayfa cizilir, hata toast kanalinda kalir (throwOnError ile ayni yuklem).
+  if (productsQuery.data === undefined || categoriesQuery.data === undefined) {
     return <ProductsLoadingState />
-  }
-
-  if (productsQuery.isError || categoriesQuery.isError) {
-    const error = productsQuery.error ?? categoriesQuery.error
-
-    return (
-      <section className="border border-rose-200 bg-rose-50 p-6">
-        <h1 className="text-base font-semibold text-rose-950">Urunler yuklenemedi</h1>
-        <p className="mt-2 text-sm text-rose-800">
-          {error?.message ?? 'Beklenmeyen bir hata olustu.'}
-        </p>
-        <button
-          type="button"
-          className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800"
-          onClick={() => {
-            void productsQuery.refetch()
-            void categoriesQuery.refetch()
-          }}
-        >
-          Tekrar dene
-        </button>
-      </section>
-    )
   }
 
   const { items: products, totalCount } = productsQuery.data

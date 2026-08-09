@@ -1,5 +1,6 @@
-import { useQuery } from '@tanstack/react-query'
+import { useSuspenseQuery } from '@tanstack/react-query'
 import { AlertTriangle, CircleDollarSign, PackageCheck, ShoppingBag } from 'lucide-react'
+import { Suspense } from 'react'
 import { ordersOptions } from '../../orders/api/orders-api'
 import { productListAllOptions } from '../../products/api/products-api'
 import { selectOrderStats, selectProductStats } from '../api/dashboard-api'
@@ -9,17 +10,9 @@ import { PageHeader } from '../../../shared/components/page-header'
 const numberFormatter = new Intl.NumberFormat('tr-TR')
 
 export function DashboardPage() {
+  // Askiya ALINMAYAN bilesende kalir: ic bilesen suspend olurken bu render commit eder,
+  // boylece /profile abonesi kurulur ve istek diger iki sorguyla paralel gider.
   const currencyFormatter = useCurrencyFormatter(0)
-  const productStatsQuery = useQuery({ ...productListAllOptions(), select: selectProductStats })
-  const orderStatsQuery = useQuery({ ...ordersOptions(), select: selectOrderStats })
-
-  // isError degil: veri varsa sayfa cizilir, hata toast kanalinda kalir (throwOnError ile ayni yuklem).
-  if (productStatsQuery.data === undefined || orderStatsQuery.data === undefined) {
-    return <DashboardLoadingState />
-  }
-
-  const { totalProducts, lowStockProducts } = productStatsQuery.data
-  const { openOrders, totalRevenue } = orderStatsQuery.data
 
   return (
     <section className="space-y-6">
@@ -29,6 +22,24 @@ export function DashboardPage() {
         description="Operasyonun bugunku gorunumu ve dikkat gerektiren stok seviyeleri."
       />
 
+      <Suspense fallback={<DashboardContentSkeleton />}>
+        <DashboardContent currencyFormatter={currencyFormatter} />
+      </Suspense>
+    </section>
+  )
+}
+
+function DashboardContent({ currencyFormatter }: { currencyFormatter: Intl.NumberFormat }) {
+  // Sayfa guard'i silindi, yuklem kaybolmadi: useSuspenseQuery `throwOnError`i sabit
+  // `defaultThrowOnError` ile gecer, o da `data === undefined` sorar (veri yoksa boundary, varsa toast).
+  const { data: productStats } = useSuspenseQuery({ ...productListAllOptions(), select: selectProductStats })
+  const { data: orderStats } = useSuspenseQuery({ ...ordersOptions(), select: selectOrderStats })
+
+  const { totalProducts, lowStockProducts } = productStats
+  const { openOrders, totalRevenue } = orderStats
+
+  return (
+    <>
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label="Toplam urun" value={numberFormatter.format(totalProducts)} icon={PackageCheck} />
         <MetricCard label="Dusuk stok" value={numberFormatter.format(lowStockProducts.length)} icon={AlertTriangle} />
@@ -58,7 +69,7 @@ export function DashboardPage() {
           </ul>
         )}
       </div>
-    </section>
+    </>
   )
 }
 
@@ -82,16 +93,16 @@ function MetricCard({
   )
 }
 
-function DashboardLoadingState() {
+function DashboardContentSkeleton() {
+  // Baslik yer tutucusu yok: gercek PageHeader Suspense'in disinda, zaten ekranda.
   return (
-    <section aria-busy="true" className="space-y-6">
-      <p className="text-sm font-medium text-teal-700">Genel Bakis</p>
-      <div className="h-8 w-56 animate-pulse bg-slate-200" />
+    <div aria-busy="true" className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <div key={index} className="h-32 animate-pulse border border-slate-200 bg-white" />
         ))}
       </div>
-    </section>
+      <div className="h-64 animate-pulse border border-slate-200 bg-white" />
+    </div>
   )
 }

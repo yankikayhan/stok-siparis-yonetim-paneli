@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query'
+import { useSuspenseQueries } from '@tanstack/react-query'
 import { AlertTriangle, CircleDollarSign, PackageCheck, ShoppingBag } from 'lucide-react'
 import { Suspense } from 'react'
 import { ordersOptions } from '../../orders/api/orders-api'
@@ -30,10 +30,16 @@ export function DashboardPage() {
 }
 
 function DashboardContent({ currencyFormatter }: { currencyFormatter: Intl.NumberFormat }) {
-  // Sayfa guard'i silindi, yuklem kaybolmadi: useSuspenseQuery `throwOnError`i sabit
+  // Tek hook sart: iki ayri useSuspenseQuery ile ikinci sorgu birincinin cevabini beklerdi
+  // (olculdu: +721 ms). useSuspenseQueries her sorguyu ayni render pass'inde baslatir.
+  // Sayfa guard'i silindi, yuklem kaybolmadi: useSuspenseQueries `throwOnError`i sabit
   // `defaultThrowOnError` ile gecer, o da `data === undefined` sorar (veri yoksa boundary, varsa toast).
-  const { data: productStats } = useSuspenseQuery({ ...productListAllOptions(), select: selectProductStats })
-  const { data: orderStats } = useSuspenseQuery({ ...ordersOptions(), select: selectOrderStats })
+  const [{ data: productStats }, { data: orderStats }] = useSuspenseQueries({
+    queries: [
+      { ...productListAllOptions(), select: selectProductStats },
+      { ...ordersOptions(), select: selectOrderStats },
+    ],
+  })
 
   const { totalProducts, lowStockProducts } = productStats
   const { openOrders, totalRevenue } = orderStats

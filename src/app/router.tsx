@@ -1,10 +1,9 @@
 import type { ReactElement } from 'react'
 import { createBrowserRouter } from 'react-router-dom'
-import { CustomersPage } from '../features/customers/pages/customers-page'
+// Index route bilincli olarak ana pakette: acilis rotasi zaten aninda gerekir, kod bolme
+// onu ana paketten cikarip ilk boyamaya bir istek turu daha ekler — kazanc sifir, maliyet gercek.
 import { DashboardPage } from '../features/dashboard/pages/dashboard-page'
-import { OrdersPage } from '../features/orders/pages/orders-page'
-import { ProductsPage } from '../features/products/pages/products-page'
-import { SettingsPage } from '../features/settings/pages/settings-page'
+import { CustomersPage, OrdersPage, ProductsPage, SettingsPage } from './lazy-pages'
 import { AppShell } from './layout/app-shell'
 import { ROUTE_SEGMENTS, type RouteSegment } from './routes'
 

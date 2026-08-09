@@ -1,5 +1,6 @@
 import { QueryErrorResetBoundary, useMutationState, useQueryClient } from '@tanstack/react-query'
 import { ChartNoAxesCombined, LoaderCircle, Menu, Package, Settings, ShoppingCart, UsersRound } from 'lucide-react'
+import { Suspense } from 'react'
 import { ErrorBoundary, type FallbackProps } from 'react-error-boundary'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useShallow } from 'zustand/react/shallow'
@@ -102,7 +103,12 @@ export function AppShell() {
           <QueryErrorResetBoundary>
             {({ reset }) => (
               <ErrorBoundary onReset={reset} resetKeys={[pathname]} FallbackComponent={RouteErrorFallback}>
-                <Outlet />
+                {/* Suspense boundary'nin ICINDE: chunk indirme hatasi da veri hatasi da ayni
+                    ekrana duser. Kurtarilabilirlikleri farklidir — veri hatasinda "Tekrar dene"
+                    gercekten yeniden dener, basarisiz chunk'i React kaliciya yazar (tek cikis: yenileme). */}
+                <Suspense fallback={<RouteChunkFallback />}>
+                  <Outlet />
+                </Suspense>
               </ErrorBoundary>
             )}
           </QueryErrorResetBoundary>
@@ -110,6 +116,16 @@ export function AppShell() {
       </div>
       <Toaster />
     </div>
+  )
+}
+
+// Bilincli olarak iskelet DEGIL: sayfalarin kendi veri iskeletleriyle karismasin, boylece
+// "chunk iniyor" ile "veri geliyor" ekranda ayirt edilebilsin.
+function RouteChunkFallback() {
+  return (
+    <p role="status" className="text-sm text-slate-600">
+      Sayfa yukleniyor...
+    </p>
   )
 }
 

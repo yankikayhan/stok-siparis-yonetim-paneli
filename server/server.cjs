@@ -115,7 +115,7 @@ server.patch('/orders/:id', (request, response) => {
 // json-server'in hazir sorgulari yetmiyor: arama ad VEYA SKU'da calisir,
 // dusuk stok ise iki alanin karsilastirmasidir (stock <= reorderLevel).
 server.get('/products', (request, response) => {
-  const { search, categoryId, stock, _page, _limit } = request.query
+  const { search, categoryId, stock, active, _page, _limit } = request.query
 
   let products = router.db.get('products').value()
 
@@ -129,6 +129,10 @@ server.get('/products', (request, response) => {
 
   if (typeof categoryId === 'string' && categoryId !== '') {
     products = products.filter((product) => product.categoryId === categoryId)
+  }
+
+  if (active === 'true' || active === 'false') {
+    products = products.filter((product) => product.active === (active === 'true'))
   }
 
   if (stock === 'low' || stock === 'in-stock') {

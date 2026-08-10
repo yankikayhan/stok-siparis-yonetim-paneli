@@ -15,7 +15,7 @@ export function ProductsPage() {
   // Sira korunur: /profile sorgusu urun ve kategori sorgularindan once kurulur.
   const currencyFormatter = useCurrencyFormatter()
   const list = useProductList(filters.listParams)
-  const actions = useProductActions(list)
+  const actions = useProductActions(list, filters.page)
 
   if (list.status === 'loading') {
     return <ProductsLoadingState />

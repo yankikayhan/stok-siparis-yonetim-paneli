@@ -9,10 +9,41 @@ import {
 } from '../api/products-api'
 import { type ProductListState } from './use-product-list'
 
+type EditTargetInput = {
+  products: Product[] | undefined
+  isPlaceholderData: boolean
+  isPageOutOfRange: boolean
+  editId: string | null
+}
+
+export type EditTargetResolution = { product: Product | undefined; shouldClear: boolean }
+
+// Duzenlenen urun listeden dustugunde dialog sessizce kapanir ama editId dolu kalirsa urun
+// listeye donunce dialog KENDILIGINDEN acilir. Karar yalnizca taze ve gecerli bir listeye
+// dayanabilir: placeholder onceki sayfanin verisidir, aralik disi sayfa ise clamp bekler.
+export function resolveEditTarget({
+  editId,
+  isPageOutOfRange,
+  isPlaceholderData,
+  products,
+}: EditTargetInput): EditTargetResolution {
+  if (editId === null || products === undefined) {
+    return { product: undefined, shouldClear: false }
+  }
+
+  const product = products.find((candidate) => candidate.id === editId)
+
+  if (isPlaceholderData || isPageOutOfRange) {
+    return { product, shouldClear: false }
+  }
+
+  return { product, shouldClear: product === undefined }
+}
+
 // Silme tek akistir (dialog ac -> onayla -> mutate -> dialog kapan): dialog state'i ile mutation
 // ayrilsaydi kapanma cagrisi hook disina cikar ve `await cancelQueries` sonrasindaki
 // zamanlamasini kaybederdi.
-export function useProductActions(list: ProductListState) {
+export function useProductActions(list: ProductListState, page: number) {
   const queryClient = useQueryClient()
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
@@ -42,10 +73,19 @@ export function useProductActions(list: ProductListState) {
   })
 
   // Dialog urunu snapshot degil guncel listeden turetir (tek dogruluk kaynagi): arkaplan
-  // refetch'inin getirdigi degisiklikler dialoga akar. Urun bu sayfadan duserse
-  // (filtre uyeligi/sayfa kaymasi) find undefined kalir ve dialog sessizce kapanir.
-  const productToEdit =
-    list.status === 'ready' ? list.products.find((product) => product.id === editId) : undefined
+  // refetch'inin getirdigi degisiklikler dialoga akar.
+  const { product: productToEdit, shouldClear } = resolveEditTarget({
+    products: list.status === 'ready' ? list.products : undefined,
+    isPlaceholderData: list.status === 'ready' && list.isPlaceholderData,
+    isPageOutOfRange: list.status === 'ready' && page > list.totalPages,
+    editId,
+  })
+
+  // Render fazinda uyarlama (effect degil): kosul kendi kendini dusurur, cunku shouldClear
+  // yalnizca editId doluyken true olabilir ve bir sonraki render'da editId null olur.
+  if (shouldClear) {
+    setEditId(null)
+  }
 
   return {
     isCreateOpen,

@@ -74,6 +74,9 @@ export const productQueryKeys = {
   // Tam liste tuketicileri (siparis dialogu, stok dogrulamasi) icin sabit anahtar;
   // gercek uygulamada dialog kendi arama endpoint'ini kullanirdi.
   listAll: () => [...productQueryKeys.lists(), { scope: 'all' }] as const,
+  // Dashboard'a ozel: sunucu tarafinda active=true ile onceden filtrelenmis sayim/liste (P1).
+  activeCount: () => [...productQueryKeys.lists(), { scope: 'active-count' }] as const,
+  activeLowStock: () => [...productQueryKeys.lists(), { scope: 'active-low-stock' }] as const,
   categories: () => [...productQueryKeys.all, 'categories'] as const,
 }
 
@@ -97,6 +100,19 @@ export function getProductsPage(params: ProductListParams) {
 
 export function getCategories() {
   return request('/categories', { schema: categoriesSchema })
+}
+
+// P1: dashboard'un 1000 kayitlik listAll'i cekmesi yerine sunucuda active=true ile onceden
+// filtrelenmis, kucuk govdeli iki sorgu. X-Total-Count dilimlemeden ONCE yazildigi icin
+// (kalici-bulgular.md §6) _limit=1 istegi bile dogru TOPLAM sayiyi dondurur.
+export function getActiveProductCount() {
+  return requestPage('/products?active=true&_page=1&_limit=1', { itemSchema: productSchema }).then(
+    (page) => page.totalCount,
+  )
+}
+
+export function getActiveLowStockProducts() {
+  return request('/products?active=true&stock=low', { schema: productsSchema })
 }
 
 // queryOptions: key ve queryFn eslesmesini tip duzeyinde baglar; sunum davranislari
@@ -123,6 +139,22 @@ export function categoriesOptions() {
     // Oturum boyunca taze kabul edilir; sayfa yenilemesi tek tazeleme yoludur.
     staleTime: Infinity,
     gcTime: Infinity,
+  })
+}
+
+// Ikisi de BIRINCIL: dashboard bunlari useSuspenseQueries icinde cagirir, Suspense'in sabit
+// gectigi defaultThrowOnError veri yoksa ikisini de kosulsuz boundary'ye firlatir (KOSUL 3.2).
+export function activeProductCountOptions() {
+  return queryOptions({
+    queryKey: productQueryKeys.activeCount(),
+    queryFn: getActiveProductCount,
+  })
+}
+
+export function activeLowStockProductsOptions() {
+  return queryOptions({
+    queryKey: productQueryKeys.activeLowStock(),
+    queryFn: getActiveLowStockProducts,
   })
 }
 

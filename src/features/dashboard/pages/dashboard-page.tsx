@@ -2,8 +2,8 @@ import { useSuspenseQueries } from '@tanstack/react-query'
 import { AlertTriangle, CircleDollarSign, PackageCheck, ShoppingBag } from 'lucide-react'
 import { Suspense } from 'react'
 import { ordersOptions } from '../../orders/api/orders-api'
-import { productListAllOptions } from '../../products/api/products-api'
-import { selectOrderStats, selectProductStats } from '../api/dashboard-api'
+import { activeLowStockProductsOptions, activeProductCountOptions } from '../../products/api/products-api'
+import { selectOrderStats } from '../api/dashboard-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 import { PageHeader } from '../../../shared/components/page-header'
 
@@ -30,24 +30,23 @@ export function DashboardPage() {
 }
 
 function DashboardContent({ currencyFormatter }: { currencyFormatter: Intl.NumberFormat }) {
-  // Tek hook sart: iki ayri useSuspenseQuery ile ikinci sorgu birincinin cevabini beklerdi
-  // (olculdu: +721 ms). useSuspenseQueries her sorguyu ayni render pass'inde baslatir.
-  // Sayfa guard'i silindi, yuklem kaybolmadi: useSuspenseQueries `throwOnError`i sabit
-  // `defaultThrowOnError` ile gecer, o da `data === undefined` sorar (veri yoksa boundary, varsa toast).
-  const [{ data: productStats }, { data: orderStats }] = useSuspenseQueries({
+  // Uc sorgu da BIRINCIL: useSuspenseQueries sabit defaultThrowOnError gecer, veri yoksa ucu
+  // de kosulsuz boundary'ye firlar (KOSUL 3.2). Dashboard artik 1000 kayitlik listAll'i
+  // cekmez: sunucu active=true ile onceden filtrelenmis sayim + dusuk-stok listesi dondurur (P1).
+  const [{ data: activeProductCount }, { data: lowStockProducts }, { data: orderStats }] = useSuspenseQueries({
     queries: [
-      { ...productListAllOptions(), select: selectProductStats },
+      activeProductCountOptions(),
+      activeLowStockProductsOptions(),
       { ...ordersOptions(), select: selectOrderStats },
     ],
   })
 
-  const { totalProducts, lowStockProducts } = productStats
   const { openOrders, totalRevenue } = orderStats
 
   return (
     <>
       <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <MetricCard label="Toplam urun" value={numberFormatter.format(totalProducts)} icon={PackageCheck} />
+        <MetricCard label="Toplam urun" value={numberFormatter.format(activeProductCount)} icon={PackageCheck} />
         <MetricCard label="Dusuk stok" value={numberFormatter.format(lowStockProducts.length)} icon={AlertTriangle} />
         <MetricCard label="Acik siparis" value={numberFormatter.format(openOrders)} icon={ShoppingBag} />
         <MetricCard label="Toplam satis" value={currencyFormatter.format(totalRevenue)} icon={CircleDollarSign} />

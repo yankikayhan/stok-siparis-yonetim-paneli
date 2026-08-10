@@ -1,15 +1,9 @@
 import type { Order } from '../../orders/api/orders-api'
-import type { Product } from '../../products/api/products-api'
 
-// Dashboard kendi endpoint'ini tutmaz: paylasilan urun/siparis cache'lerinden select ile turetir.
+// Dashboard kendi endpoint'ini tutmaz: siparis cache'inden select ile turetir.
 // Modul seviyesinde tanim, select referansini stabil tutar (memoization + structural sharing).
-export function selectProductStats(products: Product[]) {
-  return {
-    totalProducts: products.length,
-    lowStockProducts: products.filter((product) => product.stock <= product.reorderLevel),
-  }
-}
-
+// Urun tarafinda (toplam sayim + dusuk stok) artik ayri secici gerekmiyor: sunucu active=true
+// ile onceden filtrelenmis sayim/liste dondurur (bkz. products-api.ts, P1).
 export function selectOrderStats(orders: Order[]) {
   return {
     openOrders: orders.filter((order) => order.status === 'pending' || order.status === 'paid').length,

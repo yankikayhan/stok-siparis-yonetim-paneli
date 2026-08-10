@@ -33,7 +33,14 @@ export function ProductTable({
       header: 'Urun',
       cell: (product) => (
         <>
-          <p className="font-medium text-slate-950">{product.name}</p>
+          <p className="font-medium text-slate-950">
+            {product.name}
+            {!product.active && (
+              <span className="ml-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs font-medium text-slate-600">
+                Pasif
+              </span>
+            )}
+          </p>
           <p className="mt-1 text-xs text-slate-500">{product.sku}</p>
         </>
       ),

@@ -17,6 +17,19 @@ const products = [
   },
 ]
 
+const passiveProduct = {
+  id: 'prd-mouse-old',
+  name: 'Eski Model Kablosuz Mouse',
+  sku: 'ELK-MSE-000',
+  categoryId: 'cat-electronics',
+  price: 349.9,
+  stock: 10,
+  reorderLevel: 5,
+  active: false,
+  createdAt: new Date('2026-01-02T09:00:00.000Z'),
+  updatedAt: new Date('2026-02-01T09:00:00.000Z'),
+}
+
 describe('createOrderFormSchema', () => {
   it('stok seviyesine esit miktardaki siparisi gecerli kabul eder', () => {
     const result = createOrderFormSchema(products).safeParse({
@@ -52,5 +65,20 @@ describe('createOrderFormSchema', () => {
     })
 
     expect(result.success).toBe(false)
+  })
+
+  it('pasif urunu reddeder', () => {
+    const result = createOrderFormSchema([...products, passiveProduct]).safeParse({
+      customerId: 'cus-001',
+      items: [{ productId: 'prd-mouse-old', quantity: 1 }],
+    })
+
+    expect(result.success).toBe(false)
+
+    if (!result.success) {
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({ path: ['items', 0, 'productId'] }),
+      )
+    }
   })
 })

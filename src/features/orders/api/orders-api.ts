@@ -184,6 +184,18 @@ export function createOrderFormSchema(products: Product[]) {
         return
       }
 
+      // UI zaten pasif urunleri secim listesinden gizler; bu ikinci katman, taslaktan geri
+      // yuklenen eski bir siparis satirinin arka planda pasiflesmis bir urune isaret etmesi gibi
+      // kenar durumlar icin savunma hattidir (sunucunun ayni kural icin 404 dondurdugu politikayla ayni).
+      if (!product.active) {
+        context.addIssue({
+          code: 'custom',
+          message: `${product.name} pasif, siparis verilemez.`,
+          path: ['items', index, 'productId'],
+        })
+        return
+      }
+
       requestedQuantities.set(item.productId, (requestedQuantities.get(item.productId) ?? 0) + item.quantity)
     })
 

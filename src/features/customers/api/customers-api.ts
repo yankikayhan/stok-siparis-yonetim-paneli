@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 import { request } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
-import { orderSchema, type Order } from '../../orders/api/orders-api'
+import { ordersSchema, type Order } from '../../orders/api/orders-api'
 
 export const customerSchema = z.object({
   id: z.string(),
@@ -14,7 +14,6 @@ export const customerSchema = z.object({
 })
 
 const customersSchema = z.array(customerSchema)
-const ordersSchema = z.array(orderSchema)
 
 export type Customer = z.output<typeof customerSchema>
 export type CustomerOrder = Order

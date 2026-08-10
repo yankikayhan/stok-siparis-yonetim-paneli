@@ -2,7 +2,7 @@ import { type UseQueryResult, useQuery, useQueryClient } from '@tanstack/react-q
 import { Building2, Mail, Phone, ReceiptText, UsersRound } from 'lucide-react'
 import { useState } from 'react'
 import { isApiError } from '../../../shared/api/api-error'
-import { ordersOptions } from '../../orders/api/orders-api'
+import { orderStatusLabels, ordersOptions } from '../../orders/api/orders-api'
 import {
   customerOrdersOptions,
   customersOptions,
@@ -14,13 +14,6 @@ import { EmptyState } from '../../../shared/components/empty-state'
 import { PageHeader } from '../../../shared/components/page-header'
 
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' })
-
-const orderStatusLabels = {
-  pending: 'Beklemede',
-  paid: 'Odendi',
-  shipped: 'Kargoda',
-  cancelled: 'Iptal',
-} as const
 
 export function CustomersPage() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null)

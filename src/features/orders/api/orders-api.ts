@@ -1,6 +1,6 @@
-import { infiniteQueryOptions, queryOptions } from '@tanstack/react-query'
+import { infiniteQueryOptions, queryOptions, type InfiniteData } from '@tanstack/react-query'
 import { z } from 'zod'
-import { request, requestPage } from '../../../shared/api/http-client'
+import { request, requestPage, type Page } from '../../../shared/api/http-client'
 import { isoDateTimeSchema } from '../../../shared/api/iso-date'
 import type { Product } from '../../products/api/products-api'
 
@@ -32,7 +32,8 @@ export const orderSchema = z.discriminatedUnion('status', [
   orderBaseSchema.extend({ status: z.literal('cancelled'), cancelReason: z.string() }),
 ])
 
-const ordersSchema = z.array(orderSchema)
+// customers-api.ts da bu semayi kullanir (musteri siparis gecmisi ayni kaynak/sekil).
+export const ordersSchema = z.array(orderSchema)
 const orderStatusUpdateSchema = z.object({ status: orderStatusSchema })
 
 export type Order = z.output<typeof orderSchema>
@@ -118,7 +119,55 @@ export function updateOrderStatus({ id, status }: { id: string; status: OrderSta
   })
 }
 
+// Optimistic update icin gecerli bir union uyesi kurar; gercek degerler onSettled refetch'iyle gelir.
+export function applyStatus(order: Order, status: OrderStatus): Order {
+  const base = {
+    id: order.id,
+    customerId: order.customerId,
+    total: order.total,
+    createdAt: order.createdAt,
+    items: order.items,
+  }
+
+  switch (status) {
+    case 'pending':
+    case 'paid':
+      return { ...base, status }
+    case 'shipped':
+      return { ...base, status, trackingNumber: order.status === 'shipped' ? order.trackingNumber : 'Ataniyor...' }
+    case 'cancelled':
+      return { ...base, status, cancelReason: order.status === 'cancelled' ? order.cancelReason : 'Belirtilmedi' }
+  }
+}
+
+// 'orders' prefix'i altinda iki farkli sekil yasar: list() -> Order[], infinite girdileri ->
+// InfiniteData<Page<Order>>; updater sekle gore dallanir (products'taki pattern'in muadili).
+export type OrdersCache = Order[] | InfiniteData<Page<Order>>
+
+export function applyStatusToCache(data: OrdersCache, id: string, status: OrderStatus): OrdersCache {
+  if (Array.isArray(data)) {
+    return data.map((order) => (order.id === id ? applyStatus(order, status) : order))
+  }
+
+  return {
+    ...data,
+    pages: data.pages.map((page) => ({
+      ...page,
+      items: page.items.map((order) => (order.id === id ? applyStatus(order, status) : order)),
+    })),
+  }
+}
+
 export const orderStatuses = orderStatusUpdateSchema.shape.status.options
+
+// satisfies: Record<OrderStatus, string> ile uyumu kontrol eder ama literal key tiplerini
+// GENISLETMEZ; OrderStatus'a yeni deger eklenirse veya bir key yanlis/eksik yazilirsa derleme hatasi verir.
+export const orderStatusLabels = {
+  pending: 'Beklemede',
+  paid: 'Odendi',
+  shipped: 'Kargoda',
+  cancelled: 'Iptal',
+} satisfies Record<OrderStatus, string>
 
 // Stock-aware order form validation
 export function createOrderFormSchema(products: Product[]) {

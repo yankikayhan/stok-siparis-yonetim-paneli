@@ -1,6 +1,7 @@
 import { ArrowDown, ArrowUp, Minus, Plus, X } from 'lucide-react'
 import { cloneElement, useId } from 'react'
 import { FormProvider, useFormContext, useWatch, type Control } from 'react-hook-form'
+import { Dialog } from '../../../shared/components/dialog'
 import { type Customer } from '../../customers/api/customers-api'
 import { type Product } from '../../products/api/products-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
@@ -17,65 +18,63 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
   const { form, orderItems, createOrderMutation, requestClose, submit, hasDraft, discardDraft } = useOrderCreateForm({ products, onClose })
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/35 p-4" role="presentation">
-      <section role="dialog" aria-modal="true" aria-labelledby="order-create-title" className="mx-auto my-8 w-full max-w-3xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-          <h2 id="order-create-title" className="text-base font-semibold text-slate-950">Yeni siparis</h2>
-          <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950" aria-label="Pencereyi kapat"><X size={18} aria-hidden="true" /></button>
+    <Dialog titleId="order-create-title" onClose={requestClose} className="max-w-3xl">
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <h2 id="order-create-title" className="text-base font-semibold text-slate-950">Yeni siparis</h2>
+        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950" aria-label="Pencereyi kapat"><X size={18} aria-hidden="true" /></button>
+      </div>
+      <FormProvider {...form}>
+        <form className="space-y-5 p-5" onSubmit={submit}>
+        {hasDraft && (
+          <div className="flex items-center justify-between gap-3 border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900" role="status">
+            <span>Taslaktan devam ediliyor.</span>
+            <button type="button" onClick={discardDraft} className="font-medium underline hover:opacity-70">Taslagi temizle</button>
+          </div>
+        )}
+        <FormField label="Musteri" error={form.formState.errors.customerId?.message}>
+          <select {...form.register('customerId')} className="form-input">
+            <option value="">Musteri secin</option>
+            {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name} - {customer.company}</option>)}
+          </select>
+        </FormField>
+
+        <div>
+          <div className="mb-2 flex items-center justify-between gap-4">
+            <h3 className="text-sm font-semibold text-slate-950">Siparis kalemleri</h3>
+            {/* shouldFocus: odak yeni satirin ilk kayitli alanina (urun select) gider; index hesabi + zamanlama isteyen elle setFocus'a gerek kalmaz. */}
+            <button type="button" onClick={() => orderItems.append({ productId: '', quantity: 1 }, { shouldFocus: true })} className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"><Plus size={16} aria-hidden="true" /> Kalem ekle</button>
+          </div>
+          <div className="space-y-3">
+            {orderItems.fields.map((field, index) => (
+              <OrderItemRow
+                key={field.id}
+                index={index}
+                products={products}
+                isFirst={index === 0}
+                isLast={index === orderItems.fields.length - 1}
+                isOnly={orderItems.fields.length === 1}
+                onMoveUp={() => orderItems.move(index, index - 1)}
+                onMoveDown={() => orderItems.move(index, index + 1)}
+                onRemove={() => orderItems.remove(index)}
+              />
+            ))}
+          </div>
+          {form.formState.errors.items?.message && <p className="mt-2 text-xs text-rose-700">{form.formState.errors.items.message}</p>}
         </div>
-        <FormProvider {...form}>
-          <form className="space-y-5 p-5" onSubmit={submit}>
-          {hasDraft && (
-            <div className="flex items-center justify-between gap-3 border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900" role="status">
-              <span>Taslaktan devam ediliyor.</span>
-              <button type="button" onClick={discardDraft} className="font-medium underline hover:opacity-70">Taslagi temizle</button>
-            </div>
-          )}
-          <FormField label="Musteri" error={form.formState.errors.customerId?.message}>
-            <select {...form.register('customerId')} className="form-input">
-              <option value="">Musteri secin</option>
-              {customers.map((customer) => <option key={customer.id} value={customer.id}>{customer.name} - {customer.company}</option>)}
-            </select>
-          </FormField>
 
-          <div>
-            <div className="mb-2 flex items-center justify-between gap-4">
-              <h3 className="text-sm font-semibold text-slate-950">Siparis kalemleri</h3>
-              {/* shouldFocus: odak yeni satirin ilk kayitli alanina (urun select) gider; index hesabi + zamanlama isteyen elle setFocus'a gerek kalmaz. */}
-              <button type="button" onClick={() => orderItems.append({ productId: '', quantity: 1 }, { shouldFocus: true })} className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"><Plus size={16} aria-hidden="true" /> Kalem ekle</button>
-            </div>
-            <div className="space-y-3">
-              {orderItems.fields.map((field, index) => (
-                <OrderItemRow
-                  key={field.id}
-                  index={index}
-                  products={products}
-                  isFirst={index === 0}
-                  isLast={index === orderItems.fields.length - 1}
-                  isOnly={orderItems.fields.length === 1}
-                  onMoveUp={() => orderItems.move(index, index - 1)}
-                  onMoveDown={() => orderItems.move(index, index + 1)}
-                  onRemove={() => orderItems.remove(index)}
-                />
-              ))}
-            </div>
-            {form.formState.errors.items?.message && <p className="mt-2 text-xs text-rose-700">{form.formState.errors.items.message}</p>}
-          </div>
+        <OrderTotal control={form.control} products={products} />
 
-          <OrderTotal control={form.control} products={products} />
-
-          {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700">{form.formState.errors.root.serverError.message}</p>}
-          <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
-            <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
-            {/* Kilit "kaydedilecek is var mi"yi sorar: bu oturumdaki degisiklik (isDirty) ya da onceki oturumdan tasinan taslak (hasDraft) —
-                taslaktan dogan form baseline oldugu icin isDirty false baslar. isSubmitting degil mutation.isPending:
-                mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
-            <button type="submit" disabled={(!form.formState.isDirty && !hasDraft) || createOrderMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</button>
-          </div>
-          </form>
-        </FormProvider>
-      </section>
-    </div>
+        {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700">{form.formState.errors.root.serverError.message}</p>}
+        <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
+          <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
+          {/* Kilit "kaydedilecek is var mi"yi sorar: bu oturumdaki degisiklik (isDirty) ya da onceki oturumdan tasinan taslak (hasDraft) —
+              taslaktan dogan form baseline oldugu icin isDirty false baslar. isSubmitting degil mutation.isPending:
+              mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
+          <button type="submit" disabled={(!form.formState.isDirty && !hasDraft) || createOrderMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</button>
+        </div>
+        </form>
+      </FormProvider>
+    </Dialog>
   )
 }
 

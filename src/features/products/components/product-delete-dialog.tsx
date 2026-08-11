@@ -1,3 +1,4 @@
+import { Dialog } from '../../../shared/components/dialog'
 import { type Product } from '../api/products-api'
 
 type ProductDeleteDialogProps = {
@@ -8,15 +9,13 @@ type ProductDeleteDialogProps = {
 
 export function ProductDeleteDialog({ onCancel, onConfirm, product }: ProductDeleteDialogProps) {
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/35 p-4" role="presentation">
-      <section role="dialog" aria-modal="true" aria-labelledby="product-delete-title" className="w-full max-w-md bg-white p-5 shadow-xl">
-        <h2 id="product-delete-title" className="text-base font-semibold text-slate-950">Urunu sil</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-600"><strong>{product.name}</strong> urununu kalici olarak silmek istiyor musunuz?</p>
-        <div className="mt-5 flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
-          <button type="button" onClick={onConfirm} className="rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Urunu sil</button>
-        </div>
-      </section>
-    </div>
+    <Dialog titleId="product-delete-title" onClose={onCancel} className="max-w-md p-5">
+      <h2 id="product-delete-title" className="text-base font-semibold text-slate-950">Urunu sil</h2>
+      <p className="mt-2 text-sm leading-6 text-slate-600"><strong>{product.name}</strong> urununu kalici olarak silmek istiyor musunuz?</p>
+      <div className="mt-5 flex justify-end gap-3">
+        <button type="button" onClick={onCancel} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
+        <button type="button" onClick={onConfirm} className="rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800">Urunu sil</button>
+      </div>
+    </Dialog>
   )
 }

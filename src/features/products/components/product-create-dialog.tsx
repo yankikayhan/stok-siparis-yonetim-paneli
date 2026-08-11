@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { X } from 'lucide-react'
-import { cloneElement, useId } from 'react'
+import { cloneElement, useId, type Ref } from 'react'
 import { Controller, useForm } from 'react-hook-form'
+import { Dialog } from '../../../shared/components/dialog'
 import {
   createProduct,
   productFormSchema,
@@ -91,76 +92,91 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
   }
 
   return (
-    <div className="fixed inset-0 z-50 grid place-items-center bg-slate-950/35 p-4" role="presentation">
-      <section role="dialog" aria-modal="true" aria-labelledby="product-create-title" className="w-full max-w-xl bg-white shadow-xl">
-        <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-          <h2 id="product-create-title" className="text-base font-semibold text-slate-950">{isEditing ? 'Urunu duzenle' : 'Yeni urun'}</h2>
-          <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950" aria-label="Pencereyi kapat">
-            <X size={18} aria-hidden="true" />
+    <Dialog titleId="product-create-title" onClose={requestClose} className="max-w-xl">
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+        <h2 id="product-create-title" className="text-base font-semibold text-slate-950">{isEditing ? 'Urunu duzenle' : 'Yeni urun'}</h2>
+        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950" aria-label="Pencereyi kapat">
+          <X size={18} aria-hidden="true" />
+        </button>
+      </div>
+      <form
+        className="space-y-4 p-5"
+        onSubmit={form.handleSubmit((values) => createProductMutation.mutate(values))}
+      >
+        <FormField label="Urun adi" error={form.formState.errors.name?.message}>
+          <input {...form.register('name')} autoFocus className="form-input" />
+        </FormField>
+        <FormField label="SKU" error={form.formState.errors.sku?.message}>
+          <input {...form.register('sku')} className="form-input" />
+        </FormField>
+        <FormField label="Kategori" error={form.formState.errors.categoryId?.message}>
+          <select {...form.register('categoryId')} className="form-input">
+            <option value="">Kategori secin</option>
+            {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+          </select>
+        </FormField>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {/* valueAsNumber yok: string -> sayi donusumu tek noktada (Zod coerce), NaN yolu kapali. */}
+          <FormField label="Fiyat" error={form.formState.errors.price?.message}>
+            <input {...form.register('price')} type="number" min="0" step="0.01" className="form-input" />
+          </FormField>
+          <FormField label="Stok" error={form.formState.errors.stock?.message}>
+            <input {...form.register('stock')} type="number" min="0" step="1" className="form-input" />
+          </FormField>
+          <FormField label="Yeniden siparis" error={form.formState.errors.reorderLevel?.message}>
+            <input {...form.register('reorderLevel')} type="number" min="0" step="1" className="form-input" />
+          </FormField>
+        </div>
+        {/* Controller: register ref+DOM event'i olan native input ister; buton tabanli
+            segmented control'un boyle bir elemani yok, deger RHF'e field.onChange ile akar. */}
+        <Controller
+          control={form.control}
+          name="active"
+          render={({ field }) => (
+            <fieldset>
+              <legend className="text-sm font-medium text-slate-700">Durum</legend>
+              <div className="mt-1 grid grid-cols-2 gap-2">
+                {/* field.ref Aktif butonuna baglanir: semada active icin refine yok, errors.active
+                    pratikte hic tetiklenmez — baglanti yalniz yapisal butunluk icindir. */}
+                <SegmentButton ref={field.ref} active={field.value === true} label="Aktif" onClick={() => field.onChange(true)} />
+                <SegmentButton active={field.value === false} label="Pasif" onClick={() => field.onChange(false)} />
+              </div>
+              <p className="mt-1 text-xs font-normal text-slate-500">Pasif urunler siparis formunda secilemez.</p>
+              {form.formState.errors.active?.message && (
+                <p className="mt-1 text-xs font-normal text-rose-700">{form.formState.errors.active.message}</p>
+              )}
+            </fieldset>
+          )}
+        />
+        {createProductMutation.isError && <p className="text-sm text-rose-700">{createProductMutation.error.message}</p>}
+        <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
+          <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
+          {/* isDirty: degisiklik yokken submit anlamsiz; isSubmitting degil mutation.isPending —
+              mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
+          <button type="submit" disabled={!form.formState.isDirty || createProductMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">
+            {createProductMutation.isPending ? 'Kaydediliyor...' : isEditing ? 'Degisiklikleri kaydet' : 'Urunu ekle'}
           </button>
         </div>
-        <form
-          className="space-y-4 p-5"
-          onSubmit={form.handleSubmit((values) => createProductMutation.mutate(values))}
-        >
-          <FormField label="Urun adi" error={form.formState.errors.name?.message}>
-            <input {...form.register('name')} autoFocus className="form-input" />
-          </FormField>
-          <FormField label="SKU" error={form.formState.errors.sku?.message}>
-            <input {...form.register('sku')} className="form-input" />
-          </FormField>
-          <FormField label="Kategori" error={form.formState.errors.categoryId?.message}>
-            <select {...form.register('categoryId')} className="form-input">
-              <option value="">Kategori secin</option>
-              {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
-            </select>
-          </FormField>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {/* valueAsNumber yok: string -> sayi donusumu tek noktada (Zod coerce), NaN yolu kapali. */}
-            <FormField label="Fiyat" error={form.formState.errors.price?.message}>
-              <input {...form.register('price')} type="number" min="0" step="0.01" className="form-input" />
-            </FormField>
-            <FormField label="Stok" error={form.formState.errors.stock?.message}>
-              <input {...form.register('stock')} type="number" min="0" step="1" className="form-input" />
-            </FormField>
-            <FormField label="Yeniden siparis" error={form.formState.errors.reorderLevel?.message}>
-              <input {...form.register('reorderLevel')} type="number" min="0" step="1" className="form-input" />
-            </FormField>
-          </div>
-          {/* Controller: register ref+DOM event'i olan native input ister; buton tabanli
-              segmented control'un boyle bir elemani yok, deger RHF'e field.onChange ile akar. */}
-          <Controller
-            control={form.control}
-            name="active"
-            render={({ field }) => (
-              <fieldset>
-                <legend className="text-sm font-medium text-slate-700">Durum</legend>
-                <div className="mt-1 grid grid-cols-2 gap-2">
-                  <SegmentButton active={field.value === true} label="Aktif" onClick={() => field.onChange(true)} />
-                  <SegmentButton active={field.value === false} label="Pasif" onClick={() => field.onChange(false)} />
-                </div>
-                <p className="mt-1 text-xs font-normal text-slate-500">Pasif urunler siparis formunda secilemez.</p>
-              </fieldset>
-            )}
-          />
-          {createProductMutation.isError && <p className="text-sm text-rose-700">{createProductMutation.error.message}</p>}
-          <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
-            <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
-            {/* isDirty: degisiklik yokken submit anlamsiz; isSubmitting degil mutation.isPending —
-                mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
-            <button type="submit" disabled={!form.formState.isDirty || createProductMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">
-              {createProductMutation.isPending ? 'Kaydediliyor...' : isEditing ? 'Degisiklikleri kaydet' : 'Urunu ekle'}
-            </button>
-          </div>
-        </form>
-      </section>
-    </div>
+      </form>
+    </Dialog>
   )
 }
 
-function SegmentButton({ active, label, onClick }: { active: boolean; label: string; onClick: () => void }) {
+// ref?: React 19'da fonksiyon bilesenleri ref'i duz prop olarak alir, forwardRef gerekmez.
+function SegmentButton({
+  active,
+  label,
+  onClick,
+  ref,
+}: {
+  active: boolean
+  label: string
+  onClick: () => void
+  ref?: Ref<HTMLButtonElement>
+}) {
   return (
     <button
+      ref={ref}
       type="button"
       aria-pressed={active}
       onClick={onClick}

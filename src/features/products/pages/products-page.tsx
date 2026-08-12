@@ -54,7 +54,7 @@ export function ProductsPage() {
             products={list.products}
             categoryNames={list.categoryNames}
             currencyFormatter={currencyFormatter}
-            isPlaceholderData={list.isPlaceholderData}
+            isPlaceholderData={list.isPlaceholderData || filters.isPending}
             onEdit={actions.openEdit}
             onDelete={actions.openDelete}
           />
@@ -62,7 +62,7 @@ export function ProductsPage() {
             page={filters.page}
             totalPages={list.totalPages}
             totalCount={list.totalCount}
-            isPlaceholderData={list.isPlaceholderData}
+            isPlaceholderData={list.isPlaceholderData || filters.isPending}
             onPageChange={filters.setPage}
           />
         </>

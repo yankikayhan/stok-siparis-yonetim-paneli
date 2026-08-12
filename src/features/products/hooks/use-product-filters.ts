@@ -1,4 +1,4 @@
-import { useDeferredValue, useState } from 'react'
+import { useDeferredValue, useState, useTransition } from 'react'
 import {
   DEFAULT_PRODUCT_LIST_PARAMS,
   type ProductListParams,
@@ -11,6 +11,9 @@ export function useProductFilters() {
   const [stock, setStock] = useState<ProductStockFilter>(DEFAULT_PRODUCT_LIST_PARAMS.stock)
   const [page, setPage] = useState(DEFAULT_PRODUCT_LIST_PARAMS.page)
   const deferredSearch = useDeferredValue(search)
+  // isPending yalniz kategori/stok/sayfa gecisi icindir; arama metni zaten useDeferredValue'da
+  // (ayni degere iki mekanizma binmesin — useTransition/useDeferredValue karsilastirmasi IB9).
+  const [isPending, startTransition] = useTransition()
   // Key ve istek ayni nesneden beslenir; trim key kurulmadan once yapilir.
   const listParams: ProductListParams = { search: deferredSearch.trim(), categoryId, stock, page }
 
@@ -38,12 +41,17 @@ export function useProductFilters() {
     search,
     setSearch,
     categoryId,
-    setCategoryId,
+    // K1 (kontrolcu): bu transition-sarmali guncelleme yukaridaki render-fazi
+    // prevFilters/setPage(1) uyarlamasini AYNI render'da tetikler; o cagri KENDISI
+    // sarmalanmadi — React kurali geregi mevcut render'in lane'ini devralmasi beklenir
+    // (AKIL YURUTME, RAPOR'da Profiler/console kanitiyla dogrulanacak).
+    setCategoryId: (value: string) => startTransition(() => setCategoryId(value)),
     stock,
-    setStock,
+    setStock: (value: ProductStockFilter) => startTransition(() => setStock(value)),
     page,
-    setPage,
+    setPage: (value: number) => startTransition(() => setPage(value)),
     listParams,
     clampPage,
+    isPending,
   }
 }

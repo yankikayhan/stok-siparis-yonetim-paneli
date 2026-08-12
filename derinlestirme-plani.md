@@ -18,7 +18,7 @@ Mevcut durum: `useQuery` + `useMutation` + `invalidateQueries`, siparis durumund
 - [x] **Global hata yonetimi:** `QueryClient`'a `QueryCache.onError` / `MutationCache.onError` ekle; ApiError'lari Zustand toast kuyruguna bagla. Sayfa ici hata gosterimi ile global toast'in sorumluluk ayrimini kur.
 - [x] **`setQueryData` vs `invalidateQueries` deneyi:** Urun olusturma mutation'inda once `invalidateQueries` (mevcut), sonra ayni akisi `setQueryData` ile cache'e dogrudan yazarak yap. Network panelinde refetch farkini gozlemle, notunu belgeye ekle.
 - [x] **Optimistic update'i yayginlastir:** Siparis durumundaki pattern'i urun silmeye uygula (listeden aninda kaldir, hatada geri getir). `onMutate`/`onError`/`onSettled` akisini ezber degil kavrayarak yazdigini test et.
-- [ ] **`useSuspenseQuery` + Suspense:** Dashboard'u `useSuspenseQuery`'ye gecir; loading state'i `<Suspense fallback>` ile, hata durumunu Error Boundary ile yakala. Klasik `isPending` yaklasimiyla farkini karsilastir.
+- [x] **`useSuspenseQuery` + Suspense:** Dashboard'u `useSuspenseQuery`'ye gecir; loading state'i `<Suspense fallback>` ile, hata durumunu Error Boundary ile yakala. Klasik `isPending` yaklasimiyla farkini karsilastir.
 - [x] **`useQueries` ile paralel sorgular:** Siparisler sayfasindaki uc ayri `useQuery`'yi `useQueries`'e cevir; `combine` opsiyonu ile tek sonuc nesnesi uret.
 - [x] **Infinite query:** Siparis listesini `useInfiniteQuery` + "daha fazla yukle" butonuna cevir (json-server `_page` destegiyle). `getNextPageParam` ve `pages` yapisini incele.
 - [x] **`staleTime`/`gcTime` deneyleri:** Farkli degerlerle sayfalar arasi gecislerde request sayisini olc; kategoriler gibi nadiren degisen veriye uzun `staleTime` ver ve karari yorum satiriyla gerekcelendir.
@@ -35,6 +35,7 @@ Mevcut durum: Response parse, form semalari, bir `superRefine` (stok kurali). Se
 - [x] **Sema kompozisyonu:** `productFormSchema`'yi `productSchema.pick(...)` / `omit(...)` / `extend(...)` ile turet; create ve update senaryolari icin `partial()` kullanarak fark yaratmayi dene.
 - [x] **`transform` ve `pipe`:** API'den gelen `createdAt` ISO string'ini `z.iso.datetime().pipe(...)` veya `transform` ile `Date` nesnesine cevir; formatlamanin bilesenden sema katmanina tasinmasinin etkisini degerlendir.
 - [x] **`discriminatedUnion`:** Siparis durumlarina bagli farkli alanlar kurgula (or. `shipped` siparislerde zorunlu `trackingNumber`, `cancelled` siparislerde `cancelReason`). Semayi `z.discriminatedUnion('status', [...])` ile yaz, UI'da tip daraltmayla kullan.
+- [x] **Pasif urun politikasi:** `products.active` alanini urun formuna (`Controller` ile segment buton), siparis semasina (`createOrderFormSchema`'nin `superRefine`'i pasif urunu reddeder) ve sunucuya (`server.cjs` `POST /orders` 404) ayni kuralla yay; istemci-sunucu SIMETRIK reddiye. Dashboard metrikleri de `active=true` filtresine gecti (IB7).
 - [x] **Server hata govdesini parse et:** `http-client.ts`'te `!response.ok` durumunda `{ message: string }` govdesini bir `errorBodySchema` ile parse edip `ApiError.message`'a tasi. Su an server'in dondurdugu anlamli mesajlar (or. "yeterli stok yok") kayboluyor.
 - [x] **Ortak hata haritasi:** Zod v4 `z.config()` / hata ozelleştirme ile Turkce varsayilan hata mesajlarini merkezi tanimla; sema basina tekrar eden mesajlari azalt.
 - [x] **Env dogrulamayi derinlestir:** `app/config/env.ts`'i incele; `import.meta.env`'i `z.object` ile parse eden, eksik degiskende build/boot aninda anlamli hata firlatan yapiya donustur (yoksa kur).
@@ -82,15 +83,15 @@ Mevcut durum: Tek store, `persist` + `partialize`. Belgede planlanan toast kuyru
 
 Mevcut durum: Zod'dan turetilen tipler, generic `request<TSchema>`. Ileri tip pattern'leri az.
 
-- [ ] **`satisfies` operatoru:** `orderStatusLabels: Record<OrderStatus, string>` tanimlarini `satisfies` ile yeniden yaz; tip genislemesini (widening) onlemenin ve eksik key yakalamanin farkini gor.
-- [ ] **Discriminated union ile UI state:** Sayfa durumlarini `{ status: 'loading' } | { status: 'error'; error: ApiError } | { status: 'success'; data: ... }` seklinde modelleyen kucuk bir deney yap; TanStack Query'nin kendi tiplerinin bunu zaten nasil yaptigini incele (`isPending` daralttiktan sonra `data`'nin tanimli olmasi).
-- [ ] **Generic bilesen:** Urunler ve siparisler tablosundaki tekrar icin `DataTable<T>` generic bileseni yaz: `columns: Array<{ header: string; cell: (row: T) => ReactNode }>`. Generic constraint'leri ve JSX'te generic sozdizimini ogren.
+- [x] **`satisfies` operatoru:** `orderStatusLabels: Record<OrderStatus, string>` tanimlarini `satisfies` ile yeniden yaz; tip genislemesini (widening) onlemenin ve eksik key yakalamanin farkini gor.
+- [x] **Discriminated union ile UI state:** Sayfa durumlarini `{ status: 'loading' } | { status: 'error'; error: ApiError } | { status: 'success'; data: ... }` seklinde modelleyen kucuk bir deney yap; TanStack Query'nin kendi tiplerinin bunu zaten nasil yaptigini incele (`isPending` daralttiktan sonra `data`'nin tanimli olmasi).
+- [x] **Generic bilesen:** Urunler ve siparisler tablosundaki tekrar icin `DataTable<T>` generic bileseni yaz: `columns: Array<{ header: string; cell: (row: T) => ReactNode }>`. Generic constraint'leri ve JSX'te generic sozdizimini ogren.
 - [x] **`as const` + tip turetme:** Query key factory'lerdeki `as const` kullaniminin donus tiplerini nasil daralttigini incele; bir key'in tipini `ReturnType<typeof orderQueryKeys.list>` ile cikar.
 - [x] **Tip daraltma fonksiyonlari:** `ApiError` icin `isApiError(error: unknown): error is ApiError` type guard'i yaz; `instanceof` kontrollerinin dagildigi yerlerde kullan.
 - [x] **Utility type pratigi:** `ProductFormValues`'tan `Partial`, `Pick`, `Omit` ile update payload tipleri turet; kendi `Nullable<T>` gibi kucuk bir mapped type yaz.
-- [ ] **Template literal types:** Route path'lerini (`'/urunler' | '/musteriler' | ...`) tek bir union'dan turet; sidebar linklerinin yanlis path almasini derleme zamaninda engelle.
+- [x] **Template literal types:** Route path'lerini (`'/urunler' | '/musteriler' | ...`) tek bir union'dan turet; sidebar linklerinin yanlis path almasini derleme zamaninda engelle.
 - [x] **`unknown` disiplini:** `http-client.ts`'teki `payload: unknown` akisini takip et; `any` kullanmadan unknown → parse → tipli veri zincirinin neden guvenli oldugunu belgele.
-- [ ] **Strict ayarlar:** `tsconfig`'e `noUncheckedIndexedAccess` ekle; patlayan yerleri (or. `watchedItems[index]`) duzgun sekilde coz. Bu ayarin gercek hatalari nasil yakaladigini not et.
+- [x] **Strict ayarlar:** `tsconfig`'e `noUncheckedIndexedAccess` ekle; patlayan yerleri (or. `watchedItems[index]`) duzgun sekilde coz. Bu ayarin gercek hatalari nasil yakaladigini not et.
 
 ---
 
@@ -98,16 +99,16 @@ Mevcut durum: Zod'dan turetilen tipler, generic `request<TSchema>`. Ileri tip pa
 
 Mevcut durum: Fonksiyonel bilesenler, `useState`, `useDeferredValue`. Sayfalar sisman; Suspense, Error Boundary, code splitting, portal yok.
 
-- [ ] **Custom hook'lara ayristirma:** `ProductsPage` icindeki filtre + query + mutation mantigini `useProductsPage()` (veya `useProductFilters` + `useProductMutations`) hook'larina cikar. Bilesenin sadece gorunumden sorumlu kalmasini sagla.
-- [ ] **Bilesen ayristirma:** Sayfa dosyalarindaki tablo, filtre cubugu, bos/hata durumlarini ayri bilesenlere bol (`shared/components/` altina ortak `EmptyState`, `ErrorState`, `PageHeader`). Uc sayfada kopyalanan hata bloklarini tekillestir.
-- [ ] **Error Boundary:** `react-error-boundary` ile route seviyesinde boundary kur; TanStack Query'nin `throwOnError` + `QueryErrorResetBoundary` entegrasyonuyla "tekrar dene" akisini boundary uzerinden calistir.
-- [ ] **Suspense + `lazy`:** Route bilesenlerini `React.lazy` ile bolup `<Suspense>` fallback'iyle yukle; Network panelinde chunk'larin gecikmeli indigini izle. Dialog bilesenlerini de lazy yuklemeyi dene.
-- [ ] **Portal ile dialog:** Dialoglari `createPortal` ile `document.body`'ye tasi; ardindan native `<dialog>` elementi + `showModal()` yaklasimiyla karsilastir. Focus trap, `Escape` ile kapanma ve arka plan scroll kilidi ekle.
-- [ ] **`useEffect` disiplinini gor:** Projede su an neredeyse hic `useEffect` yok — bu iyi. Hangi isler icin effect'in GEREKMEDIGINI (veri cekme → Query, abonelik → Zustand subscribe) kisa notlarla belgele; gercekten gereken bir ornek ekle (or. dialog acikken `Escape` dinleme).
-- [ ] **Memoizasyon bilinci:** `useMemo`/`useCallback`/`memo`'yu once OLCMEDEN ekleme; Profiler ile urun listesinde gercek bir yeniden render sorunu bul, sonra hedefli optimize et. "Her seyi memo'la" anti-pattern'ini not et.
+- [x] **Custom hook'lara ayristirma:** `ProductsPage` icindeki filtre + query + mutation mantigini `useProductsPage()` (veya `useProductFilters` + `useProductMutations`) hook'larina cikar. Bilesenin sadece gorunumden sorumlu kalmasini sagla.
+- [x] **Bilesen ayristirma:** Sayfa dosyalarindaki tablo, filtre cubugu, bos/hata durumlarini ayri bilesenlere bol (`shared/components/` altina ortak `EmptyState`, `ErrorState`, `PageHeader`). Bes sayfada (dashboard, urunler, musteriler, siparisler, ayarlar) kopyalanan hata bloklarini tekillestir.
+- [x] **Error Boundary:** `react-error-boundary` ile route seviyesinde boundary kur; TanStack Query'nin `throwOnError` + `QueryErrorResetBoundary` entegrasyonuyla "tekrar dene" akisini boundary uzerinden calistir.
+- [x] **Suspense + `lazy`:** Route bilesenlerini `React.lazy` ile bolup `<Suspense>` fallback'iyle yukle; Network panelinde chunk'larin gecikmeli indigini izle. Dialog bilesenlerini de lazy yuklemeyi dene.
+- [x] **Portal ile dialog:** Dialoglari `createPortal` ile `document.body`'ye tasi; ardindan native `<dialog>` elementi + `showModal()` yaklasimiyla karsilastir. Focus trap, `Escape` ile kapanma ve arka plan scroll kilidi ekle. *(createPortal yerine native dialog + showModal secildi — TASARIM v1 §5'te gerekceli reddedildi.)*
+- [x] **`useEffect` disiplinini gor:** Projede su an neredeyse hic `useEffect` yok — bu iyi. Hangi isler icin effect'in GEREKMEDIGINI (veri cekme → Query, abonelik → Zustand subscribe) kisa notlarla belgele; gercekten gereken bir ornek ekle (or. dialog acikken `Escape` dinleme).
+- [x] **Memoizasyon bilinci:** `useMemo`/`useCallback`/`memo`'yu once OLCMEDEN ekleme; Profiler ile urun listesinde gercek bir yeniden render sorunu bul, sonra hedefli optimize et. "Her seyi memo'la" anti-pattern'ini not et. *(Disiplin uygulandi: Urunler filtresi + Dashboard Profiler ile olculdu; olcum ortami — `npm run preview` profiling desteklemedigi icin dev-modu vekil olcum — guvenilmez bulundu, bu yuzden "gercek bir sorun bulunup hedefli cozuldu" DEGIL, yalniz spekulatif kod EKLENMEDI. Olcum borcu `bekleyenler.md` B22'de acik.)*
 - [x] **`useId` ve erisilebilirlik:** Dialog ve form alanlarindaki elle yazilmis id'leri (`order-status-${order.id}` vb.) gozden gecir; form label iliskilerinde `useId` kullan.
-- [ ] **Concurrent ozellikler:** Mevcut `useDeferredValue`'ya ek olarak filtre degisimini `useTransition` ile sarmala; `isPending` gostergesiyle iki yaklasimin farkini karsilastir.
-- [ ] **Liste render optimizasyonu (opsiyonel):** Urun listesi buyurse (seed'i 500 kayda cikar) sanal liste (`@tanstack/react-virtual`) dene.
+- [x] **Concurrent ozellikler:** Mevcut `useDeferredValue`'ya ek olarak filtre degisimini `useTransition` ile sarmala; `isPending` gostergesiyle iki yaklasimin farkini karsilastir. *(Urunler filtresine (kategori/stok/sayfa) uygulandi, koda girdi. Ayrica route-gecisi geri bildirimi icin `useNavigation` denendi ama router'da `loader` olmadigi icin chunk suresini izleyemedigi KAYNAK'ta dogrulanip GERI ALINDI — bkz. `bekleyenler.md` B3.)*
+- [ ] **Liste render optimizasyonu (opsiyonel):** Dashboard'un dusuk-stok listesi (seed 1000 urunle ~180 satir, urun listesi degil — server-side sayfali oldugu icin hedef degil) sanal liste (`@tanstack/react-virtual`) adayiydi. *(Olculdu, UYGULANMADI: Profiler `npm run preview`de calismadigi icin dev-modu vekil olcum (28.6ms/30ms) alindi, esik kiyaslamasi guvenilmez bulundu — bilincli atlandi, RHF'in "Cok adimli form" maddesindeki emsalle ayni muamele. Olcum araci borcu `bekleyenler.md` B22'de acik.)*
 
 ---
 

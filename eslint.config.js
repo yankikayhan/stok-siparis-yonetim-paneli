@@ -19,4 +19,13 @@ export default defineConfig([
       globals: globals.browser,
     },
   },
+  {
+    // package.json'da "type": "module" oldugu icin flat config .js'i ESM, .cjs'i CJS sayar;
+    // ayrica sourceType belirtmeye gerek yok.
+    files: ['server/**/*.{js,cjs}'],
+    extends: [js.configs.recommended],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
 ])

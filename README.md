@@ -91,7 +91,7 @@ Terminalin gosterdigi Vite adresini tarayicida acin. Varsayilan adres genellikle
 | `npm run api:delay` | API'yi her istekte 700 ms yapay gecikmeyle baslatir; loading durumlarini incelemek icindir. |
 | `npm run build` | TypeScript kontrolunu ve production Vite derlemesini calistirir; cikti `dist/` klasorune gider. |
 | `npm run preview` | Olusturulmus production derlemesini yerelde onizler. Once `npm run build` calistirilmalidir. |
-| `npm run lint` | ESLint kurallarini tum projede calistirir. |
+| `npm run lint` | ESLint kurallarini `src/` (TS/TSX) ve `server/` (JS/CJS) dosyalarinda calistirir. |
 | `npm run test` | Vitest testlerini bir kez calistirir. |
 
 ## Uygulama sayfalari

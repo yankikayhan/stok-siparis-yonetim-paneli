@@ -185,6 +185,25 @@ export function removeProductFromListCache(data: ProductListCache, productId: st
   }
 }
 
+// P2: siparis olusturma sonrasi listAll'i invalidation'dan haric tutup dogrudan bu fonksiyonla
+// guncellemek icin (bkz. use-order-create-form.ts). listAll her zaman Product[] sekli tasir (Page degil).
+export function applyOrderItemsToListAllCache(
+  data: Product[] | undefined,
+  items: Array<{ productId: string; quantity: number }>,
+): Product[] | undefined {
+  if (data === undefined) return undefined
+
+  const orderedQuantities = new Map<string, number>()
+  items.forEach((item) => {
+    orderedQuantities.set(item.productId, (orderedQuantities.get(item.productId) ?? 0) + item.quantity)
+  })
+
+  return data.map((product) => {
+    const quantity = orderedQuantities.get(product.id)
+    return quantity === undefined ? product : { ...product, stock: product.stock - quantity }
+  })
+}
+
 export function createProduct(values: ProductFormValues) {
   const now = new Date().toISOString()
 

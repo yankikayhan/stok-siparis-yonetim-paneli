@@ -4,7 +4,12 @@ import { useMemo } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { isApiError } from '../../../shared/api/api-error'
 import { customerQueryKeys } from '../../customers/api/customers-api'
-import { productQueryKeys, type Product } from '../../products/api/products-api'
+import {
+  applyOrderItemsToListAllCache,
+  productListAllOptions,
+  productQueryKeys,
+  type Product,
+} from '../../products/api/products-api'
 import {
   createOrder,
   createOrderFormSchema,
@@ -51,12 +56,27 @@ export function useOrderCreateForm({ products, onClose }: UseOrderCreateFormOpti
     mutationFn: createOrder,
     // Dialog acik kaldigi icin hata inline gosterilir; global toast susturulur.
     meta: { suppressErrorToast: true, successMessage: 'Siparis olusturuldu.' },
-    onSuccess: async () => {
+    onSuccess: async (order) => {
+      // P2: listAll siparisler sayfasinda AKTIF gozlemleniyor (useOrderList → productListAllOptions);
+      // dusuk maliyetli yol invalidation degil, siparis kalemleriyle DOGRUDAN guncelleme.
+      queryClient.setQueryData<Product[]>(productListAllOptions().queryKey, (data) =>
+        applyOrderItemsToListAllCache(data, order.items),
+      )
+
+      // listAll (yukarida elle guncellendi) ve activeCount (siparisten ETKILENMEZ, aktif urun
+      // sayisi degismez) invalidation'dan haric tutulur; paged liste + dashboard dusuk-stok
+      // listesi orders sayfasindayken mounted olmadigi icin mark-stale zaten ucretsiz kalir.
+      const excludedFromInvalidation = [productQueryKeys.listAll(), productQueryKeys.activeCount()]
+
       // Dashboard ayni siparis/urun cache'lerini okudugu icin ayrica invalidate edilmez.
       // orders prefix'i tam listeyle birlikte filtre basina infinite girdileri de kapsar.
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: orderQueryKeys.all }),
-        queryClient.invalidateQueries({ queryKey: productQueryKeys.lists() }),
+        queryClient.invalidateQueries({
+          queryKey: productQueryKeys.lists(),
+          predicate: (query) =>
+            !excludedFromInvalidation.some((key) => JSON.stringify(key) === JSON.stringify(query.queryKey)),
+        }),
         queryClient.invalidateQueries({ queryKey: customerQueryKeys.all }),
       ])
       // Siparis kaydedildi; yarim is kalmadigi icin taslak da silinir.

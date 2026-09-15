@@ -1,4 +1,5 @@
 import { useLayoutEffect, useRef, type ReactNode } from 'react'
+import { cn } from '../lib/cn'
 
 type DialogProps = {
   titleId: string
@@ -84,7 +85,10 @@ export function Dialog({ children, className = '', onClose, titleId }: DialogPro
         event.preventDefault()
         onClose()
       }}
-      className={`m-auto max-h-[90vh] w-full overflow-y-auto bg-white shadow-xl backdrop:bg-slate-950/35 ${className}`}
+      className={cn(
+        'm-auto max-h-[90vh] w-full overflow-y-auto bg-white shadow-xl backdrop:bg-slate-950/35',
+        className,
+      )}
     >
       {children}
     </dialog>

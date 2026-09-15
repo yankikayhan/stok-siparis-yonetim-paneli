@@ -4,6 +4,7 @@ import { X } from 'lucide-react'
 import { cloneElement, useId, type Ref } from 'react'
 import { Controller, useForm } from 'react-hook-form'
 import { Dialog } from '../../../shared/components/dialog'
+import { Button } from '../../../shared/components/button'
 import {
   createProduct,
   productFormSchema,
@@ -150,12 +151,12 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
         />
         {createProductMutation.isError && <p className="text-sm text-rose-700">{createProductMutation.error.message}</p>}
         <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
-          <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
+          <Button type="button" variant="secondary" onClick={requestClose}>Vazgec</Button>
           {/* isDirty: degisiklik yokken submit anlamsiz; isSubmitting degil mutation.isPending —
               mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
-          <button type="submit" disabled={!form.formState.isDirty || createProductMutation.isPending} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60">
+          <Button type="submit" disabled={!form.formState.isDirty || createProductMutation.isPending}>
             {createProductMutation.isPending ? 'Kaydediliyor...' : isEditing ? 'Degisiklikleri kaydet' : 'Urunu ekle'}
-          </button>
+          </Button>
         </div>
       </form>
     </Dialog>

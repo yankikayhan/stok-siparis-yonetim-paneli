@@ -2,6 +2,7 @@ import { ArrowDown, ArrowUp, Minus, Plus, X } from 'lucide-react'
 import { cloneElement, useId } from 'react'
 import { FormProvider, useFormContext, useWatch, type Control } from 'react-hook-form'
 import { Dialog } from '../../../shared/components/dialog'
+import { Button } from '../../../shared/components/button'
 import { type Customer } from '../../customers/api/customers-api'
 import { type Product } from '../../products/api/products-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
@@ -42,7 +43,7 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
           <div className="mb-2 flex items-center justify-between gap-4">
             <h3 className="text-sm font-semibold text-slate-950">Siparis kalemleri</h3>
             {/* shouldFocus: odak yeni satirin ilk kayitli alanina (urun select) gider; index hesabi + zamanlama isteyen elle setFocus'a gerek kalmaz. */}
-            <button type="button" onClick={() => orderItems.append({ productId: '', quantity: 1 }, { shouldFocus: true })} className="inline-flex items-center gap-1 rounded-md border border-slate-300 px-2.5 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50"><Plus size={16} aria-hidden="true" /> Kalem ekle</button>
+            <Button type="button" variant="secondary" size="sm" className="inline-flex items-center gap-1" onClick={() => orderItems.append({ productId: '', quantity: 1 }, { shouldFocus: true })}><Plus size={16} aria-hidden="true" /> Kalem ekle</Button>
           </div>
           <div className="space-y-3">
             {orderItems.fields.map((field, index) => (
@@ -66,11 +67,11 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
 
         {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700">{form.formState.errors.root.serverError.message}</p>}
         <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
-          <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
+          <Button type="button" variant="secondary" onClick={requestClose}>Vazgec</Button>
           {/* Kilit "kaydedilecek is var mi"yi sorar: bu oturumdaki degisiklik (isDirty) ya da onceki oturumdan tasinan taslak (hasDraft) —
               taslaktan dogan form baseline oldugu icin isDirty false baslar. isSubmitting degil mutation.isPending:
               mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
-          <button type="submit" disabled={(!form.formState.isDirty && !hasDraft) || createOrderMutation.isPending} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60">{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</button>
+          <Button type="submit" disabled={(!form.formState.isDirty && !hasDraft) || createOrderMutation.isPending}>{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</Button>
         </div>
         </form>
       </FormProvider>

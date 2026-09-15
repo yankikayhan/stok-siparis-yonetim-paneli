@@ -1,3 +1,4 @@
+import { Button } from '../../../shared/components/button'
 import { EmptyState } from '../../../shared/components/empty-state'
 import { PageHeader } from '../../../shared/components/page-header'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
@@ -31,9 +32,9 @@ export function ProductsPage() {
           title="Urunler"
           description="Urun katalogunu ve stok seviyelerini yonetin."
         />
-        <button type="button" onClick={actions.openCreate} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800">
+        <Button type="button" onClick={actions.openCreate}>
           Urun ekle
-        </button>
+        </Button>
       </div>
 
       <ProductFilterBar

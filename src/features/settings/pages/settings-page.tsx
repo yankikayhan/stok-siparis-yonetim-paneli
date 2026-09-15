@@ -4,6 +4,7 @@ import { Moon, Rows3, Sun } from 'lucide-react'
 import { cloneElement, useId } from 'react'
 import { useForm } from 'react-hook-form'
 import { useUiStore } from '../../../shared/stores/ui-store'
+import { Button } from '../../../shared/components/button'
 import { PageHeader } from '../../../shared/components/page-header'
 import {
   profileOptions,
@@ -94,7 +95,7 @@ function ProfileSettingsForm({ profile }: { profile: Profile }) {
         {updateProfileMutation.isError && <p className="text-sm text-rose-700">{updateProfileMutation.error.message}</p>}
         {updateProfileMutation.isSuccess && <p className="text-sm text-brand-700">Profil kaydedildi.</p>}
         <div className="flex justify-end border-t border-slate-200 pt-4">
-          <button type="submit" disabled={!form.formState.isDirty || updateProfileMutation.isPending} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50">{updateProfileMutation.isPending ? 'Kaydediliyor...' : 'Degisiklikleri kaydet'}</button>
+          <Button type="submit" disabled={!form.formState.isDirty || updateProfileMutation.isPending}>{updateProfileMutation.isPending ? 'Kaydediliyor...' : 'Degisiklikleri kaydet'}</Button>
         </div>
       </form>
     </section>

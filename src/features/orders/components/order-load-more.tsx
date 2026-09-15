@@ -1,3 +1,5 @@
+import { Button } from '../../../shared/components/button'
+
 type OrderLoadMoreProps = {
   totalCount: number
   loadedCount: number
@@ -21,15 +23,16 @@ export function OrderLoadMore({
         Toplam {totalCount} siparisin {loadedCount} tanesi goruntuleniyor
       </p>
       {hasNextPage && (
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={onLoadMore}
           // Placeholder'da eski filtrenin listesi gorunur; yeni key'in ilk sayfasi gelmeden devami istenmez.
           disabled={isFetchingNextPage || isPlaceholderData}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           {isFetchingNextPage ? 'Yukleniyor...' : 'Daha fazla yukle'}
-        </button>
+        </Button>
       )}
     </div>
   )

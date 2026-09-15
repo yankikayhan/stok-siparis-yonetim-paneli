@@ -1,3 +1,5 @@
+import { Button } from './button'
+
 type ErrorStateProps = {
   title: string
   message: string
@@ -11,13 +13,9 @@ export function ErrorState({ message, onRetry, title }: ErrorStateProps) {
     <section className="border border-rose-200 bg-rose-50 p-6">
       <h1 className="text-base font-semibold text-rose-950">{title}</h1>
       <p className="mt-2 text-sm text-rose-800">{message}</p>
-      <button
-        type="button"
-        onClick={onRetry}
-        className="mt-4 rounded-md bg-rose-700 px-3 py-2 text-sm font-medium text-white hover:bg-rose-800"
-      >
+      <Button type="button" variant="danger" onClick={onRetry} className="mt-4">
         Tekrar dene
-      </button>
+      </Button>
     </section>
   )
 }

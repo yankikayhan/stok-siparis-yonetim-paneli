@@ -1,3 +1,5 @@
+import { Button } from '../../../shared/components/button'
+
 type ProductPaginationProps = {
   page: number
   totalPages: number
@@ -21,23 +23,25 @@ export function ProductPagination({
         Toplam {totalCount} kayit · Sayfa {page} / {totalPages}
       </p>
       <div className="flex gap-2">
-        <button
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={() => onPageChange(page - 1)}
           disabled={page === 1}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Onceki
-        </button>
-        <button
+        </Button>
+        <Button
           type="button"
+          variant="secondary"
+          size="sm"
           onClick={() => onPageChange(page + 1)}
           // Placeholder gosterilirken yeni verinin totalPages'i bilinmez; tasmayi onlemek icin kilitli.
           disabled={isPlaceholderData || page >= totalPages}
-          className="rounded-md border border-slate-300 px-3 py-1.5 text-sm font-medium text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         >
           Sonraki
-        </button>
+        </Button>
       </div>
     </div>
   )

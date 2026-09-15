@@ -7,6 +7,7 @@ import { OrderStatusFilterBar } from '../components/order-status-filter'
 import { OrderTable } from '../components/order-table'
 import { useOrderList } from '../hooks/use-order-list'
 import { useOrderStatusUpdate } from '../hooks/use-order-status-update'
+import { Button } from '../../../shared/components/button'
 import { EmptyState } from '../../../shared/components/empty-state'
 import { PageHeader } from '../../../shared/components/page-header'
 
@@ -29,7 +30,7 @@ export function OrdersPage() {
           title="Siparisler"
           description="Siparis durumlarini takip edin ve operasyon akisini yonetin."
         />
-        <button type="button" onClick={() => setIsCreateDialogOpen(true)} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800">Siparis olustur</button>
+        <Button type="button" onClick={() => setIsCreateDialogOpen(true)}>Siparis olustur</Button>
       </div>
 
       <OrderStatusFilterBar value={statusFilter} onChange={setStatusFilter} />

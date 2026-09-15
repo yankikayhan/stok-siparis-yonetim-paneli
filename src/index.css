@@ -4,6 +4,11 @@
    production CSS'ine girmisti (olculdu). Kapsam disi: yalnizca kokteki *.md; index.html iceride. */
 @source not "../*.md";
 
+/* Sinif tabanli dark: <html class="dark"> ve tum cocuklari. Secici notasyonu v4 dogrudan
+   kabul eder; Tailwind'in varsayilan dark varyanti (@media prefers-color-scheme) boylece
+   tamamen devre disi kalir — OS tercihi bu projede okunmaz (bilincli karar, K1). */
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
 
@@ -22,11 +27,28 @@
     font-family: var(--font-sans);
   }
 
+  /* Renk semasi beyani: preflight dokunmaz (kontrol edildi), tek sahip burasi.
+     dark kurali :root uzerinde — html elemani zaten .dark tasir. */
+  :root {
+    color-scheme: light;
+  }
+
+  :root.dark {
+    color-scheme: dark;
+  }
+
   body {
     margin: 0;
     min-width: 20rem;
     background: #f8fafc;
     color: #0f172a;
+  }
+
+  /* Literal hex (slate-950 / slate-50): var() alias'i degil — IB1 emsali: kullanima gore
+     emit garantisi olmadigindan alias dangling kalabilir; K5 karariyla tutarli. */
+  :root.dark body {
+    background: #020617;
+    color: #f8fafc;
   }
 }
 

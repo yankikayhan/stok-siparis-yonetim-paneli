@@ -5,6 +5,23 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>stok-siparis-yonetim-paneli</title>
+    <script>
+      // persist anahtari src/shared/stores/ui-store.ts `name` ile ELLE senkron tutulur;
+      // degisirse burasi da degisir (zarf sekli IB8'de version/migrate ile degisirse de).
+      // Gorevi: dark secimliyken ilk boyamadan ONCE .dark sinifini koymak (FOUC onlemi).
+      // Bos/olmayan anahtar veya light deger -> hicbir sey yapma (varsayilan light).
+      try {
+        var raw = localStorage.getItem('stok-siparis-yonetim-paneli-preferences')
+        if (raw !== null && JSON.parse(raw)?.state?.theme === 'dark') {
+          document.documentElement.classList.add('dark')
+        }
+      } catch {
+        // Bozuk govde: light'a dus ve kalintiyi sil ki persist temiz varsayilanlarla
+        // kurulsun, sonraki secimler saglam govdeye yazilsin (tasarim I1 onlemi).
+        // Sekil-bozuk ama gecerli JSON (or. {}) silinmez; yalniz gercek parse hatasi silinir.
+        try { localStorage.removeItem('stok-siparis-yonetim-paneli-preferences') } catch {}
+      }
+    </script>
   </head>
   <body>
     <div id="root"></div>

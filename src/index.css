@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Otomatik tarama repo kokunu da kapsar: plan dokumanindaki duz metinden uretilmis bir kural
+   production CSS'ine girmisti (olculdu). Kapsam disi: yalnizca kokteki *.md; index.html iceride. */
+@source not "../*.md";
+
 @theme {
   --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
 

@@ -27,9 +27,11 @@ const navigationItems: Array<{ to: RoutePath; label: string; icon: typeof Packag
 export function AppShell() {
   const queryClient = useQueryClient()
   const { pathname } = useLocation()
-  const { theme, isSidebarOpen, toggleSidebar } = useUiStore(
+  // Tema artik bu bilesende okunmaz: <html class="dark"> + dark: varyantlari
+  // (index.css @custom-variant) esitlemeyi CSS'e tasidi; tema degisiminde bu agac
+  // yeniden render OLMAZ. data-theme attribute'u da kalkti.
+  const { isSidebarOpen, toggleSidebar } = useUiStore(
     useShallow((state) => ({
-      theme: state.theme,
       isSidebarOpen: state.isSidebarOpen,
       toggleSidebar: state.toggleSidebar,
     })),
@@ -48,19 +50,19 @@ export function AppShell() {
   const isCreatingOrder = pendingOrderCreations.length > 0
 
   return (
-    <div data-theme={theme} className={theme === 'dark' ? 'flex min-h-screen flex-col bg-slate-950 text-slate-50' : 'flex min-h-screen flex-col bg-slate-50 text-slate-950'}>
-      <header className={theme === 'dark' ? 'flex h-16 shrink-0 items-center border-b border-slate-700 bg-slate-900 px-4 sm:px-6' : 'flex h-16 shrink-0 items-center border-b border-slate-200 bg-white px-4 sm:px-6'}>
+    <div className="flex min-h-screen flex-col bg-slate-50 text-slate-950 dark:bg-slate-950 dark:text-slate-50">
+      <header className="flex h-16 shrink-0 items-center border-b border-slate-200 bg-white px-4 sm:px-6 dark:border-slate-700 dark:bg-slate-900">
         <button
           type="button"
           onClick={toggleSidebar}
-          className={theme === 'dark' ? 'grid size-9 place-items-center rounded-md text-slate-300 hover:bg-slate-800 hover:text-white' : 'grid size-9 place-items-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-950'}
+          className="grid size-9 place-items-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
           aria-label="Gezinme menusunu ac veya kapat"
         >
           <Menu size={20} aria-hidden="true" />
         </button>
-        <p className={theme === 'dark' ? 'ml-3 text-sm font-semibold tracking-wide text-white' : 'ml-3 text-sm font-semibold tracking-wide text-slate-900'}>Noktasi Isletme</p>
+        <p className="ml-3 text-sm font-semibold tracking-wide text-slate-900 dark:text-white">Noktasi Isletme</p>
         {isCreatingOrder && (
-          <span role="status" className={theme === 'dark' ? 'ml-auto flex items-center gap-2 text-sm text-slate-300' : 'ml-auto flex items-center gap-2 text-sm text-slate-600'}>
+          <span role="status" className="ml-auto flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300">
             <LoaderCircle size={16} className="animate-spin" aria-hidden="true" />
             Siparis kaydediliyor...
           </span>
@@ -69,7 +71,7 @@ export function AppShell() {
 
       <div className="mx-auto flex w-full max-w-screen-2xl flex-1">
         <aside
-          className={`shrink-0 overflow-hidden transition-[width] duration-200 ${theme === 'dark' ? 'border-r border-slate-700 bg-slate-900' : 'border-r border-slate-200 bg-white'} ${
+          className={`shrink-0 overflow-hidden transition-[width] duration-200 border-r border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 ${
             isSidebarOpen ? 'w-60' : 'w-0 border-r-0'
           }`}
         >
@@ -85,9 +87,7 @@ export function AppShell() {
                   `mb-1 flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors ${
                     isActive
                       ? 'bg-brand-50 text-brand-800'
-                      : theme === 'dark'
-                        ? 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                        : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'
+                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
                   }`
                 }
               >

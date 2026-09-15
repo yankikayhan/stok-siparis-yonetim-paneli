@@ -84,7 +84,7 @@ export function AppShell() {
                 className={({ isActive }) =>
                   `mb-1 flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-teal-50 text-teal-800'
+                      ? 'bg-brand-50 text-brand-800'
                       : theme === 'dark'
                         ? 'text-slate-300 hover:bg-slate-800 hover:text-white'
                         : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950'

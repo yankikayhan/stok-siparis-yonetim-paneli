@@ -31,7 +31,7 @@ export function ProductFilterBar({
           value={search}
           onChange={(event) => onSearchChange(event.target.value)}
           placeholder="Urun adi veya SKU ara"
-          className="h-10 w-full border border-slate-300 bg-white pl-10 pr-3 text-sm outline-none placeholder:text-slate-400 focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+          className="h-10 w-full border border-slate-300 bg-white pl-10 pr-3 text-sm outline-none placeholder:text-slate-400 focus:border-brand-700 focus:ring-2 focus:ring-brand-100"
         />
       </label>
       <label>
@@ -39,7 +39,7 @@ export function ProductFilterBar({
         <select
           value={categoryId}
           onChange={(event) => onCategoryChange(event.target.value)}
-          className="h-10 w-full border border-slate-300 bg-white px-3 text-sm outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+          className="h-10 w-full border border-slate-300 bg-white px-3 text-sm outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100"
         >
           <option value="all">Tum kategoriler</option>
           {categories.map((category) => (
@@ -54,7 +54,7 @@ export function ProductFilterBar({
         <select
           value={stock}
           onChange={(event) => onStockChange(event.target.value as ProductStockFilter)}
-          className="h-10 w-full border border-slate-300 bg-white px-3 text-sm outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100"
+          className="h-10 w-full border border-slate-300 bg-white px-3 text-sm outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100"
         >
           <option value="all">Tum stok durumlari</option>
           <option value="low">Dusuk stok</option>

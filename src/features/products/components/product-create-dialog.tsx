@@ -153,7 +153,7 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
           <button type="button" onClick={requestClose} className="rounded-md border border-slate-300 px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">Vazgec</button>
           {/* isDirty: degisiklik yokken submit anlamsiz; isSubmitting degil mutation.isPending —
               mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
-          <button type="submit" disabled={!form.formState.isDirty || createProductMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">
+          <button type="submit" disabled={!form.formState.isDirty || createProductMutation.isPending} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60">
             {createProductMutation.isPending ? 'Kaydediliyor...' : isEditing ? 'Degisiklikleri kaydet' : 'Urunu ekle'}
           </button>
         </div>
@@ -181,7 +181,7 @@ function SegmentButton({
       aria-pressed={active}
       onClick={onClick}
       className={`flex h-10 items-center justify-center border text-sm font-medium ${
-        active ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+        active ? 'border-brand-700 bg-brand-50 text-brand-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'
       }`}
     >
       {label}

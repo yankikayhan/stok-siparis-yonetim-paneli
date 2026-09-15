@@ -26,7 +26,7 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
       <FormProvider {...form}>
         <form className="space-y-5 p-5" onSubmit={submit}>
         {hasDraft && (
-          <div className="flex items-center justify-between gap-3 border border-teal-200 bg-teal-50 px-3 py-2 text-sm text-teal-900" role="status">
+          <div className="flex items-center justify-between gap-3 border border-brand-200 bg-brand-50 px-3 py-2 text-sm text-brand-900" role="status">
             <span>Taslaktan devam ediliyor.</span>
             <button type="button" onClick={discardDraft} className="font-medium underline hover:opacity-70">Taslagi temizle</button>
           </div>
@@ -70,7 +70,7 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
           {/* Kilit "kaydedilecek is var mi"yi sorar: bu oturumdaki degisiklik (isDirty) ya da onceki oturumdan tasinan taslak (hasDraft) —
               taslaktan dogan form baseline oldugu icin isDirty false baslar. isSubmitting degil mutation.isPending:
               mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
-          <button type="submit" disabled={(!form.formState.isDirty && !hasDraft) || createOrderMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-60">{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</button>
+          <button type="submit" disabled={(!form.formState.isDirty && !hasDraft) || createOrderMutation.isPending} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-60">{createOrderMutation.isPending ? 'Olusturuluyor...' : 'Siparisi olustur'}</button>
         </div>
         </form>
       </FormProvider>

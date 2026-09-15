@@ -55,7 +55,7 @@ export function OrderTable({
             value={order.status}
             disabled={isUpdatingStatus}
             onChange={(event) => onStatusChange(order.id, event.target.value as OrderStatus)}
-            className="h-9 border border-slate-300 bg-white px-2 text-sm text-slate-700 outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100 disabled:opacity-60"
+            className="h-9 border border-slate-300 bg-white px-2 text-sm text-slate-700 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100 disabled:opacity-60"
           >
             {orderStatuses.map((status) => (
               <option key={status} value={status}>

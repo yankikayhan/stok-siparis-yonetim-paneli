@@ -31,7 +31,7 @@ export function ProductsPage() {
           title="Urunler"
           description="Urun katalogunu ve stok seviyelerini yonetin."
         />
-        <button type="button" onClick={actions.openCreate} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800">
+        <button type="button" onClick={actions.openCreate} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800">
           Urun ekle
         </button>
       </div>

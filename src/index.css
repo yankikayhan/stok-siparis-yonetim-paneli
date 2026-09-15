@@ -2,6 +2,15 @@
 
 @theme {
   --font-sans: "IBM Plex Sans", "Segoe UI", sans-serif;
+
+  /* Marka rengi. Degerler Tailwind teal ramp'inden birebir kopyalandi; alias (var ile baglama)
+     DEGIL, cunku kullanilmayan bir tema degiskeninin emit edilecegi garanti degil. */
+  --color-brand-50: oklch(98.4% 0.014 180.72);
+  --color-brand-100: oklch(95.3% 0.051 180.801);
+  --color-brand-200: oklch(91% 0.096 180.426);
+  --color-brand-700: oklch(51.1% 0.096 186.391);
+  --color-brand-800: oklch(43.7% 0.078 188.216);
+  --color-brand-900: oklch(38.6% 0.063 188.416);
 }
 
 @layer base {
@@ -18,5 +27,5 @@
 }
 
 @utility form-input {
-  @apply h-10 w-full border border-slate-300 bg-white px-3 text-sm font-normal outline-none focus:border-teal-700 focus:ring-2 focus:ring-teal-100;
+  @apply h-10 w-full border border-slate-300 bg-white px-3 text-sm font-normal outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100;
 }

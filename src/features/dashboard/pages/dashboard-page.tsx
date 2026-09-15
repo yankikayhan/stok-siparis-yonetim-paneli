@@ -91,7 +91,7 @@ function MetricCard({
     <div className="border border-slate-200 bg-white p-5">
       <div className="flex items-center justify-between gap-4">
         <dt className="text-sm font-medium text-slate-600">{label}</dt>
-        <Icon size={18} className="text-teal-700" aria-hidden="true" />
+        <Icon size={18} className="text-brand-700" aria-hidden="true" />
       </div>
       <dd className="mt-4 text-2xl font-semibold text-slate-950">{value}</dd>
     </div>

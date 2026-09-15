@@ -29,7 +29,7 @@ export function OrdersPage() {
           title="Siparisler"
           description="Siparis durumlarini takip edin ve operasyon akisini yonetin."
         />
-        <button type="button" onClick={() => setIsCreateDialogOpen(true)} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800">Siparis olustur</button>
+        <button type="button" onClick={() => setIsCreateDialogOpen(true)} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800">Siparis olustur</button>
       </div>
 
       <OrderStatusFilterBar value={statusFilter} onChange={setStatusFilter} />

@@ -58,7 +58,7 @@ export function CustomersPage() {
         <div className="grid gap-6 lg:grid-cols-[minmax(17rem,0.9fr)_minmax(0,1.5fr)]">
           <div className="border border-slate-200 bg-white">
             <div className="flex items-center gap-2 border-b border-slate-200 px-5 py-4">
-              <UsersRound size={18} className="text-teal-700" aria-hidden="true" />
+              <UsersRound size={18} className="text-brand-700" aria-hidden="true" />
               <h2 className="text-sm font-semibold text-slate-950">Musteri listesi</h2>
             </div>
             <ul className="divide-y divide-slate-100">
@@ -71,7 +71,7 @@ export function CustomersPage() {
                       type="button"
                       onClick={() => setSelectedCustomerId(customer.id)}
                       className={`w-full px-5 py-4 text-left transition-colors ${
-                        isSelected ? 'bg-teal-50' : 'hover:bg-slate-50'
+                        isSelected ? 'bg-brand-50' : 'hover:bg-slate-50'
                       }`}
                     >
                       <p className="text-sm font-semibold text-slate-950">{customer.name}</p>
@@ -146,7 +146,7 @@ function CustomerDetail({
                 </div>
                 <div className="text-right">
                   <p className="text-sm font-semibold text-slate-950">{currencyFormatter.format(order.total)}</p>
-                  <p className="mt-1 text-xs font-medium text-teal-700">{orderStatusLabels[order.status]}</p>
+                  <p className="mt-1 text-xs font-medium text-brand-700">{orderStatusLabels[order.status]}</p>
                 </div>
               </li>
             ))}
@@ -160,7 +160,7 @@ function CustomerDetail({
 function DetailItem({ icon: Icon, label, value }: { icon: typeof Mail; label: string; value: string }) {
   return (
     <div className="flex gap-3">
-      <Icon size={17} className="mt-0.5 shrink-0 text-teal-700" aria-hidden="true" />
+      <Icon size={17} className="mt-0.5 shrink-0 text-brand-700" aria-hidden="true" />
       <div className="min-w-0">
         <dt className="text-xs font-medium uppercase tracking-wide text-slate-500">{label}</dt>
         <dd className="mt-1 break-words text-sm text-slate-800">{value}</dd>

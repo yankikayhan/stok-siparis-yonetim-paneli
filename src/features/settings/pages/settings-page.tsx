@@ -92,9 +92,9 @@ function ProfileSettingsForm({ profile }: { profile: Profile }) {
           <select {...form.register('currency')} className="form-input"><option value="TRY">TRY - Turk Lirasi</option><option value="USD">USD - Amerikan Dolari</option><option value="EUR">EUR - Euro</option></select>
         </FormField>
         {updateProfileMutation.isError && <p className="text-sm text-rose-700">{updateProfileMutation.error.message}</p>}
-        {updateProfileMutation.isSuccess && <p className="text-sm text-teal-700">Profil kaydedildi.</p>}
+        {updateProfileMutation.isSuccess && <p className="text-sm text-brand-700">Profil kaydedildi.</p>}
         <div className="flex justify-end border-t border-slate-200 pt-4">
-          <button type="submit" disabled={!form.formState.isDirty || updateProfileMutation.isPending} className="rounded-md bg-teal-700 px-3 py-2 text-sm font-medium text-white hover:bg-teal-800 disabled:cursor-not-allowed disabled:opacity-50">{updateProfileMutation.isPending ? 'Kaydediliyor...' : 'Degisiklikleri kaydet'}</button>
+          <button type="submit" disabled={!form.formState.isDirty || updateProfileMutation.isPending} className="rounded-md bg-brand-700 px-3 py-2 text-sm font-medium text-white hover:bg-brand-800 disabled:cursor-not-allowed disabled:opacity-50">{updateProfileMutation.isPending ? 'Kaydediliyor...' : 'Degisiklikleri kaydet'}</button>
         </div>
       </form>
     </section>
@@ -102,7 +102,7 @@ function ProfileSettingsForm({ profile }: { profile: Profile }) {
 }
 
 function PreferenceButton({ active, icon: Icon, label, onClick }: { active: boolean; icon: typeof Sun; label: string; onClick: () => void }) {
-  return <button type="button" onClick={onClick} className={`flex h-10 items-center justify-center gap-2 border text-sm font-medium ${active ? 'border-teal-700 bg-teal-50 text-teal-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}><Icon size={16} aria-hidden="true" />{label}</button>
+  return <button type="button" onClick={onClick} className={`flex h-10 items-center justify-center gap-2 border text-sm font-medium ${active ? 'border-brand-700 bg-brand-50 text-brand-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'}`}><Icon size={16} aria-hidden="true" />{label}</button>
 }
 
 type FieldElementProps = { id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string }

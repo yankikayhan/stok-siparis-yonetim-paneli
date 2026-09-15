@@ -75,7 +75,7 @@ export function ProductTable({
       cellClassName: 'text-right',
       cell: (product) => (
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-teal-700 hover:text-teal-900">Duzenle</button>
+          <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900">Duzenle</button>
           <button type="button" onClick={() => onDelete(product)} className="text-sm font-medium text-rose-700 hover:text-rose-900">Sil</button>
         </div>
       ),

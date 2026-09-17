@@ -2,9 +2,9 @@ import { CircleAlert, CircleCheck, Info, X } from 'lucide-react'
 import { useToastStore, type Toast } from '../stores/toast-store'
 
 const toastStyles: Record<Toast['type'], string> = {
-  success: 'border-brand-200 bg-brand-50 text-brand-900',
-  error: 'border-rose-200 bg-rose-50 text-rose-900',
-  info: 'border-slate-200 bg-white text-slate-900',
+  success: 'border-brand-200 bg-brand-50 text-brand-900 dark:border-brand-800 dark:bg-brand-900 dark:text-brand-100',
+  error: 'border-rose-200 bg-rose-50 text-rose-900 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200',
+  info: 'border-slate-200 bg-white text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-white',
 }
 
 const toastIcons: Record<Toast['type'], typeof Info> = {

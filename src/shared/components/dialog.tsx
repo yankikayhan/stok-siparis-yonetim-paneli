@@ -86,7 +86,8 @@ export function Dialog({ children, className = '', onClose, titleId }: DialogPro
         onClose()
       }}
       className={cn(
-        'm-auto max-h-[90vh] w-full overflow-y-auto bg-white shadow-xl backdrop:bg-slate-950/35',
+        // dark:border: golge koyu zeminde gorunmezlesir, yuzey ayrimi dark'ta kenarlikla kurulur (tasarim D1/§C).
+        'm-auto max-h-[90vh] w-full overflow-y-auto bg-white shadow-xl backdrop:bg-slate-950/35 dark:border dark:border-slate-700 dark:bg-slate-900 dark:backdrop:bg-slate-950/60',
         className,
       )}
     >

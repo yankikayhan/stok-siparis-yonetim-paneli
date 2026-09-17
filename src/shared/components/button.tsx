@@ -10,8 +10,9 @@ type ButtonSize = 'md' | 'sm'
 const baseClass = 'rounded-md text-sm font-medium'
 
 const variantClasses: Record<ButtonVariant, string> = {
+  // primary/danger aynen kalir: koyu zemin ustu renkli zemin + text-white iki temada da calisir.
   primary: 'bg-brand-700 text-white hover:bg-brand-800',
-  secondary: 'border border-slate-300 text-slate-700 hover:bg-slate-50',
+  secondary: 'border border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800',
   danger: 'bg-rose-700 text-white hover:bg-rose-800',
 }
 

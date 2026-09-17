@@ -32,10 +32,10 @@ export function DataTable<T>({
   return (
     <div
       aria-busy={isPlaceholderData}
-      className={`overflow-x-auto border border-slate-200 bg-white ${isPlaceholderData ? 'opacity-60' : ''}`}
+      className={`overflow-x-auto border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900 ${isPlaceholderData ? 'opacity-60' : ''}`}
     >
       <table className={`w-full text-left text-sm ${tableClassName}`}>
-        <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <thead className="border-b border-slate-200 bg-slate-50 text-xs font-semibold uppercase tracking-wide text-slate-500 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
           <tr>
             {columns.map((column, index) => (
               <th key={index} className={`px-5 py-3 ${column.headerClassName ?? ''}`}>
@@ -44,7 +44,7 @@ export function DataTable<T>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-slate-100">
+        <tbody className="divide-y divide-slate-100 dark:divide-slate-700">
           {data.map((row) => (
             <tr key={getRowKey(row)} className={rowClassName}>
               {columns.map((column, index) => (

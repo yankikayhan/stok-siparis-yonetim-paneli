@@ -53,7 +53,9 @@
 }
 
 /* @layer components degil @utility: olculdu (40px -> `form-input h-24` 96px), yani bu sinif
-   utility katmanindadir ve cagri yerindeki bir utility onu ezebilir — istenen davranis budur. */
+   utility katmanindadir ve cagri yerindeki bir utility onu ezebilir — istenen davranis budur.
+   Metin rengi dark'ta ACIKCA yazilmaz: preflight form kontrollerine `color: inherit` uygular
+   (KAYNAK: preflight.css button/input/select/optgroup/textarea blogu), body'nin dark rengi miras alinir. */
 @utility form-input {
-  @apply h-10 w-full border border-slate-300 bg-white px-3 text-sm font-normal outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100;
+  @apply h-10 w-full border border-slate-300 bg-white px-3 text-sm font-normal outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100 dark:border-slate-600 dark:bg-slate-900 dark:focus:ring-brand-900;
 }

@@ -67,12 +67,13 @@ export function CustomersPage() {
 
                 return (
                   <li key={customer.id}>
+                    {/* Durum boyamasi data-* varyantinda (T6): secim kosulu className'den cikti;
+                        seciliyken hover baskisi not-data-selected ile dislanir (davranis ayni). */}
                     <button
                       type="button"
                       onClick={() => setSelectedCustomerId(customer.id)}
-                      className={`w-full px-5 py-4 text-left transition-colors ${
-                        isSelected ? 'bg-brand-50 dark:bg-brand-900' : 'hover:bg-slate-50 dark:hover:bg-slate-800'
-                      }`}
+                      data-selected={isSelected ? '' : undefined}
+                      className="w-full px-5 py-4 text-left transition-colors data-selected:bg-brand-50 not-data-selected:hover:bg-slate-50 dark:data-selected:bg-brand-900 dark:not-data-selected:hover:bg-slate-800"
                     >
                       <p className="text-sm font-semibold text-slate-950 dark:text-slate-50">{customer.name}</p>
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{customer.company}</p>

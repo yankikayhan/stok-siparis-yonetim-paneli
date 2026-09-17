@@ -83,13 +83,12 @@ export function AppShell() {
                 end={to === '/'}
                 onMouseEnter={to === '/urunler' ? prefetchProductsPage : undefined}
                 onFocus={to === '/urunler' ? prefetchProductsPage : undefined}
-                className={({ isActive }) =>
-                  `mb-1 flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors ${
-                    isActive
-                      ? 'bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100'
-                      : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
-                  }`
-                }
+                // Aktif boyama aria-current uzerinden (T6): NavLink aktifken aria-current="page" yazar
+                // (KAYNAK: chunk-KS7C4IRE.mjs:10616); className fonksiyonu boylece sabit string'e iner.
+                // not-aria-[...]:hover dislayiciligi eski ternary'nin davranisini korur; aktifte hover
+                // icin acik aktif-hover zinciri gerekir (denetim v1/I1): hover +1 ozgulluk kazandigi
+                // icin inaktif hover kurallari (media hover:hover) aktif duz kurallari ezerdi.
+                className="mb-1 flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors text-slate-600 hover:bg-slate-100 hover:text-slate-950 aria-[current=page]:bg-brand-50 aria-[current=page]:text-brand-800 aria-[current=page]:hover:bg-brand-50 aria-[current=page]:hover:text-brand-800 not-aria-[current=page]:hover:bg-slate-100 not-aria-[current=page]:hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white dark:aria-[current=page]:bg-brand-900 dark:aria-[current=page]:text-brand-100 dark:aria-[current=page]:hover:bg-brand-900 dark:aria-[current=page]:hover:text-brand-100 dark:not-aria-[current=page]:hover:bg-slate-800 dark:not-aria-[current=page]:hover:text-white"
               >
                 <Icon size={18} aria-hidden="true" />
                 {label}

@@ -181,11 +181,8 @@ function SegmentButton({
       type="button"
       aria-pressed={active}
       onClick={onClick}
-      className={`flex h-10 items-center justify-center border text-sm font-medium ${
-        active
-          ? 'border-brand-700 bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100'
-          : 'border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800'
-      }`}
+      // Durum boyamasi aria-* varyantinda (T6): attribute tek dogruluk kaynagi, ternary yok.
+      className="flex h-10 items-center justify-center border text-sm font-medium border-slate-300 text-slate-700 hover:bg-slate-50 aria-pressed:border-brand-700 aria-pressed:bg-brand-50 aria-pressed:text-brand-800 aria-pressed:hover:bg-brand-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:aria-pressed:border-brand-700 dark:aria-pressed:bg-brand-900 dark:aria-pressed:text-brand-100 dark:aria-pressed:hover:bg-brand-900"
     >
       {label}
     </button>

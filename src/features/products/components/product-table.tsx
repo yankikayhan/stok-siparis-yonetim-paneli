@@ -74,7 +74,11 @@ export function ProductTable({
       header: <span className="sr-only">Islemler</span>,
       cellClassName: 'text-right',
       cell: (product) => (
-        <div className="flex justify-end gap-3">
+        // Gizleme yalniz hover destekleyen ortamda kurulur (B4 onceden karari): `hover` varyanti
+        // kurallari zaten @media (hover: hover) icine sarar (KAYNAK: lib.mjs @192103), bu yuzden
+        // dokunmatikte (hover: none) butonlar hic gizlenmez; klavye icin group-focus-within.
+        // opacity yerine hidden/invisible secilmedi: alan korunur (G2-13), odaklanma bozulmaz (G2-10).
+        <div className="flex justify-end gap-3 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">
           <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900 dark:text-brand-200 dark:hover:text-brand-100">Duzenle</button>
           <button type="button" onClick={() => onDelete(product)} className="text-sm font-medium text-rose-700 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300">Sil</button>
         </div>
@@ -90,7 +94,7 @@ export function ProductTable({
       isPlaceholderData={isPlaceholderData}
       tableClassName="min-w-180"
       bodyCellClassName={tableCellPadding}
-      rowClassName="text-slate-700 dark:text-slate-300"
+      rowClassName="group text-slate-700 dark:text-slate-300"
     />
   )
 }

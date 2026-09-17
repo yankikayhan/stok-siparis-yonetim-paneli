@@ -22,9 +22,14 @@ export function DashboardPage() {
         description="Operasyonun bugunku gorunumu ve dikkat gerektiren stok seviyeleri."
       />
 
-      <Suspense fallback={<DashboardContentSkeleton />}>
-        <DashboardContent currencyFormatter={currencyFormatter} />
-      </Suspense>
+      {/* Container Suspense'i de KAPSAR: React fallback'i <Suspense> cocuklarinin disina
+          render eder, bu yuzden div fallback'in DE atasi olmali (I2; S4'te iceride unutulmustu,
+          KK5 1280px'te skeleton 1 sutun gostererek yakaladi). */}
+      <div className="@container">
+        <Suspense fallback={<DashboardContentSkeleton />}>
+          <DashboardContent currencyFormatter={currencyFormatter} />
+        </Suspense>
+      </div>
     </section>
   )
 }
@@ -45,7 +50,7 @@ function DashboardContent({ currencyFormatter }: { currencyFormatter: Intl.Numbe
 
   return (
     <>
-      <dl className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <dl className="grid gap-4 @sm:grid-cols-2 @4xl:grid-cols-4">
         <MetricCard label="Toplam urun" value={numberFormatter.format(activeProductCount)} icon={PackageCheck} />
         <MetricCard label="Dusuk stok" value={numberFormatter.format(lowStockProducts.length)} icon={AlertTriangle} />
         <MetricCard label="Acik siparis" value={numberFormatter.format(openOrders)} icon={ShoppingBag} />
@@ -102,7 +107,7 @@ function DashboardContentSkeleton() {
   // Baslik yer tutucusu yok: gercek PageHeader Suspense'in disinda, zaten ekranda.
   return (
     <div aria-busy="true" className="space-y-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid gap-4 @sm:grid-cols-2 @4xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
           <div key={index} className="h-32 animate-pulse border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800" />
         ))}

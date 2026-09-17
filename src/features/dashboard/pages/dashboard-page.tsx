@@ -52,21 +52,21 @@ function DashboardContent({ currencyFormatter }: { currencyFormatter: Intl.Numbe
         <MetricCard label="Toplam satis" value={currencyFormatter.format(totalRevenue)} icon={CircleDollarSign} />
       </dl>
 
-      <div className="border border-slate-200 bg-white">
-        <div className="border-b border-slate-200 px-5 py-4">
-          <h2 className="text-sm font-semibold text-slate-950">Dusuk stok uyarilari</h2>
+      <div className="border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900">
+        <div className="border-b border-slate-200 px-5 py-4 dark:border-slate-700">
+          <h2 className="text-sm font-semibold text-slate-950 dark:text-slate-50">Dusuk stok uyarilari</h2>
         </div>
         {lowStockProducts.length === 0 ? (
-          <p className="px-5 py-8 text-sm text-slate-600">Yeniden siparis gerektiren urun bulunmuyor.</p>
+          <p className="px-5 py-8 text-sm text-slate-600 dark:text-slate-300">Yeniden siparis gerektiren urun bulunmuyor.</p>
         ) : (
-          <ul className="divide-y divide-slate-100">
+          <ul className="divide-y divide-slate-100 dark:divide-slate-700">
             {lowStockProducts.map((product) => (
               <li key={product.id} className="flex items-center justify-between gap-4 px-5 py-4">
                 <div>
-                  <p className="text-sm font-medium text-slate-900">{product.name}</p>
-                  <p className="mt-1 text-xs text-slate-500">{product.sku}</p>
+                  <p className="text-sm font-medium text-slate-900 dark:text-white">{product.name}</p>
+                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{product.sku}</p>
                 </div>
-                <p className="text-sm font-semibold text-amber-700">
+                <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">
                   {product.stock} / {product.reorderLevel} adet
                 </p>
               </li>
@@ -88,12 +88,12 @@ function MetricCard({
   value: string
 }) {
   return (
-    <div className="border border-slate-200 bg-white p-5">
+    <div className="border border-slate-200 bg-white p-5 dark:border-slate-700 dark:bg-slate-900">
       <div className="flex items-center justify-between gap-4">
-        <dt className="text-sm font-medium text-slate-600">{label}</dt>
-        <Icon size={18} className="text-brand-700" aria-hidden="true" />
+        <dt className="text-sm font-medium text-slate-600 dark:text-slate-300">{label}</dt>
+        <Icon size={18} className="text-brand-700 dark:text-brand-200" aria-hidden="true" />
       </div>
-      <dd className="mt-4 text-2xl font-semibold text-slate-950">{value}</dd>
+      <dd className="mt-4 text-2xl font-semibold text-slate-950 dark:text-slate-50">{value}</dd>
     </div>
   )
 }
@@ -104,10 +104,10 @@ function DashboardContentSkeleton() {
     <div aria-busy="true" className="space-y-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="h-32 animate-pulse border border-slate-200 bg-white" />
+          <div key={index} className="h-32 animate-pulse border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800" />
         ))}
       </div>
-      <div className="h-64 animate-pulse border border-slate-200 bg-white" />
+      <div className="h-64 animate-pulse border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-800" />
     </div>
   )
 }

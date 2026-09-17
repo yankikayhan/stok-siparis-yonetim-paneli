@@ -24,23 +24,23 @@ export function OrderTable({
   const columns: DataTableColumn<Order>[] = [
     {
       header: 'Siparis',
-      cellClassName: 'font-medium text-slate-950',
+      cellClassName: 'font-medium text-slate-950 dark:text-slate-50',
       cell: (order) => order.id.toUpperCase(),
     },
     {
       header: 'Musteri',
-      cellClassName: 'text-slate-700',
+      cellClassName: 'text-slate-700 dark:text-slate-300',
       cell: (order) => customerNames.get(order.customerId) ?? '-',
     },
     {
       header: 'Tarih',
-      cellClassName: 'text-slate-700',
+      cellClassName: 'text-slate-700 dark:text-slate-300',
       cell: (order) => dateFormatter.format(order.createdAt),
     },
     {
       header: 'Toplam',
       headerClassName: 'text-right',
-      cellClassName: 'text-right font-medium text-slate-950',
+      cellClassName: 'text-right font-medium text-slate-950 dark:text-slate-50',
       cell: (order) => currencyFormatter.format(order.total),
     },
     {
@@ -55,7 +55,7 @@ export function OrderTable({
             value={order.status}
             disabled={isUpdatingStatus}
             onChange={(event) => onStatusChange(order.id, event.target.value as OrderStatus)}
-            className="h-9 border border-slate-300 bg-white px-2 text-sm text-slate-700 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100 disabled:opacity-60"
+            className="h-9 border border-slate-300 bg-white px-2 text-sm text-slate-700 outline-none focus:border-brand-700 focus:ring-2 focus:ring-brand-100 disabled:opacity-60 dark:border-slate-600 dark:bg-slate-900 dark:text-slate-300 dark:focus:ring-brand-900"
           >
             {orderStatuses.map((status) => (
               <option key={status} value={status}>
@@ -63,8 +63,8 @@ export function OrderTable({
               </option>
             ))}
           </select>
-          {order.status === 'shipped' && <p className="mt-1 text-xs text-slate-500">Takip: {order.trackingNumber}</p>}
-          {order.status === 'cancelled' && <p className="mt-1 text-xs text-slate-500">Neden: {order.cancelReason}</p>}
+          {order.status === 'shipped' && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Takip: {order.trackingNumber}</p>}
+          {order.status === 'cancelled' && <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">Neden: {order.cancelReason}</p>}
         </>
       ),
     },

@@ -33,15 +33,15 @@ export function ProductTable({
       header: 'Urun',
       cell: (product) => (
         <>
-          <p className="font-medium text-slate-950">
+          <p className="font-medium text-slate-950 dark:text-slate-50">
             {product.name}
             {!product.active && (
-              <span className="ml-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs font-medium text-slate-600">
+              <span className="ml-2 rounded bg-slate-200 px-1.5 py-0.5 text-xs font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-400">
                 Pasif
               </span>
             )}
           </p>
-          <p className="mt-1 text-xs text-slate-500">{product.sku}</p>
+          <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{product.sku}</p>
         </>
       ),
     },
@@ -63,7 +63,7 @@ export function ProductTable({
         const isLowStock = product.stock <= product.reorderLevel
 
         return (
-          <span className={isLowStock ? 'font-semibold text-amber-700' : 'text-slate-700'}>
+          <span className={isLowStock ? 'font-semibold text-amber-700 dark:text-amber-400' : 'text-slate-700 dark:text-slate-300'}>
             {isLowStock && <TriangleAlert className="mr-1 inline size-4" aria-hidden="true" />}
             {product.stock} adet
           </span>
@@ -75,8 +75,8 @@ export function ProductTable({
       cellClassName: 'text-right',
       cell: (product) => (
         <div className="flex justify-end gap-3">
-          <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900">Duzenle</button>
-          <button type="button" onClick={() => onDelete(product)} className="text-sm font-medium text-rose-700 hover:text-rose-900">Sil</button>
+          <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900 dark:text-brand-200 dark:hover:text-brand-100">Duzenle</button>
+          <button type="button" onClick={() => onDelete(product)} className="text-sm font-medium text-rose-700 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300">Sil</button>
         </div>
       ),
     },
@@ -90,7 +90,7 @@ export function ProductTable({
       isPlaceholderData={isPlaceholderData}
       tableClassName="min-w-180"
       bodyCellClassName={tableCellPadding}
-      rowClassName="text-slate-700"
+      rowClassName="text-slate-700 dark:text-slate-300"
     />
   )
 }

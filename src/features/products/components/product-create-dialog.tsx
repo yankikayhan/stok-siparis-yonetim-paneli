@@ -94,9 +94,9 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
 
   return (
     <Dialog titleId="product-create-title" onClose={requestClose} className="max-w-xl">
-      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-        <h2 id="product-create-title" className="text-base font-semibold text-slate-950">{isEditing ? 'Urunu duzenle' : 'Yeni urun'}</h2>
-        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950" aria-label="Pencereyi kapat">
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-700">
+        <h2 id="product-create-title" className="text-base font-semibold text-slate-950 dark:text-slate-50">{isEditing ? 'Urunu duzenle' : 'Yeni urun'}</h2>
+        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Pencereyi kapat">
           <X size={18} aria-hidden="true" />
         </button>
       </div>
@@ -135,22 +135,22 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
           name="active"
           render={({ field }) => (
             <fieldset>
-              <legend className="text-sm font-medium text-slate-700">Durum</legend>
+              <legend className="text-sm font-medium text-slate-700 dark:text-slate-300">Durum</legend>
               <div className="mt-1 grid grid-cols-2 gap-2">
                 {/* field.ref Aktif butonuna baglanir: semada active icin refine yok, errors.active
                     pratikte hic tetiklenmez — baglanti yalniz yapisal butunluk icindir. */}
                 <SegmentButton ref={field.ref} active={field.value === true} label="Aktif" onClick={() => field.onChange(true)} />
                 <SegmentButton active={field.value === false} label="Pasif" onClick={() => field.onChange(false)} />
               </div>
-              <p className="mt-1 text-xs font-normal text-slate-500">Pasif urunler siparis formunda secilemez.</p>
+              <p className="mt-1 text-xs font-normal text-slate-500 dark:text-slate-400">Pasif urunler siparis formunda secilemez.</p>
               {form.formState.errors.active?.message && (
-                <p className="mt-1 text-xs font-normal text-rose-700">{form.formState.errors.active.message}</p>
+                <p className="mt-1 text-xs font-normal text-rose-700 dark:text-rose-400">{form.formState.errors.active.message}</p>
               )}
             </fieldset>
           )}
         />
-        {createProductMutation.isError && <p className="text-sm text-rose-700">{createProductMutation.error.message}</p>}
-        <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
+        {createProductMutation.isError && <p className="text-sm text-rose-700 dark:text-rose-400">{createProductMutation.error.message}</p>}
+        <div className="flex justify-end gap-3 border-t border-slate-200 pt-4 dark:border-slate-700">
           <Button type="button" variant="secondary" onClick={requestClose}>Vazgec</Button>
           {/* isDirty: degisiklik yokken submit anlamsiz; isSubmitting degil mutation.isPending —
               mutate senkron doner, gercek istek suresini mutation state'i bilir. */}
@@ -182,7 +182,9 @@ function SegmentButton({
       aria-pressed={active}
       onClick={onClick}
       className={`flex h-10 items-center justify-center border text-sm font-medium ${
-        active ? 'border-brand-700 bg-brand-50 text-brand-800' : 'border-slate-300 text-slate-700 hover:bg-slate-50'
+        active
+          ? 'border-brand-700 bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100'
+          : 'border-slate-300 text-slate-700 hover:bg-slate-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800'
       }`}
     >
       {label}
@@ -199,12 +201,12 @@ function FormField({ children, error, label }: { children: React.ReactElement<Fi
   const errorId = `${fieldId}-error`
 
   return (
-    <div className="block text-sm font-medium text-slate-700">
+    <div className="block text-sm font-medium text-slate-700 dark:text-slate-300">
       <label htmlFor={fieldId}>{label}</label>
       <span className="mt-1 block">
         {cloneElement(children, { id: fieldId, 'aria-invalid': error ? true : undefined, 'aria-describedby': error ? errorId : undefined })}
       </span>
-      {error && <span id={errorId} className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}
+      {error && <span id={errorId} className="mt-1 block text-xs font-normal text-rose-700 dark:text-rose-400">{error}</span>}
     </div>
   )
 }

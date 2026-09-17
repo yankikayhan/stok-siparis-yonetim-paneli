@@ -86,7 +86,7 @@ export function AppShell() {
                 className={({ isActive }) =>
                   `mb-1 flex h-10 items-center gap-3 rounded-md px-3 text-sm font-medium transition-colors ${
                     isActive
-                      ? 'bg-brand-50 text-brand-800'
+                      ? 'bg-brand-50 text-brand-800 dark:bg-brand-900 dark:text-brand-100'
                       : 'text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white'
                   }`
                 }
@@ -123,7 +123,7 @@ export function AppShell() {
 // "chunk iniyor" ile "veri geliyor" ekranda ayirt edilebilsin.
 function RouteChunkFallback() {
   return (
-    <p role="status" className="text-sm text-slate-600">
+    <p role="status" className="text-sm text-slate-600 dark:text-slate-300">
       Sayfa yukleniyor...
     </p>
   )

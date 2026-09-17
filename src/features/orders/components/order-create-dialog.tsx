@@ -20,14 +20,14 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
 
   return (
     <Dialog titleId="order-create-title" onClose={requestClose} className="max-w-3xl">
-      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
-        <h2 id="order-create-title" className="text-base font-semibold text-slate-950">Yeni siparis</h2>
-        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950" aria-label="Pencereyi kapat"><X size={18} aria-hidden="true" /></button>
+      <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-700">
+        <h2 id="order-create-title" className="text-base font-semibold text-slate-950 dark:text-slate-50">Yeni siparis</h2>
+        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Pencereyi kapat"><X size={18} aria-hidden="true" /></button>
       </div>
       <FormProvider {...form}>
         <form className="space-y-5 p-5" onSubmit={submit}>
         {hasDraft && (
-          <div className="flex items-center justify-between gap-3 border border-brand-200 bg-brand-50 px-3 py-2 text-sm text-brand-900" role="status">
+          <div className="flex items-center justify-between gap-3 border border-brand-200 bg-brand-50 px-3 py-2 text-sm text-brand-900 dark:border-brand-800 dark:bg-brand-900 dark:text-brand-100" role="status">
             <span>Taslaktan devam ediliyor.</span>
             <button type="button" onClick={discardDraft} className="font-medium underline hover:opacity-70">Taslagi temizle</button>
           </div>
@@ -41,7 +41,7 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
 
         <div>
           <div className="mb-2 flex items-center justify-between gap-4">
-            <h3 className="text-sm font-semibold text-slate-950">Siparis kalemleri</h3>
+            <h3 className="text-sm font-semibold text-slate-950 dark:text-slate-50">Siparis kalemleri</h3>
             {/* shouldFocus: odak yeni satirin ilk kayitli alanina (urun select) gider; index hesabi + zamanlama isteyen elle setFocus'a gerek kalmaz. */}
             <Button type="button" variant="secondary" size="sm" className="inline-flex items-center gap-1" onClick={() => orderItems.append({ productId: '', quantity: 1 }, { shouldFocus: true })}><Plus size={16} aria-hidden="true" /> Kalem ekle</Button>
           </div>
@@ -60,13 +60,13 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
               />
             ))}
           </div>
-          {form.formState.errors.items?.message && <p className="mt-2 text-xs text-rose-700">{form.formState.errors.items.message}</p>}
+          {form.formState.errors.items?.message && <p className="mt-2 text-xs text-rose-700 dark:text-rose-400">{form.formState.errors.items.message}</p>}
         </div>
 
         <OrderTotal control={form.control} products={products} />
 
-        {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700">{form.formState.errors.root.serverError.message}</p>}
-        <div className="flex justify-end gap-3 border-t border-slate-200 pt-4">
+        {form.formState.errors.root?.serverError && <p className="text-sm text-rose-700 dark:text-rose-400">{form.formState.errors.root.serverError.message}</p>}
+        <div className="flex justify-end gap-3 border-t border-slate-200 pt-4 dark:border-slate-700">
           <Button type="button" variant="secondary" onClick={requestClose}>Vazgec</Button>
           {/* Kilit "kaydedilecek is var mi"yi sorar: bu oturumdaki degisiklik (isDirty) ya da onceki oturumdan tasinan taslak (hasDraft) —
               taslaktan dogan form baseline oldugu icin isDirty false baslar. isSubmitting degil mutation.isPending:
@@ -100,7 +100,7 @@ function OrderItemRow({ index, products, isFirst, isLast, isOnly, onMoveUp, onMo
   const selectedProduct = products.find((product) => product.id === items[index]?.productId)
 
   return (
-    <div className="grid gap-3 border border-slate-200 p-3 sm:grid-cols-[minmax(0,1fr)_9rem_auto] sm:items-start">
+    <div className="grid gap-3 border border-slate-200 p-3 sm:grid-cols-[minmax(0,1fr)_9rem_auto] sm:items-start dark:border-slate-700">
       <FormField label={`Urun ${index + 1}`} error={form.formState.errors.items?.[index]?.productId?.message}>
         <select {...form.register(`items.${index}.productId`)} className="form-input">
           <option value="">Urun secin</option>
@@ -128,9 +128,9 @@ function OrderItemRow({ index, products, isFirst, isLast, isOnly, onMoveUp, onMo
       </FormField>
       {/* move, alan degerini hata/touched state'iyle birlikte tasir; key={field.id} DOM eslesmesini korur. */}
       <div className="mt-6 flex gap-1">
-        <button type="button" onClick={onMoveUp} disabled={isFirst} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Kalem ${index + 1} yukari tasi`}><ArrowUp size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={onMoveDown} disabled={isLast} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Kalem ${index + 1} asagi tasi`}><ArrowDown size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={onRemove} disabled={isOnly} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40" aria-label={`Kalem ${index + 1} sil`}><Minus size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={onMoveUp} disabled={isFirst} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800" aria-label={`Kalem ${index + 1} yukari tasi`}><ArrowUp size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={onMoveDown} disabled={isLast} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800" aria-label={`Kalem ${index + 1} asagi tasi`}><ArrowDown size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={onRemove} disabled={isOnly} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800" aria-label={`Kalem ${index + 1} sil`}><Minus size={17} aria-hidden="true" /></button>
       </div>
     </div>
   )
@@ -150,10 +150,10 @@ function OrderTotal({ control, products }: { control: Control<OrderFormInput>; p
   }, 0)
 
   return (
-    <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-sm">
+    <div className="flex items-center justify-between border-t border-slate-200 pt-3 text-sm dark:border-slate-700">
       {/* Sunucu fiyati kayitli urunden alir; toplam bu yuzden 'tahmini'dir. */}
-      <span className="text-slate-600">Tahmini toplam</span>
-      <strong className="text-base text-slate-950">{currencyFormatter.format(total)}</strong>
+      <span className="text-slate-600 dark:text-slate-300">Tahmini toplam</span>
+      <strong className="text-base text-slate-950 dark:text-slate-50">{currencyFormatter.format(total)}</strong>
     </div>
   )
 }
@@ -169,13 +169,13 @@ function FormField({ children, error, hint, label }: { children: React.ReactElem
   const describedBy = [hint ? hintId : undefined, error ? errorId : undefined].filter(Boolean).join(' ') || undefined
 
   return (
-    <div className="block text-sm font-medium text-slate-700">
+    <div className="block text-sm font-medium text-slate-700 dark:text-slate-300">
       <label htmlFor={fieldId}>{label}</label>
       <span className="mt-1 block">
         {cloneElement(children, { id: fieldId, 'aria-invalid': error ? true : undefined, 'aria-describedby': describedBy })}
       </span>
-      {hint && <span id={hintId} className="mt-1 block text-xs font-normal text-slate-500">{hint}</span>}
-      {error && <span id={errorId} className="mt-1 block text-xs font-normal text-rose-700">{error}</span>}
+      {hint && <span id={hintId} className="mt-1 block text-xs font-normal text-slate-500 dark:text-slate-400">{hint}</span>}
+      {error && <span id={errorId} className="mt-1 block text-xs font-normal text-rose-700 dark:text-rose-400">{error}</span>}
     </div>
   )
 }

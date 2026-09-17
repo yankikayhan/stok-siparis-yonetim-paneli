@@ -8,9 +8,9 @@ type OrderStatusFilterBarProps = {
 
 export function OrderStatusFilterBar({ onChange, value }: OrderStatusFilterBarProps) {
   return (
-    <div className="flex items-center gap-3 border border-slate-200 bg-white p-4">
-      <ArrowUpDown size={18} className="text-slate-500" aria-hidden="true" />
-      <label className="flex items-center gap-3 text-sm font-medium text-slate-700">
+    <div className="flex items-center gap-3 border border-slate-200 bg-white p-4 dark:border-slate-700 dark:bg-slate-900">
+      <ArrowUpDown size={18} className="text-slate-500 dark:text-slate-400" aria-hidden="true" />
+      <label className="flex items-center gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
         Durum
         <select
           value={value}

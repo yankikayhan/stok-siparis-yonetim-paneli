@@ -9,6 +9,11 @@ export type Toast = {
 
 const AUTO_DISMISS_MS = 5000
 
+// B15 yigin siniri: ayni anda en fazla 3 toast. Asimda en eski aktif erken kapanir;
+// cikis animasyonu store'da degil Toaster'da yasar (store saf kalir, toast-store.test.ts'in
+// bes senaryosu korunur) — buradan dusen toast oradaki exiting akisina girer.
+const MAX_VISIBLE_TOASTS = 3
+
 type ToastState = {
   toasts: Toast[]
   addToast: (toast: Omit<Toast, 'id'>) => void
@@ -21,7 +26,11 @@ export const useToastStore = create<ToastState>()(
       toasts: [],
       addToast: (toast) => {
         const id = crypto.randomUUID()
-        set((state) => ({ toasts: [...state.toasts, { ...toast, id }] }), false, 'addToast')
+        set(
+          (state) => ({ toasts: [...state.toasts, { ...toast, id }].slice(-MAX_VISIBLE_TOASTS) }),
+          false,
+          'addToast',
+        )
         // Elle kapatilan toast icin gec tetiklenen timer no-op'tur; dismissToast idempotent.
         setTimeout(() => get().dismissToast(id), AUTO_DISMISS_MS)
       },

@@ -74,4 +74,16 @@ describe('useToastStore', () => {
     expect(() => vi.runAllTimers()).not.toThrow()
     expect(useToastStore.getState().toasts).toHaveLength(0)
   })
+
+  it('dorduncu toast eklendiginde en eski toast kuyruktan dusurulur (yigin siniri 3)', () => {
+    useToastStore.getState().addToast({ type: 'info', message: 'Birinci' })
+    useToastStore.getState().addToast({ type: 'info', message: 'Ikinci' })
+    useToastStore.getState().addToast({ type: 'info', message: 'Ucuncu' })
+    useToastStore.getState().addToast({ type: 'info', message: 'Dorduncu' })
+
+    const { toasts } = useToastStore.getState()
+
+    expect(toasts).toHaveLength(3)
+    expect(toasts.map((toast) => toast.message)).toEqual(['Ikinci', 'Ucuncu', 'Dorduncu'])
+  })
 })

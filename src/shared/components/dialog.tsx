@@ -87,7 +87,10 @@ export function Dialog({ children, className = '', onClose, titleId }: DialogPro
       }}
       className={cn(
         // dark:border: golge koyu zeminde gorunmezlesir, yuzey ayrimi dark'ta kenarlikla kurulur (tasarim D1/§C).
+        // Acilis animasyonu yalniz sinif duzeyinde (starting-style): effect'lere dokunulmaz;
+        // boylece B21 odak guard'inin zamanlamasi (K2) korunur. Backdrop ayni surede solar.
         'm-auto max-h-[90vh] w-full overflow-y-auto bg-white shadow-xl backdrop:bg-slate-950/35 dark:border dark:border-slate-700 dark:bg-slate-900 dark:backdrop:bg-slate-950/60',
+        'transition-opacity duration-200 motion-safe:starting:opacity-0 backdrop:transition-opacity backdrop:duration-200 backdrop:motion-safe:starting:opacity-0',
         className,
       )}
     >

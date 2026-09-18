@@ -26,7 +26,7 @@ export function Toaster() {
           <div
             key={toast.id}
             role={toast.type === 'error' ? 'alert' : 'status'}
-            className={`pointer-events-auto flex items-start gap-3 border p-4 text-sm shadow-lg ${toastStyles[toast.type]}`}
+            className={`pointer-events-auto flex items-start gap-3 border p-4 text-sm shadow-lg transition-[opacity,translate] duration-200 motion-safe:starting:opacity-0 motion-safe:starting:translate-y-2 ${toastStyles[toast.type]}`}
           >
             <Icon size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
             <p className="min-w-0 flex-1 leading-5">{toast.message}</p>

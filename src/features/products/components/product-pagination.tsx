@@ -8,8 +8,9 @@ type ProductPaginationProps = {
   onPageChange: (page: number) => void
 }
 
-// Kanonik veride 1000 urun / 10 = 100 sayfa, gezinme ise yalniz +-1 adim; sayfa atlama bir
-// davranis eklemesi oldugu icin bu refactor'un disinda birakildi.
+// B18 kapsaminda genisletildi: +-1 adimlarina iki uca hizli atlama (İlk/Son) eklendi.
+// Asimetri bilinclidir: geriye yon (İlk/Onceki) her zaman guvenli, placeholder'da da serbest;
+// ileriye yon (Son/Sonraki) placeholder'da kilitlidir cunku yeni verinin totalPages'i bilinmez.
 export function ProductPagination({
   isPlaceholderData,
   onPageChange,
@@ -23,6 +24,15 @@ export function ProductPagination({
         Toplam {totalCount} kayit · Sayfa {page} / {totalPages}
       </p>
       <div className="flex gap-2">
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onPageChange(1)}
+          disabled={page === 1}
+        >
+          İlk
+        </Button>
         <Button
           type="button"
           variant="secondary"
@@ -41,6 +51,15 @@ export function ProductPagination({
           disabled={isPlaceholderData || page >= totalPages}
         >
           Sonraki
+        </Button>
+        <Button
+          type="button"
+          variant="secondary"
+          size="sm"
+          onClick={() => onPageChange(totalPages)}
+          disabled={isPlaceholderData || page >= totalPages}
+        >
+          Son
         </Button>
       </div>
     </div>

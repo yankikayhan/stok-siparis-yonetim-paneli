@@ -17,11 +17,26 @@ function toErrorMessage(error: unknown, fallback: string) {
   return isApiError(error) ? error.message : fallback
 }
 
+// IB9 (KACAK): retry her denemede QueryCache.onError calistirir — uc denemeli bir refetch
+// ayni sorgu icin 3 toast basar; rozet (StaleBanner) zaten kalici bilgi verirken bu gurultu
+// g10'un ruhunu zedeler. Ayni queryKey icin kisa pencerede tekillestir: ilk hata toast
+// basar, pencere icindeki tekrarlar susar. Kullanici gezintisi sirasinda FARKLI sorgular
+// (urunler, siparisler...) ayri key tasir — her biri kendi tek toast'ini uretir.
+const REFETCH_TOAST_THROTTLE_MS = 10_000
+const lastRefetchToastAt = new Map<string, number>()
+
 export const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error, query) => {
       // Ilk yukleme hatasini sayfa zaten gosterir; toast yalnizca arka plan refetch hatasi icindir.
       if (query.state.data === undefined) return
+
+      // Ayni sorgunun retry dalgalanmasini tek toast'a indir (rozet kalici kanal olarak var).
+      const key = JSON.stringify(query.queryKey)
+      const now = Date.now()
+      const last = lastRefetchToastAt.get(key)
+      if (last !== undefined && now - last < REFETCH_TOAST_THROTTLE_MS) return
+      lastRefetchToastAt.set(key, now)
 
       useToastStore.getState().addToast({
         type: 'error',

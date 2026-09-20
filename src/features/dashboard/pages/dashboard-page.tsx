@@ -6,6 +6,7 @@ import { activeLowStockProductsOptions, activeProductCountOptions } from '../../
 import { selectOrderStats } from '../api/dashboard-api'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 import { PageHeader } from '../../../shared/components/page-header'
+import { StaleBanner } from '../../../shared/components/stale-banner'
 
 const numberFormatter = new Intl.NumberFormat('tr-TR')
 
@@ -38,18 +39,25 @@ function DashboardContent({ currencyFormatter }: { currencyFormatter: Intl.Numbe
   // Uc sorgu da BIRINCIL: useSuspenseQueries sabit defaultThrowOnError gecer, veri yoksa ucu
   // de kosulsuz boundary'ye firlar (KOSUL 3.2). Dashboard artik 1000 kayitlik listAll'i
   // cekmez: sunucu active=true ile onceden filtrelenmis sayim + dusuk-stok listesi dondurur (P1).
-  const [{ data: activeProductCount }, { data: lowStockProducts }, { data: orderStats }] = useSuspenseQueries({
+  const results = useSuspenseQueries({
     queries: [
       activeProductCountOptions(),
       activeLowStockProductsOptions(),
       { ...ordersOptions(), select: selectOrderStats },
     ],
   })
+  const [{ data: activeProductCount }, { data: lowStockProducts }, { data: orderStats }] = results
+
+  // B5 rozeti: uc BIRINCIL sorgudan HERHANGI biri arka plan refetch hatasindaysa (isError +
+  // veri dolu) sayfa bazli tek rozet yanar. Suspense'te veri yoksa boundary firlar; buraya
+  // ancak refetch hatasi (veri korunur) duser. Kart bazli ayrim B5 kapsami disinda.
+  const isStale = results.some((r) => r.isError && r.data !== undefined)
 
   const { openOrders, totalRevenue } = orderStats
 
   return (
     <>
+      <StaleBanner isError={isStale} hasData className="mb-6" />
       <dl className="grid gap-4 @sm:grid-cols-2 @4xl:grid-cols-4">
         <MetricCard label="Toplam urun" value={numberFormatter.format(activeProductCount)} icon={PackageCheck} />
         <MetricCard label="Dusuk stok" value={numberFormatter.format(lowStockProducts.length)} icon={AlertTriangle} />

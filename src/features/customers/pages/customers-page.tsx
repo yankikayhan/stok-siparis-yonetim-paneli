@@ -12,6 +12,7 @@ import {
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 import { EmptyState } from '../../../shared/components/empty-state'
 import { PageHeader } from '../../../shared/components/page-header'
+import { StaleBanner } from '../../../shared/components/stale-banner'
 
 const dateFormatter = new Intl.DateTimeFormat('tr-TR', { dateStyle: 'medium' })
 
@@ -48,6 +49,11 @@ export function CustomersPage() {
         title="Musteriler"
         description="Musteri kayitlarini ve siparis gecmislerini inceleyin."
       />
+
+      {/* B5 rozeti: YALNIZ birincil liste sorgusundan (customersQuery) turer; ikincil
+          customerOrdersOptions (throwOnError:false) rozete dahil degil — onun kendi inline
+          hata kutusu var (D1: ayni hata uc kanalda uclenmesin). */}
+      <StaleBanner isError={customersQuery.isError && customersQuery.data !== undefined} hasData />
 
       {customersQuery.data.length === 0 ? (
         <EmptyState

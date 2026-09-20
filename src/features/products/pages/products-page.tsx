@@ -1,7 +1,10 @@
+import { useQuery } from '@tanstack/react-query'
 import { Button } from '../../../shared/components/button'
 import { EmptyState } from '../../../shared/components/empty-state'
 import { PageHeader } from '../../../shared/components/page-header'
+import { StaleBanner } from '../../../shared/components/stale-banner'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
+import { productListOptions } from '../api/products-api'
 import { ProductCreateDialog } from '../components/product-create-dialog'
 import { ProductDeleteDialog } from '../components/product-delete-dialog'
 import { ProductFilterBar } from '../components/product-filter-bar'
@@ -17,6 +20,13 @@ export function ProductsPage() {
   const currencyFormatter = useCurrencyFormatter()
   const list = useProductList(filters.listParams)
   const actions = useProductActions(list, filters.page)
+  // B5 rozeti: ProductListState union'i status tasimadigi icin ayni queryKey'e ikinci bir
+  // abone kurulur. Opsiyonlar AYNEN gecilir (ek queryFn/enabled YOK): boylece birinci
+  // aboneye katilir (dedup — ayni key'de ek istek uretmez, cache'i paylasir) ve arka plan
+  // refetch hatasini gorur. Yalniz refetch hatasinda yanar (isError + veri dolu); ilk
+  // yukleme hatasi boundary'ye gider (veri yok), buraya dusmez.
+  const productsStaleQuery = useQuery(productListOptions(filters.listParams))
+  const isStale = productsStaleQuery.isError && productsStaleQuery.data !== undefined
 
   if (list.status === 'loading') {
     return <ProductsLoadingState />
@@ -36,6 +46,8 @@ export function ProductsPage() {
           Urun ekle
         </Button>
       </div>
+
+      <StaleBanner isError={isStale} hasData />
 
       <ProductFilterBar
         search={filters.search}

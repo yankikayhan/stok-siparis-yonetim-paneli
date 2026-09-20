@@ -44,7 +44,15 @@ export function OrderTable({
       cell: (order) => currencyFormatter.format(order.total),
     },
     {
+      // B20: Durum kolonu auto-layout'ta en esnek kolon oldugu icin bosta kalan
+      // genisligi yutuyordu (once olcumu: 371px, ortalamanin 1.53x'i — digerleri
+      // 189-238px). w-40 bir ust sinir degil 'istek'tir: kolonun 'en esnek'
+      // niteligini kaldirip butcesini daraltir. header + cell birlikte: auto-layout
+      // hucre genisliklerini yalniz ilk satirdan degil tum icerikten hesaplar,
+      // yalniz <th> daraltmasi alt satirli hucrelerde etkisiz kalirdi.
       header: 'Durum',
+      headerClassName: 'w-40',
+      cellClassName: 'w-40',
       cell: (order) => (
         <>
           <label className="sr-only" htmlFor={`order-status-${order.id}`}>

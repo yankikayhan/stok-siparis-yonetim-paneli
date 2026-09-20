@@ -24,7 +24,8 @@ export function ProductTable({
   products,
 }: ProductTableProps) {
   const tableDensity = useUiStore((state) => state.tableDensity)
-  const tableCellPadding = tableDensity === 'compact' ? 'py-2.5' : 'py-4'
+  // Uc deger kapsanir: compact py-2.5 · spacious py-5 · comfortable (varsayilan) py-4.
+  const tableCellPadding = tableDensity === 'compact' ? 'py-2.5' : tableDensity === 'spacious' ? 'py-5' : 'py-4'
 
   // DataTable'a verilen sozlesme: ProductTable'in kendi disa donuk props'lari degismedi,
   // yalniz JSX satiri kurma sorumlulugu kolon tanimlamaya donustu.

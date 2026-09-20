@@ -49,9 +49,11 @@ export function SettingsPage() {
             </fieldset>
             <fieldset className="mt-5">
               <legend className="text-sm font-medium text-slate-800 dark:text-slate-200">Tablo yogunlugu</legend>
-              <div className="mt-2 grid grid-cols-2 gap-2">
+              {/* Ucuncu secenek (spacious/'Genis') uc sutuna cikarildi: 3 buton 2 sutunlu grid'de tasardi. */}
+              <div className="mt-2 grid grid-cols-3 gap-2">
                 <PreferenceButton active={tableDensity === 'comfortable'} icon={Rows3} label="Rahat" onClick={() => setTableDensity('comfortable')} />
                 <PreferenceButton active={tableDensity === 'compact'} icon={Rows3} label="Sik" onClick={() => setTableDensity('compact')} />
+                <PreferenceButton active={tableDensity === 'spacious'} icon={Rows3} label="Genis" onClick={() => setTableDensity('spacious')} />
               </div>
             </fieldset>
           </section>

@@ -147,7 +147,7 @@ Siparis olusturma formunda:
 
 Profil formu ad, e-posta, sirket adi ve para birimi alanlarini `PATCH /profile` ile kaydeder. Kaydet dugmesi formda degisiklik yoksa pasiftir.
 
-Tema (`light`/`dark`), yan menu aciklik durumu ve tablo yogunlugu (`comfortable`/`compact`) API'ye gonderilmez. Bunlar Zustand `persist` middleware'i ile tarayicinin `localStorage` alaninda `stok-siparis-yonetim-paneli-preferences` anahtariyla saklanir.
+Tema (`light`/`dark`), yan menu aciklik durumu ve tablo yogunlugu (`compact`/`comfortable`/`spacious`) API'ye gonderilmez. Bunlar Zustand `persist` middleware'i ile tarayicinin `localStorage` alaninda `stok-siparis-yonetim-paneli-preferences` anahtariyla saklanir.
 
 ## Siparis akisi ve stok kurali
 

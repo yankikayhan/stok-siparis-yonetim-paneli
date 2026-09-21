@@ -70,9 +70,9 @@ Mevcut durum: Tek store, `persist` + `partialize`. Belgede planlanan toast kuyru
 - [x] **Store'a component disindan erisim:** `QueryCache.onError` icinden (React disi kod) `useToastStore.getState().addToast(...)` cagir; hook ile `getState` farkini ve nerede hangisinin dogru oldugunu ogren.
 - [x] **Selector disiplini:** `useUiStore((s) => s.theme)` gibi dar selector'larin neden onemli oldugunu olc: tum store'u alan bir bilesenle (`useUiStore()`) karsilastirip gereksiz render'lari React DevTools Profiler'da izle.
 - [x] **`useShallow`:** Birden fazla alani tek selector'la alirken `useShallow` kullan; obje donduren selector'un her render'da yeni referans uretme tuzagini bizzat yasa ve coz.
-- [ ] **Slice pattern:** UI store'u buyudugunde (tema + sidebar + tablo + toast) slice'lara bol: `createThemeSlice`, `createToastSlice`... Tek store icinde birlesecek sekilde tipleriyle kur.
-- [ ] **`subscribeWithSelector`:** Tema degistiginde `document.documentElement`'e `dark` class'ini yazan bir subscription kur (React render dongusu disinda yan etki). Tailwind dark mode ile birlestir.
-- [ ] **Persist derinligi:** `version` + `migrate` ekle: store semasi degistiginde (or. `tableDensity`'ye yeni deger) eski localStorage verisinin nasil goc ettirildigini dene. `onRehydrateStorage` ile hydration anini logla.
+- [x] **Slice pattern:** UI store'u buyudugunde (tema + sidebar + tablo + toast) slice'lara bol: `createThemeSlice`, `createToastSlice`... Tek store icinde birlesecek sekilde tipleriyle kur. *(2026-09-21: uygulandi — toast ayri store'da kaldi (IB8 R2); slice bolumu yalniz ui-store icinde: createThemeSlice/createSidebarSlice/createTableDensitySlice.)*
+- [x] **`subscribeWithSelector`:** Tema degistiginde `document.documentElement`'e `dark` class'ini yazan bir subscription kur (React render dongusu disinda yan etki). Tailwind dark mode ile birlestir.
+- [x] **Persist derinligi:** `version` + `migrate` ekle: store semasi degistiginde (or. `tableDensity`'ye yeni deger) eski localStorage verisinin nasil goc ettirildigini dene. `onRehydrateStorage` ile hydration anini logla.
 - [x] **Siparis taslagi (draft) store'u:** Dialog kapaninca kaybolan siparis formunu opsiyonel olarak taslak store'una yaz ("kaldigin yerden devam et"). Form state ↔ client state sinirini bilerek ihlal edip geri duzelterek sinirin nedenini kavra.
 - [x] **Store testi:** Vitest ile toast store'unun saf logigini test et (`useToastStore.getState()` uzerinden, render gerektirmeden). Store'larin test edilebilirlik avantajini gor.
 - [x] **Devtools middleware:** `devtools` middleware ekleyip Redux DevTools uzantisinda action akisini izle; action'lara isim ver.
@@ -116,16 +116,16 @@ Mevcut durum: Fonksiyonel bilesenler, `useState`, `useDeferredValue`. Sayfalar s
 
 Mevcut durum: Utility'ler dogrudan; class tekrari cok; dark mode store'da var ama hic uygulanmiyor.
 
-- [ ] **Dark mode'u gercekten uygula:** `@custom-variant dark` (v4) ile class tabanli dark mode kur; Zustand `theme` degerini `<html>` class'ina bagla (Zustand `subscribeWithSelector` maddesiyle birlikte). Tum sayfalarin dark varyantlarini ekle.
-- [ ] **`@theme` ile design token:** `index.css`'te `@theme` blogu tanimla: marka rengi (`--color-brand-*`) olarak teal'i tokenlestir; `bg-teal-700` gibi dogrudan renk kullanimlarini `bg-brand-700`'e cevir. Tema degisiminin tek noktadan yonetilmesini sagla.
-- [ ] **Class tekrarini bilesenle coz:** `rounded-md bg-teal-700 px-3 py-2 text-sm...` butonu her yerde kopyalanmis. Once `Button` bileseni yaz (variant: primary/secondary/danger); utility-first dunyada tekrarin CSS ile degil bilesenle cozuldugunu kavra.
-- [ ] **`data-*` variant'lari:** Secili musteri satiri gibi durumlari `data-selected` attribute + `data-selected:bg-teal-50` variant'iyla yaz; template literal ile class birlestirmeye kiyasla okunabilirligi degerlendir.
-- [ ] **`group` ve `peer`:** Tablo satiri hover'inda islem butonlarini gosterme (`group-hover:opacity-100`) gibi bir etkilesim ekle; `peer` ile input durumuna bagli label stili dene.
-- [ ] **Container queries:** Dashboard kartlarini viewport yerine kapsayici genisligine gore diz (`@container` + `@lg:grid-cols-2`); media query ile farkini gor.
-- [ ] **`form-input` ozel class'ini incele:** `index.css`'teki mevcut ozel class'in nasil tanimlandigina bak; v4'te `@layer components` + `@apply` kullanimini, ne zaman tercih edilip ne zaman kacinilmasi gerektigini not et.
-- [ ] **Animasyon ve gecisler:** Toast'lara giris/cikis animasyonu (`transition`, `starting-style` veya keyframe) ekle; dialog acilisina da uygula.
-- [ ] **Responsive denetim:** Tum sayfalari mobil genislikte gozden gecir; tablolarin `overflow-x-auto` disinda mobil kart gorunumune donusmesi gibi bir kirilim dene.
-- [ ] **`clsx`/`tailwind-merge` (opsiyonel):** `Button` bileseninde variant + disaridan gelen `className` birlesimini `tailwind-merge` ile coz; class cakismasi sorununu bizzat gor.
+- [x] **Dark mode'u gercekten uygula:** `@custom-variant dark` (v4) ile class tabanli dark mode kur; Zustand `theme` degerini `<html>` class'ina bagla (Zustand `subscribeWithSelector` maddesiyle birlikte). Tum sayfalarin dark varyantlarini ekle.
+- [x] **`@theme` ile design token:** `index.css`'te `@theme` blogu tanimla: marka rengi (`--color-brand-*`) olarak teal'i tokenlestir; `bg-teal-700` gibi dogrudan renk kullanimlarini `bg-brand-700`'e cevir. Tema degisiminin tek noktadan yonetilmesini sagla.
+- [x] **Class tekrarini bilesenle coz:** `rounded-md bg-teal-700 px-3 py-2 text-sm...` butonu her yerde kopyalanmis. Once `Button` bileseni yaz (variant: primary/secondary/danger); utility-first dunyada tekrarin CSS ile degil bilesenle cozuldugunu kavra.
+- [x] **`data-*` variant'lari:** Secili musteri satiri gibi durumlari `data-selected` attribute + `data-selected:bg-teal-50` variant'iyla yaz; template literal ile class birlestirmeye kiyasla okunabilirligi degerlendir.
+- [x] **`group` ve `peer`:** Tablo satiri hover'inda islem butonlarini gosterme (`group-hover:opacity-100`) gibi bir etkilesim ekle; `peer` ile input durumuna bagli label stili dene.
+- [x] **Container queries:** Dashboard kartlarini viewport yerine kapsayici genisligine gore diz (`@container` + `@lg:grid-cols-2`); media query ile farkini gor.
+- [x] **`form-input` ozel class'ini incele:** `index.css`'teki mevcut ozel class'in nasil tanimlandigina bak; v4'te `@layer components` + `@apply` kullanimini, ne zaman tercih edilip ne zaman kacinilmasi gerektigini not et.
+- [x] **Animasyon ve gecisler:** Toast'lara giris/cikis animasyonu (`transition`, `starting-style` veya keyframe) ekle; dialog acilisina da uygula.
+- [x] **Responsive denetim:** Tum sayfalari mobil genislikte gozden gecir; tablolarin `overflow-x-auto` disinda mobil kart gorunumune donusmesi gibi bir kirilim dene. *(2026-09-17: uygulandi; urunler tablosu min-w-180 tasmasi bilincli kapsam disi — bkz. bekleyenler.)*
+- [x] **`clsx`/`tailwind-merge` (opsiyonel):** `Button` bileseninde variant + disaridan gelen `className` birlesimini `tailwind-merge` ile coz; class cakismasi sorununu bizzat gor.
 
 ---
 

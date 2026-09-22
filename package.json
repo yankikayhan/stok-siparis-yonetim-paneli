@@ -9,6 +9,8 @@
     "api:delay": "node server/server.cjs --delay=700",
     "seed": "node server/seed-cli.js",
     "build": "tsc -b && vite build",
+    "build:profile": "vite build --mode profiling",
+    "preview:profile": "vite preview",
     "lint": "eslint .",
     "test": "vitest run",
     "preview": "vite preview"

@@ -92,7 +92,9 @@ Terminalin gosterdigi Vite adresini tarayicida acin. Varsayilan adres genellikle
 | `npm run api:delay` | API'yi her istekte 700 ms yapay gecikmeyle baslatir; loading durumlarini incelemek icindir. |
 | `npm run seed` | `server/db.json`'i `server/seed-fixture.json`'dan bastan uretir; API kapaliyken calistirilir. |
 | `npm run build` | TypeScript kontrolunu ve production Vite derlemesini calistirir; cikti `dist/` klasorune gider. |
+| `npm run build:profile` | Profiling build uretir (`react-dom/profiling` alias'i ile); **su an CALISMIYOR** — uretilen bundle runtime'da boot-crash veriyor (IB1a, 2026-09-23). Kullanma. |
 | `npm run preview` | Olusturulmus production derlemesini yerelde onizler. Once `npm run build` calistirilmalidir. |
+| `npm run preview:profile` | Profiling build'i onizler; **su an CALISMIYOR** (ust satirla ayni sebep). |
 | `npm run lint` | ESLint kurallarini `src/` (TS/TSX) ve `server/` (JS/CJS) dosyalarinda calistirir. |
 | `npm run test` | Vitest testlerini bir kez calistirir. |
 

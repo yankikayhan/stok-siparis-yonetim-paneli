@@ -43,6 +43,19 @@ export function AppShell() {
     void queryClient.prefetchQuery(categoriesOptions())
   }
 
+  // B4 (Adim 8 / IB2): hover'da chunk prefetch — veri prefetch'inin dogal esi (bekleyenler B4).
+  // import() fire-and-forget: sonuc kullanilmaz, yalnizca tarayicinin chunk'i onceden indirmesi
+  // saglanir. Hata sessizdir (prefetch hatasi kullaniciyi etkilemez; gercek yukleme tiklamada
+  // baslar ve o zaman ErrorBoundary'ye duser). Ust uste hover'da tarayici HTTP cache'i ayni
+  // chunk icin ikinci istek atmaz (KAYNAK: MDN HTTP caching; bu projede OLCULMEDI — S7'de
+  // Network panelinde dogrulanir).
+  const prefetchPageChunk = (to: RoutePath) => {
+    if (to === '/urunler') void import('../../features/products/pages/products-page')
+    if (to === '/musteriler') void import('../../features/customers/pages/customers-page')
+    if (to === '/siparisler') void import('../../features/orders/pages/orders-page')
+    if (to === '/ayarlar') void import('../../features/settings/pages/settings-page')
+  }
+
   // Dialog'un disindan, mutation cache'i uzerinden izleme: dialog kapansa bile gosterge dogru kalir.
   const pendingOrderCreations = useMutationState({
     filters: { mutationKey: orderMutationKeys.create, status: 'pending' },
@@ -81,8 +94,14 @@ export function AppShell() {
                 key={to}
                 to={to}
                 end={to === '/'}
-                onMouseEnter={to === '/urunler' ? prefetchProductsPage : undefined}
-                onFocus={to === '/urunler' ? prefetchProductsPage : undefined}
+                onMouseEnter={() => {
+                  if (to === '/urunler') prefetchProductsPage()
+                  prefetchPageChunk(to)
+                }}
+                onFocus={() => {
+                  if (to === '/urunler') prefetchProductsPage()
+                  prefetchPageChunk(to)
+                }}
                 // Aktif boyama aria-current uzerinden (T6): NavLink aktifken aria-current="page" yazar
                 // (KAYNAK: chunk-KS7C4IRE.mjs:10616); className fonksiyonu boylece sabit string'e iner.
                 // not-aria-[...]:hover dislayiciligi eski ternary'nin davranisini korur; aktifte hover

@@ -1,18 +1,36 @@
 import { useQuery } from '@tanstack/react-query'
+import { lazy, Suspense } from 'react'
 import { Button } from '../../../shared/components/button'
 import { EmptyState } from '../../../shared/components/empty-state'
 import { PageHeader } from '../../../shared/components/page-header'
 import { StaleBanner } from '../../../shared/components/stale-banner'
+import { retryableImport } from '../../../shared/lib/retryable-import'
+import { DialogErrorBoundary } from '../../../shared/components/dialog-error-boundary'
 import { useCurrencyFormatter } from '../../settings/hooks/use-currency-formatter'
 import { productListOptions } from '../api/products-api'
-import { ProductCreateDialog } from '../components/product-create-dialog'
-import { ProductDeleteDialog } from '../components/product-delete-dialog'
 import { ProductFilterBar } from '../components/product-filter-bar'
 import { ProductPagination } from '../components/product-pagination'
 import { ProductTable } from '../components/product-table'
 import { useProductActions } from '../hooks/use-product-actions'
 import { useProductFilters } from '../hooks/use-product-filters'
 import { useProductList } from '../hooks/use-product-list'
+
+// B1 (Adim 8 / IB2): dialog lazy — named export koprusu + retryableImport (B2).
+// Fallback null: kullanici sayfayi goruyor; dialog'un kendi starting-style animasyonu gelir.
+// mapModule: retry yolunda (?retry=1) ham modul named export tasir, React.lazy default ister.
+const ProductCreateDialog = lazy(
+  retryableImport(
+    () => import('../components/product-create-dialog'),
+    (module) => ({ default: module.ProductCreateDialog as typeof import('../components/product-create-dialog').ProductCreateDialog }),
+  ),
+)
+
+const ProductDeleteDialog = lazy(
+  retryableImport(
+    () => import('../components/product-delete-dialog'),
+    (module) => ({ default: module.ProductDeleteDialog as typeof import('../components/product-delete-dialog').ProductDeleteDialog }),
+  ),
+)
 
 export function ProductsPage() {
   const filters = useProductFilters()
@@ -80,14 +98,30 @@ export function ProductsPage() {
           />
         </>
       )}
-      {actions.isCreateOpen && <ProductCreateDialog categories={list.categories} onClose={actions.closeCreate} />}
-      {actions.productToEdit && <ProductCreateDialog categories={list.categories} product={actions.productToEdit} onClose={actions.closeEdit} />}
+      {actions.isCreateOpen && (
+        <DialogErrorBoundary onReset={actions.closeCreate}>
+          <Suspense fallback={null}>
+            <ProductCreateDialog categories={list.categories} onClose={actions.closeCreate} />
+          </Suspense>
+        </DialogErrorBoundary>
+      )}
+      {actions.productToEdit && (
+        <DialogErrorBoundary onReset={actions.closeEdit}>
+          <Suspense fallback={null}>
+            <ProductCreateDialog categories={list.categories} product={actions.productToEdit} onClose={actions.closeEdit} />
+          </Suspense>
+        </DialogErrorBoundary>
+      )}
       {actions.productToDelete && (
-        <ProductDeleteDialog
-          product={actions.productToDelete}
-          onCancel={actions.closeDelete}
-          onConfirm={actions.confirmDelete}
-        />
+        <DialogErrorBoundary onReset={actions.closeDelete}>
+          <Suspense fallback={null}>
+            <ProductDeleteDialog
+              product={actions.productToDelete}
+              onCancel={actions.closeDelete}
+              onConfirm={actions.confirmDelete}
+            />
+          </Suspense>
+        </DialogErrorBoundary>
       )}
     </section>
   )

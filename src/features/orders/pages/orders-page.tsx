@@ -1,8 +1,9 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { ClipboardList } from 'lucide-react'
-import { useState } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { ordersInfiniteOptions, type OrderStatusFilter } from '../api/orders-api'
-import { OrderCreateDialog } from '../components/order-create-dialog'
+import { retryableImport } from '../../../shared/lib/retryable-import'
+import { DialogErrorBoundary } from '../../../shared/components/dialog-error-boundary'
 import { OrderLoadMore } from '../components/order-load-more'
 import { OrderStatusFilterBar } from '../components/order-status-filter'
 import { OrderTable } from '../components/order-table'
@@ -12,6 +13,17 @@ import { Button } from '../../../shared/components/button'
 import { EmptyState } from '../../../shared/components/empty-state'
 import { PageHeader } from '../../../shared/components/page-header'
 import { StaleBanner } from '../../../shared/components/stale-banner'
+
+// B1 (Adim 8 / IB2): dialog lazy — named export koprusu + retryableImport (B2).
+// Fallback null: kullanici sayfayi goruyor; "dialog yukleniyor" metni yerine hicbir sey
+// gostermemek daha az kafa karistiricidir (dialog'un kendi starting-style animasyonu gelir).
+// mapModule: retry yolunda (?retry=1) ham modul named export tasir, React.lazy default ister.
+const OrderCreateDialog = lazy(
+  retryableImport(
+    () => import('../components/order-create-dialog'),
+    (module) => ({ default: module.OrderCreateDialog as typeof import('../components/order-create-dialog').OrderCreateDialog }),
+  ),
+)
 
 export function OrdersPage() {
   const [statusFilter, setStatusFilter] = useState<OrderStatusFilter>('all')
@@ -69,7 +81,13 @@ export function OrdersPage() {
           />
         </>
       )}
-      {isCreateDialogOpen && <OrderCreateDialog customers={list.customers} products={list.products} onClose={() => setIsCreateDialogOpen(false)} />}
+      {isCreateDialogOpen && (
+        <DialogErrorBoundary onReset={() => setIsCreateDialogOpen(false)}>
+          <Suspense fallback={null}>
+            <OrderCreateDialog customers={list.customers} products={list.products} onClose={() => setIsCreateDialogOpen(false)} />
+          </Suspense>
+        </DialogErrorBoundary>
+      )}
     </section>
   )
 }

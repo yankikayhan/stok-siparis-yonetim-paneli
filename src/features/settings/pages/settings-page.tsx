@@ -106,7 +106,7 @@ function ProfileSettingsForm({ profile }: { profile: Profile }) {
 
 function PreferenceButton({ active, icon: Icon, label, onClick }: { active: boolean; icon: typeof Sun; label: string; onClick: () => void }) {
   // aria-pressed eki (B6): attribute hem erisilebilirlik hem de boyama icin tek kaynak (T6).
-  return <button type="button" aria-pressed={active} onClick={onClick} className="flex h-10 items-center justify-center gap-2 border text-sm font-medium border-slate-300 text-slate-700 hover:bg-slate-50 aria-pressed:border-brand-700 aria-pressed:bg-brand-50 aria-pressed:text-brand-800 aria-pressed:hover:bg-brand-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:aria-pressed:border-brand-700 dark:aria-pressed:bg-brand-900 dark:aria-pressed:text-brand-100 dark:aria-pressed:hover:bg-brand-900"><Icon size={16} aria-hidden="true" />{label}</button>
+  return <button type="button" aria-pressed={active} onClick={onClick} className="flex h-10 items-center justify-center gap-2 border text-sm font-medium border-slate-300 text-slate-700 hover:bg-slate-50 aria-pressed:border-brand-700 aria-pressed:bg-brand-50 aria-pressed:text-brand-800 aria-pressed:hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:aria-pressed:border-brand-700 dark:aria-pressed:bg-brand-900 dark:aria-pressed:text-brand-100 dark:aria-pressed:hover:bg-brand-900 dark:focus-visible:outline-brand-200"><Icon size={16} aria-hidden="true" />{label}</button>
 }
 
 type FieldElementProps = { id?: string; 'aria-invalid'?: boolean; 'aria-describedby'?: string }

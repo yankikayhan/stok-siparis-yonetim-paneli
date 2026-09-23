@@ -68,7 +68,7 @@ export function AppShell() {
         <button
           type="button"
           onClick={toggleSidebar}
-          className="grid size-9 place-items-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
+          className="grid size-9 place-items-center rounded-md text-slate-600 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:outline-brand-200"
           aria-label="Gezinme menusunu ac veya kapat"
         >
           <Menu size={20} aria-hidden="true" />

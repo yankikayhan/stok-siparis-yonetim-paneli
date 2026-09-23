@@ -80,8 +80,8 @@ export function ProductTable({
         // dokunmatikte (hover: none) butonlar hic gizlenmez; klavye icin group-focus-within.
         // opacity yerine hidden/invisible secilmedi: alan korunur (G2-13), odaklanma bozulmaz (G2-10).
         <div className="flex justify-end gap-3 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100">
-          <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900 dark:text-brand-200 dark:hover:text-brand-100">Duzenle</button>
-          <button type="button" onClick={() => onDelete(product.id)} className="text-sm font-medium text-rose-700 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300">Sil</button>
+          <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-brand-200 dark:hover:text-brand-100 dark:focus-visible:outline-brand-200">Duzenle</button>
+          <button type="button" onClick={() => onDelete(product.id)} className="text-sm font-medium text-rose-700 hover:text-rose-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-rose-400 dark:hover:text-rose-300 dark:focus-visible:outline-brand-200">Sil</button>
         </div>
       ),
     },
@@ -117,8 +117,8 @@ export function ProductTable({
                 {product.stock} adet
               </p>
               <div className="mt-3 flex justify-end gap-3 border-t border-slate-200 pt-3 dark:border-slate-700">
-                <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900 dark:text-brand-200 dark:hover:text-brand-100">Duzenle</button>
-                <button type="button" onClick={() => onDelete(product.id)} className="text-sm font-medium text-rose-700 hover:text-rose-900 dark:text-rose-400 dark:hover:text-rose-300">Sil</button>
+                <button type="button" onClick={() => onEdit(product.id)} className="text-sm font-medium text-brand-700 hover:text-brand-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-brand-200 dark:hover:text-brand-100 dark:focus-visible:outline-brand-200">Duzenle</button>
+                <button type="button" onClick={() => onDelete(product.id)} className="text-sm font-medium text-rose-700 hover:text-rose-900 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-rose-400 dark:hover:text-rose-300 dark:focus-visible:outline-brand-200">Sil</button>
               </div>
             </div>
           )

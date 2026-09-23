@@ -22,14 +22,14 @@ export function OrderCreateDialog({ customers, products, onClose }: OrderCreateD
     <Dialog titleId="order-create-title" onClose={requestClose} className="max-w-3xl">
       <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-700">
         <h2 id="order-create-title" className="text-base font-semibold text-slate-950 dark:text-slate-50">Yeni siparis</h2>
-        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Pencereyi kapat"><X size={18} aria-hidden="true" /></button>
+        <button type="button" onClick={requestClose} className="grid size-8 place-items-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:outline-brand-200" aria-label="Pencereyi kapat"><X size={18} aria-hidden="true" /></button>
       </div>
       <FormProvider {...form}>
         <form className="space-y-5 p-5" onSubmit={submit}>
         {hasDraft && (
           <div className="flex items-center justify-between gap-3 border border-brand-200 bg-brand-50 px-3 py-2 text-sm text-brand-900 dark:border-brand-800 dark:bg-brand-900 dark:text-brand-100" role="status">
             <span>Taslaktan devam ediliyor.</span>
-            <button type="button" onClick={discardDraft} className="font-medium underline hover:opacity-70">Taslagi temizle</button>
+            <button type="button" onClick={discardDraft} className="font-medium underline hover:opacity-70 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:focus-visible:outline-brand-200">Taslagi temizle</button>
           </div>
         )}
         <FormField label="Musteri" error={form.formState.errors.customerId?.message}>
@@ -128,9 +128,9 @@ function OrderItemRow({ index, products, isFirst, isLast, isOnly, onMoveUp, onMo
       </FormField>
       {/* move, alan degerini hata/touched state'iyle birlikte tasir; key={field.id} DOM eslesmesini korur. */}
       <div className="mt-6 flex gap-1">
-        <button type="button" onClick={onMoveUp} disabled={isFirst} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800" aria-label={`Kalem ${index + 1} yukari tasi`}><ArrowUp size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={onMoveDown} disabled={isLast} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800" aria-label={`Kalem ${index + 1} asagi tasi`}><ArrowDown size={17} aria-hidden="true" /></button>
-        <button type="button" onClick={onRemove} disabled={isOnly} className="grid size-10 place-items-center border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800" aria-label={`Kalem ${index + 1} sil`}><Minus size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={onMoveUp} disabled={isFirst} className="grid size-10 place-items-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus-visible:outline-brand-200" aria-label={`Kalem ${index + 1} yukari tasi`}><ArrowUp size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={onMoveDown} disabled={isLast} className="grid size-10 place-items-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus-visible:outline-brand-200" aria-label={`Kalem ${index + 1} asagi tasi`}><ArrowDown size={17} aria-hidden="true" /></button>
+        <button type="button" onClick={onRemove} disabled={isOnly} className="grid size-10 place-items-center rounded-md border border-slate-300 text-slate-600 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:focus-visible:outline-brand-200" aria-label={`Kalem ${index + 1} sil`}><Minus size={17} aria-hidden="true" /></button>
       </div>
     </div>
   )

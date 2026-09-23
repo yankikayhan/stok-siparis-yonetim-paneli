@@ -88,7 +88,7 @@ export function Toaster() {
               type="button"
               onClick={() => dismissToast(toast.id)}
               disabled={toast.exiting}
-              className="grid size-6 shrink-0 place-items-center hover:opacity-70 disabled:opacity-60"
+              className="grid size-6 shrink-0 place-items-center rounded-md hover:opacity-70 disabled:opacity-60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:focus-visible:outline-brand-200"
               aria-label="Bildirimi kapat"
             >
               <X size={15} aria-hidden="true" />

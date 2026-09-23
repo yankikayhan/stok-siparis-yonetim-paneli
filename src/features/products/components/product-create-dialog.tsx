@@ -96,7 +96,7 @@ export function ProductCreateDialog({ categories, product, onClose }: ProductCre
     <Dialog titleId="product-create-title" onClose={requestClose} className="max-w-xl">
       <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-700">
         <h2 id="product-create-title" className="text-base font-semibold text-slate-950 dark:text-slate-50">{isEditing ? 'Urunu duzenle' : 'Yeni urun'}</h2>
-        <button type="button" onClick={requestClose} className="grid size-8 place-items-center text-slate-500 hover:bg-slate-100 hover:text-slate-950 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white" aria-label="Pencereyi kapat">
+        <button type="button" onClick={requestClose} className="grid size-8 place-items-center rounded-md text-slate-500 hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-slate-400 dark:hover:bg-slate-800 dark:hover:text-white dark:focus-visible:outline-brand-200" aria-label="Pencereyi kapat">
           <X size={18} aria-hidden="true" />
         </button>
       </div>
@@ -182,7 +182,7 @@ function SegmentButton({
       aria-pressed={active}
       onClick={onClick}
       // Durum boyamasi aria-* varyantinda (T6): attribute tek dogruluk kaynagi, ternary yok.
-      className="flex h-10 items-center justify-center border text-sm font-medium border-slate-300 text-slate-700 hover:bg-slate-50 aria-pressed:border-brand-700 aria-pressed:bg-brand-50 aria-pressed:text-brand-800 aria-pressed:hover:bg-brand-50 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:aria-pressed:border-brand-700 dark:aria-pressed:bg-brand-900 dark:aria-pressed:text-brand-100 dark:aria-pressed:hover:bg-brand-900"
+      className="flex h-10 items-center justify-center border text-sm font-medium border-slate-300 text-slate-700 hover:bg-slate-50 aria-pressed:border-brand-700 aria-pressed:bg-brand-50 aria-pressed:text-brand-800 aria-pressed:hover:bg-brand-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-800 dark:aria-pressed:border-brand-700 dark:aria-pressed:bg-brand-900 dark:aria-pressed:text-brand-100 dark:aria-pressed:hover:bg-brand-900 dark:focus-visible:outline-brand-200"
     >
       {label}
     </button>

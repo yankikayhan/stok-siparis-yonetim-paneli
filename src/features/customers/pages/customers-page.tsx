@@ -79,7 +79,7 @@ export function CustomersPage() {
                       type="button"
                       onClick={() => setSelectedCustomerId(customer.id)}
                       data-selected={isSelected ? '' : undefined}
-                      className="w-full px-5 py-4 text-left transition-colors data-selected:bg-brand-50 not-data-selected:hover:bg-slate-50 dark:data-selected:bg-brand-900 dark:not-data-selected:hover:bg-slate-800"
+                      className="w-full px-5 py-4 text-left transition-colors data-selected:bg-brand-50 not-data-selected:hover:bg-slate-50 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-700 dark:data-selected:bg-brand-900 dark:not-data-selected:hover:bg-slate-800 dark:focus-visible:outline-brand-200"
                     >
                       <p className="text-sm font-semibold text-slate-950 dark:text-slate-50">{customer.name}</p>
                       <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">{customer.company}</p>
@@ -136,7 +136,7 @@ function CustomerDetail({
         ) : ordersQuery.isError ? (
           <div className="mt-4 border border-rose-200 bg-rose-50 p-4 dark:border-rose-900 dark:bg-rose-950">
             <p className="text-sm text-rose-800 dark:text-rose-300">{isApiError(ordersQuery.error) ? ordersQuery.error.message : 'Siparisler yuklenemedi.'}</p>
-            <button type="button" onClick={() => void ordersQuery.refetch()} className="mt-3 text-sm font-medium text-rose-800 underline dark:text-rose-300">Tekrar dene</button>
+            <button type="button" onClick={() => void ordersQuery.refetch()} className="mt-3 text-sm font-medium text-rose-800 underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:text-rose-300 dark:focus-visible:outline-brand-200">Tekrar dene</button>
           </div>
         ) : ordersQuery.data?.length === 0 ? (
           <p className="mt-4 text-sm text-slate-600 dark:text-slate-300">Bu musteriye ait siparis bulunmuyor.</p>

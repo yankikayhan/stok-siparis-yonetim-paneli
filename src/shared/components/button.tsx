@@ -7,7 +7,12 @@ type ButtonSize = 'md' | 'sm'
 // Taban + varyant tablolari bilesen icinde kalir: react-refresh kurali, bilesen export eden
 // modulden bilesen-olmayan export'u sinirlar (kalici-bulgular §5); disa acilacak tek sozlesme
 // Button'in kendisidir.
-const baseClass = 'rounded-md text-sm font-medium'
+// IB4 Katman 1 (B25): ortak odak halkasi — focus-visible (klavye odaginda belirir, mouse
+// tiklamasinda cikmaz), outline tabanli (ring degil): elemandan bagimsiz cizilir, boyut/
+// kenarlik duzenini degistirmez (Gecis 3 YOL). Iki tema: acikta brand-700, koyuda brand-200.
+// twMerge cakismasi yok (Gecis 3 OLCULDU): outline siniflari ne birbirini ne tabani ezer.
+const baseClass =
+  'rounded-md text-sm font-medium focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 dark:focus-visible:outline-brand-200'
 
 const variantClasses: Record<ButtonVariant, string> = {
   // primary/danger aynen kalir: koyu zemin ustu renkli zemin + text-white iki temada da calisir.

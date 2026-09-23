@@ -112,11 +112,11 @@ export function ProductsPage() {
           </Suspense>
         </DialogErrorBoundary>
       )}
-      {actions.productToDelete && (
+      {actions.deleteId !== null && (
         <DialogErrorBoundary onReset={actions.closeDelete}>
           <Suspense fallback={null}>
             <ProductDeleteDialog
-              product={actions.productToDelete}
+              productName={actions.productToDeleteName}
               onCancel={actions.closeDelete}
               onConfirm={actions.confirmDelete}
             />

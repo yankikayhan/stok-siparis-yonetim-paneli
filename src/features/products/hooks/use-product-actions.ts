@@ -47,7 +47,9 @@ export function useProductActions(list: ProductListState, page: number) {
   const queryClient = useQueryClient()
   const [isCreateOpen, setIsCreateOpen] = useState(false)
   const [editId, setEditId] = useState<string | null>(null)
-  const [productToDelete, setProductToDelete] = useState<Product | null>(null)
+  // B19 (Adim 8 / IB3): snapshot YERINE id — silme id ile yapilir; gosterim adi taze listeden
+  // turetilir (tek dogruluk kaynagi: duzenleme tarafinin resolveEditTarget deseniyle ayni ilke).
+  const [deleteId, setDeleteId] = useState<string | null>(null)
   const deleteProductMutation = useMutation({
     mutationFn: deleteProduct,
     // Tetikle-ve-devam-et aksiyonu: dialog mutate aninda kapanir, hata toast'la bildirilir.
@@ -61,7 +63,7 @@ export function useProductActions(list: ProductListState, page: number) {
       queryClient.setQueriesData<ProductListCache>({ queryKey: productQueryKeys.lists() }, (data) =>
         data === undefined ? undefined : removeProductFromListCache(data, productId),
       )
-      setProductToDelete(null)
+      setDeleteId(null)
 
       return { snapshot }
     },
@@ -87,6 +89,13 @@ export function useProductActions(list: ProductListState, page: number) {
     setEditId(null)
   }
 
+  // Silme onayinin gosterim adi taze listeden turetilir; urun taze listede yoksa (or. baska
+  // sekmede silinmis) dialog yine acilir ama fallback metinle — silme id iledir, karar etkilenmez.
+  const productToDeleteName =
+    deleteId !== null && list.status === 'ready'
+      ? list.products.find((product) => product.id === deleteId)?.name
+      : undefined
+
   return {
     isCreateOpen,
     openCreate: () => setIsCreateOpen(true),
@@ -94,12 +103,13 @@ export function useProductActions(list: ProductListState, page: number) {
     productToEdit,
     openEdit: (productId: string) => setEditId(productId),
     closeEdit: () => setEditId(null),
-    productToDelete,
-    openDelete: (product: Product) => setProductToDelete(product),
-    closeDelete: () => setProductToDelete(null),
+    deleteId,
+    productToDeleteName,
+    openDelete: (productId: string) => setDeleteId(productId),
+    closeDelete: () => setDeleteId(null),
     confirmDelete: () => {
-      if (productToDelete === null) return
-      deleteProductMutation.mutate(productToDelete.id)
+      if (deleteId === null) return
+      deleteProductMutation.mutate(deleteId)
     },
   }
 }

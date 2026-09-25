@@ -35,42 +35,37 @@ export function Dialog({ children, className = '', onClose, titleId }: DialogPro
     }
   }, [])
 
-  // OLCULDU (Playwright ile izole edilip dogrulandi): bu Chromium kurulumunda native odak-tuzagi
-  // son etkin elemandan sonra DIALOG ELEMENTININ KENDISINE fantom bir durak birakiyor; gercek
-  // pencerede bu durak tarayici arayuzune (adres cubugu vb.) kacisa donusuyordu. Guvenlik agi:
-  // odak dialogun disina (ya da dialogun kendisine) tasarsa, son basilan tusun yonune gore
-  // (Tab -> ilk eleman, Shift+Tab -> son eleman) geri cekilir; iki yon de Playwright'ta ayri
-  // ayri dogrulandi.
+  // B21 (Rapor A, 2026-09-25): reaktif focusout guard'i KALDIRILDI, yerine onleyici
+  // capture-phase keydown konur. OLCULDU (Rapor A: Playwright izole + kullanicinin gercek
+  // tarayicisi): son elemanda (Shift'siz) Tab -> ilk elemana, ilk elemanda Shift+Tab ->
+  // son elemana; odak hic dialog disina cikmaz (preventDefault OS/chrome'a kacis firsati
+  // birakmaz). Fantom durak (dialog elementinin kendisi) da ortadan kalkar. ESC akisi
+  // degismez: native onCancel -> requestClose/onClose.
   useLayoutEffect(() => {
     const dialog = dialogRef.current
     if (!dialog) return
 
-    let lastTabWasShift = false
-
-    // Fonksiyon DEKLARASYONU degil ifadesi (const): hoisting yuzunden TypeScript'in yukaridaki
-    // `if (!dialog) return` daraltmasini kaybetmemesi icin (derleyici bunu build'de yakaladi).
     const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Tab') lastTabWasShift = event.shiftKey
+      if (event.key !== 'Tab') return
+
+      const focusables = dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+
+      // Liste bos degil (her dialog en az bir kapat butonu tasir); yine de no-op guvenli.
+      if (!event.shiftKey && active === last) {
+        event.preventDefault()
+        first?.focus()
+      } else if (event.shiftKey && active === first) {
+        event.preventDefault()
+        last?.focus()
+      }
     }
 
-    const handleFocusOut = () => {
-      requestAnimationFrame(() => {
-        const active = document.activeElement
-        const escaped = active === dialog || !dialog.contains(active)
-        if (!dialog.open || !escaped) return
-
-        const focusables = dialog.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR)
-        const target = lastTabWasShift ? focusables[focusables.length - 1] : focusables[0]
-        target?.focus()
-      })
-    }
-
-    dialog.addEventListener('keydown', handleKeyDown)
-    dialog.addEventListener('focusout', handleFocusOut)
-    return () => {
-      dialog.removeEventListener('keydown', handleKeyDown)
-      dialog.removeEventListener('focusout', handleFocusOut)
-    }
+    // Capture-phase: native dialog'un kendi Tab dispatch'inden ONCE calisir (ZAMAN §2.9).
+    dialog.addEventListener('keydown', handleKeyDown, true)
+    return () => dialog.removeEventListener('keydown', handleKeyDown, true)
   }, [])
 
   return (

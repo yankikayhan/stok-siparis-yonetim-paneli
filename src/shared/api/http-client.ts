@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { environment } from '../../app/config/env'
 import { ApiError } from './api-error'
-import { formatZodError } from './format-zod-error'
+import { formatZodError } from '../lib/format-zod-error'
 
 const errorBodySchema = z.object({ message: z.string() })
 

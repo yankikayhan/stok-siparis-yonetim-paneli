@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { formatZodError } from '../../shared/api/format-zod-error'
+import { formatZodError } from '../../shared/lib/format-zod-error'
 
 const environmentSchema = z.object({
   VITE_API_URL: z.url('Gecerli bir URL olmali (or. http://localhost:3001).').default('http://localhost:3001'),

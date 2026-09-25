@@ -21,4 +21,11 @@ export default defineConfig(({ command, mode }) => ({
       ignored: ['**/server/db.json'],
     },
   },
+  // B13 (Rapor A): Vitest her test worker'inda zod.ts'i yukler — TR locale test
+  // ortaminda da aktif olur. z.config idempotent (KAYNAK: zod locales/tr.js yan
+  // etkisiz config setter; cagri tekrari ayni state'i yazar). Mevcut testler custom
+  // mesaj kullandigi icin etkilenmez (kalici-bulgular §6).
+  test: {
+    setupFiles: ['./src/app/config/zod.ts'],
+  },
 }))
